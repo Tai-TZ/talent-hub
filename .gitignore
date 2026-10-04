@@ -43,3 +43,6 @@ next-env.d.ts
 .ai-log/
 
 *.tsbuildinfo
+
+.claude/memory/
+.claude/settings.local.json

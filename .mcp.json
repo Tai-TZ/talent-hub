@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "memory": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory@2026.8.31"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": ".claude/memory/memory.jsonl"
+      }
+    },
+    "ast-grep": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "uvx",
+        "--python",
+        "3.13",
+        "--from",
+        "git+https://github.com/ast-grep/ast-grep-mcp@149e20d47bb7125fb0c1451feea2f48a98742034",
+        "ast-grep-server"
+      ],
+      "env": {}
+    },
+    "semgrep": {
+      "type": "stdio",
+      "command": "semgrep",
+      "args": [
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}
