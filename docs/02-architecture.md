@@ -58,6 +58,27 @@ flowchart LR
 
 RBAC theo **permission** (vd `application.review`, `decision.approve`), vai trò là tập permission → dễ thêm vai trò mới.
 
+### 2.1 Đăng nhập
+Không có chức năng tự đăng ký. Có 2 cách đăng nhập:
+
+1. **Tài khoản do admin cấp**: admin tạo user (từng người hoặc import CSV) và gán vai trò → hệ thống gửi email mời có link đặt mật khẩu (dùng 1 lần, hết hạn sau 72h) → bắt buộc đổi mật khẩu lần đầu. Admin có thể khoá/mở khoá tài khoản và reset mật khẩu.
+2. **Tài khoản Microsoft** (Microsoft identity platform, OIDC Authorization Code + PKCE, endpoint `common` để nhận cả tài khoản cơ quan/trường học và tài khoản Microsoft cá nhân):
+   - Nếu email Microsoft khớp với user admin đã tạo → liên kết vào `oauth_accounts` và đăng nhập với vai trò đã gán.
+   - Nếu chưa có user → **chỉ** tự tạo user với vai trò `applicant`. Không bao giờ tự cấp vai trò nhân sự qua đăng nhập Microsoft.
+   - Có thể giới hạn danh sách tenant được phép cho nhân sự (cấu hình `MS_STAFF_TENANT_IDS`).
+
+```mermaid
+flowchart TD
+  L[Trang đăng nhập] --> P[Email + mật khẩu do admin cấp]
+  L --> M[Đăng nhập Microsoft]
+  P --> V{Đúng mật khẩu<br/>và tài khoản đang active?}
+  V -->|lần đầu| CP[Bắt buộc đổi mật khẩu] --> OK
+  V -->|có| OK[Cấp session theo vai trò]
+  M --> E{Email đã có user?}
+  E -->|có| LINK[Liên kết tài khoản Microsoft] --> OK
+  E -->|chưa| NEW[Tạo user vai trò applicant] --> OK
+```
+
 ## 3. Luồng xét tuyển (state machine)
 
 ```mermaid
@@ -198,7 +219,7 @@ class LMSConnector(Protocol):
 - Giai đoạn đầu: `MockCRMConnector`, `MockLMSConnector` + script sinh dữ liệu mẫu.
 
 ## 8. Bảo mật và tuân thủ
-- Auth: access token ngắn hạn + refresh token xoay vòng, lưu trong cookie httpOnly/SameSite; mật khẩu Argon2; Google OAuth (OIDC); khoá tài khoản khi đăng nhập sai nhiều lần.
+- Auth: access token ngắn hạn + refresh token xoay vòng, lưu trong cookie httpOnly/SameSite; mật khẩu Argon2; khoá tài khoản khi đăng nhập sai nhiều lần (chi tiết luồng đăng nhập ở mục 2.1).
 - File upload: giới hạn loại/kích thước, quét virus (ClamAV), tải về bằng presigned URL ngắn hạn.
 - PII: mã hoá cột, che bớt trên UI theo quyền, không gửi PII sang LLM khi không cần, consent khi nộp hồ sơ, chức năng xuất/xoá dữ liệu theo yêu cầu (Nghị định 13/2023).
 - Rate limit cho chatbot và auth; CORS chặt; secret qua biến môi trường / secret manager.
@@ -227,7 +248,7 @@ talent-hub/
 │   ├── docker-compose.yml   # chạy local: postgres+pgvector, redis, minio, api, worker, web
 │   └── powerbi/             # SQL views, hướng dẫn kết nối
 ├── docs/
-└── .github/workflows/       # lint, test, build image
+└── .github/workflows/       # lint, test
 ```
 
 **Stack chi tiết:** Python 3.12, FastAPI, SQLAlchemy 2 (async) + Alembic, Pydantic v2, arq, pytest · Next.js 15, TypeScript, TanStack Query, React Hook Form + Zod, Tailwind + shadcn/ui, Recharts · PostgreSQL 16 + pgvector · Redis · MinIO (local) / S3.
