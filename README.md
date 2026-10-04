@@ -7,6 +7,7 @@ Nền tảng hỗ trợ tuyển sinh và quản lý chất lượng đào tạo 
 ## Tài liệu
 - [Yêu cầu đề bài](docs/00-requirements.md)
 - [Quyết định kiến trúc](docs/01-decisions.md)
+- [Kiến trúc & flow](docs/02-architecture.md)
 
 ## Stack dự kiến
 Next.js · FastAPI · PostgreSQL + pgvector · LLM adapter (đa provider) · Power BI · Docker
