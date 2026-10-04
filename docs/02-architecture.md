@@ -62,10 +62,10 @@ RBAC theo **permission** (vd `application.review`, `decision.approve`), vai trò
 Không có chức năng tự đăng ký. Có 2 cách đăng nhập:
 
 1. **Tài khoản do admin cấp**: admin tạo user (từng người hoặc import CSV) và gán vai trò → hệ thống gửi email mời có link đặt mật khẩu (dùng 1 lần, hết hạn sau 72h) → bắt buộc đổi mật khẩu lần đầu. Admin có thể khoá/mở khoá tài khoản và reset mật khẩu.
-2. **Tài khoản Microsoft** (Microsoft identity platform, OIDC Authorization Code + PKCE, endpoint `common` để nhận cả tài khoản cơ quan/trường học và tài khoản Microsoft cá nhân):
-   - Nếu email Microsoft khớp với user admin đã tạo → liên kết vào `oauth_accounts` và đăng nhập với vai trò đã gán.
-   - Nếu chưa có user → **chỉ** tự tạo user với vai trò `applicant`. Không bao giờ tự cấp vai trò nhân sự qua đăng nhập Microsoft.
-   - Có thể giới hạn danh sách tenant được phép cho nhân sự (cấu hình `MS_STAFF_TENANT_IDS`).
+2. **Tài khoản Microsoft** (Microsoft identity platform, OIDC Authorization Code + PKCE, endpoint `common` để nhận cả tài khoản cơ quan/trường học và tài khoản Microsoft cá nhân). Danh tính được xác định bằng **`iss` + `sub`**, tuyệt đối không dùng claim `email` để tìm hoặc gộp tài khoản (xem nOAuth trong [03-research.md](03-research.md)):
+   - **Nhân sự**: admin tạo user → link mời dùng 1 lần → người dùng đăng nhập Microsoft qua link đó để gắn `iss+sub` vào user. Từ đó mới đăng nhập Microsoft được. Không bao giờ tự cấp vai trò nhân sự khi đăng nhập.
+   - **Ứng viên**: đăng nhập Microsoft lần đầu tự tạo user `applicant`, định danh bằng `iss+sub`; email chỉ để liên lạc và phải xác minh riêng qua link gửi về email trước khi nộp hồ sơ.
+   - Giới hạn tenant được phép cho nhân sự bằng cấu hình `MS_STAFF_TENANT_IDS`.
 
 ```mermaid
 flowchart TD
@@ -74,9 +74,10 @@ flowchart TD
   P --> V{Đúng mật khẩu<br/>và tài khoản đang active?}
   V -->|lần đầu| CP[Bắt buộc đổi mật khẩu] --> OK
   V -->|có| OK[Cấp session theo vai trò]
-  M --> E{Email đã có user?}
-  E -->|có| LINK[Liên kết tài khoản Microsoft] --> OK
-  E -->|chưa| NEW[Tạo user vai trò applicant] --> OK
+  M --> E{iss+sub đã gắn với user?}
+  E -->|có| OK
+  E -->|chưa, có link mời| LINK[Gắn iss+sub vào user nhân sự] --> OK
+  E -->|chưa, không có link mời| NEW[Tạo user vai trò applicant] --> OK
 ```
 
 ## 3. Luồng xét tuyển (state machine)

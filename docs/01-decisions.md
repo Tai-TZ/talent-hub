@@ -9,7 +9,7 @@
 | 5 | 2026-10-05 | LLM: **lớp adapter đa provider**, gắn API key sau | Không khoá cứng vào một provider; đổi qua cấu hình |
 | 6 | 2026-10-05 | Dashboard: **built-in (web) + export dataset cho Power BI** | Vận hành hằng ngày trên web; báo cáo quản lý qua Power BI |
 | 7 | 2026-10-05 | CRM/LMS: **lớp adapter chung + connector giả lập (mock)** | Chưa chốt hệ thống cụ thể; sau này chỉ cần viết connector mới |
-| 8 | 2026-10-05 | Đăng nhập: **tài khoản do admin cấp** (không có tự đăng ký) **hoặc tài khoản Microsoft** (Microsoft Entra ID / Microsoft account qua OIDC) | Kiểm soát chặt người truy cập; đồng bộ hệ sinh thái Microsoft (Power BI, Microsoft 365) |
+| 8 | 2026-10-05 | Đăng nhập: **tài khoản do admin cấp** (không có tự đăng ký) **hoặc tài khoản Microsoft** (OIDC; định danh bằng `iss+sub`, không dùng email để gộp tài khoản vì lỗ hổng nOAuth; nhân sự gắn qua link mời, ứng viên tự tạo tài khoản applicant) | Kiểm soát chặt người truy cập; đồng bộ hệ sinh thái Microsoft (Power BI, Microsoft 365) |
 | 9 | 2026-10-05 | Hạ tầng: **chỉ chạy local bằng Docker Compose**, chưa deploy (storage dùng chuẩn S3 qua MinIO) | Chưa cần deploy; giữ chuẩn S3/Postgres/Redis để sau này lên cloud không phải sửa code |
 | 10 | 2026-10-05 | Xét tuyển: **Lọc hồ sơ → Bài test → Phỏng vấn → Phê duyệt 2 cấp** (người thẩm định đề xuất, người phê duyệt quyết định, phải là 2 người khác nhau) | Đáp ứng yêu cầu người phụ trách duyệt quyết định quan trọng |
 | 11 | 2026-10-05 | AI chỉ **gợi ý**, không bao giờ tự đổi trạng thái hồ sơ | Tuân thủ human-in-the-loop, tránh thiên lệch tự động |
