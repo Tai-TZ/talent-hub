@@ -1,5 +1,7 @@
 # Kiến trúc Talent Hub
 
+> Khách hàng đầu tiên là Northwind University (chương trình nhân tài AI thực chiến); nền tảng **đa tổ chức** để các trường khác dùng lại bằng cấu hình. Xem [09-multi-tenancy.md](09-multi-tenancy.md) và [10-sample-tenant.md](10-sample-tenant.md).
+
 ## 1. Tổng quan hệ thống
 
 ```mermaid
@@ -52,11 +54,14 @@ flowchart LR
 |---|---|
 | `applicant` | Tạo/sửa hồ sơ của mình (khi còn DRAFT/NEEDS_INFO), xem timeline, rút hồ sơ, dùng chatbot |
 | `reviewer` | Xem hồ sơ được phân công, chấm rubric, đề xuất quyết định |
+| `cohort_manager` | Quản lý khoá học: xếp lớp/nhánh, mở đóng phase, xét đạt, phụ cấp, đối tác thực chiến |
+| `mentor` | Người hướng dẫn tại doanh nghiệp đối tác: xem học viên được giao, đánh giá năng lực và nhận xét |
 | `approver` | Phê duyệt / trả lại đề xuất (không được duyệt đề xuất của chính mình) |
-| `training_manager` | Quản lý chương trình, chuẩn đầu ra, xem phân tích, xử lý cảnh báo, duyệt báo cáo cải tiến |
-| `admin` | Quản lý user, đợt tuyển, rubric, tích hợp, kho tri thức chatbot |
+| `training_manager` | Quản lý chương trình, khung năng lực/chuẩn đầu ra, xem phân tích, xử lý cảnh báo, duyệt báo cáo cải tiến |
+| `admin` | Quản trị một tổ chức: user, đợt tuyển, rubric, tích hợp, kho tri thức chatbot |
+| `platform_admin` | Vận hành nền tảng: tạo/cấu hình tổ chức, mẫu chương trình; thuộc tổ chức hệ thống, mọi truy cập chéo tổ chức đều được audit |
 
-RBAC theo **permission** (vd `application.review`, `decision.approve`), vai trò là tập permission → dễ thêm vai trò mới.
+Mọi vai trò áp dụng **trong phạm vi một tổ chức** (xem [09-multi-tenancy.md](09-multi-tenancy.md)). RBAC theo **permission** (vd `application.review`, `decision.approve`), vai trò là tập permission → dễ thêm vai trò mới.
 
 ### 2.1 Đăng nhập
 Không có chức năng tự đăng ký. Có 2 cách đăng nhập:
@@ -82,47 +87,51 @@ flowchart TD
 
 ## 3. Luồng xét tuyển (state machine)
 
+Trạng thái hồ sơ là tập cố định; **dãy vòng** (`current_round`) do cấu hình đợt tuyển quyết định (Northwind University: `portfolio` → `aptitude`; trường khác có thể thêm phỏng vấn…).
+
 ```mermaid
 stateDiagram-v2
   [*] --> DRAFT
   DRAFT --> SUBMITTED: ứng viên nộp
-  SUBMITTED --> SCREENING: tự động / phân công reviewer
-  SCREENING --> NEEDS_INFO: thiếu giấy tờ
-  NEEDS_INFO --> SCREENING: ứng viên bổ sung
-  SCREENING --> TESTING: đạt vòng hồ sơ
-  TESTING --> INTERVIEW: đạt bài test
-  SCREENING --> PENDING_APPROVAL: đề xuất loại
-  TESTING --> PENDING_APPROVAL: đề xuất loại
-  INTERVIEW --> PENDING_APPROVAL: đề xuất đỗ / loại / chờ
+  SUBMITTED --> IN_ROUND: sàng lọc điều kiện, vào vòng đầu
+  IN_ROUND --> NEEDS_INFO: thiếu giấy tờ
+  NEEDS_INFO --> IN_ROUND: ứng viên bổ sung
+  IN_ROUND --> IN_ROUND: đạt vòng, sang vòng kế (current_round đổi)
+  IN_ROUND --> PENDING_APPROVAL: đề xuất đỗ / chờ / loại
   PENDING_APPROVAL --> ACCEPTED: approver duyệt
   PENDING_APPROVAL --> REJECTED: approver duyệt
   PENDING_APPROVAL --> WAITLISTED: approver duyệt
-  PENDING_APPROVAL --> INTERVIEW: approver trả lại
+  PENDING_APPROVAL --> IN_ROUND: approver trả lại
   WAITLISTED --> ACCEPTED: còn chỉ tiêu (cần duyệt)
-  ACCEPTED --> ENROLLED: xác nhận nhập học + tạo tài khoản LMS
+  ACCEPTED --> ENROLLED: xếp lớp, xác nhận nhập học, tạo tài khoản LMS
   DRAFT --> WITHDRAWN
   SUBMITTED --> WITHDRAWN
-  SCREENING --> WITHDRAWN
-  TESTING --> WITHDRAWN
-  INTERVIEW --> WITHDRAWN
+  IN_ROUND --> WITHDRAWN
+  NEEDS_INFO --> WITHDRAWN
+  ACCEPTED --> WITHDRAWN
 ```
 
 **Quy tắc:**
-- Bảng chuyển trạng thái hợp lệ định nghĩa trong code (`workflow/transitions.py`) kèm permission yêu cầu cho mỗi bước; API từ chối mọi chuyển không hợp lệ.
-- Mọi quyết định cuối (ACCEPTED/REJECTED/WAITLISTED) **bắt buộc** qua PENDING_APPROVAL, `approved_by ≠ proposed_by`, có lý do.
+- Bảng chuyển hợp lệ định nghĩa trong code (`workflow/transitions.py`) kèm permission yêu cầu cho mỗi bước; API từ chối mọi chuyển không hợp lệ. Dãy vòng và việc có phê duyệt 2 cấp đọc từ cấu hình đợt tuyển.
+- Mọi quyết định cuối (ACCEPTED/REJECTED/WAITLISTED) **bắt buộc** qua PENDING_APPROVAL, `approved_by ≠ proposed_by`, có lý do (nếu đợt cấu hình `approval: none` thì vẫn bắt buộc có người ra quyết định, chỉ bỏ cấp thứ hai).
 - Mỗi lần chuyển ghi 1 dòng `application_events` → chính là timeline hiển thị cho ứng viên (lọc bớt thông tin nội bộ).
 - Thông báo email ở mỗi mốc quan trọng (qua worker).
 - Optimistic locking (`version`) để 2 người không xử lý cùng lúc.
+- Sàng lọc điều kiện tự động chỉ **gợi ý loại** để người xác nhận hàng loạt, không tự loại hồ sơ.
 
 ## 4. Luồng đào tạo và chuẩn đầu ra
 
+Mô hình: **Program → Cohort (khoá) → Phase (giai đoạn) → Track (nhánh)**. Chương trình mẫu của Northwind University là 12 tuần theo 3+3+6 và 3 nhánh; chương trình theo môn/tín chỉ của trường khác dùng cùng mô hình qua mẫu cấu hình. Chi tiết: [10-sample-tenant.md](10-sample-tenant.md).
+
 ```mermaid
 flowchart LR
-  LMS[LMS] -->|sync định kỳ / webhook| RES[assessment_results]
-  ASM[assessments] -->|map + trọng số| LO[learning_outcomes]
+  LMS[LMS / bài test] -->|sync, webhook, CSV| RES[assessment_results]
+  MEN[Mentor / giảng viên] -->|đánh giá theo mức| CA[competency_assessments]
+  ASM[assessments] -->|map + trọng số| LO[competencies]
   RES --> CALC[Job tính attainment]
+  CA --> CALC
   LO --> CALC
-  CALC --> ATT[outcome_attainment]
+  CALC --> ATT[competency_attainment]
   ATT --> DASH[Dashboard + analytics views]
   ATT & RES --> DQ[Job kiểm tra chất lượng dữ liệu]
   DQ --> ALR[data_quality_alerts]
@@ -130,11 +139,11 @@ flowchart LR
   REP -->|training_manager duyệt| PUB[Báo cáo đã duyệt]
 ```
 
-- **Attainment** của 1 học viên với 1 chuẩn đầu ra = trung bình có trọng số điểm (đã chuẩn hoá %) của các bài đánh giá map vào chuẩn đó. Đạt nếu ≥ ngưỡng (mặc định 70%, cấu hình được theo chương trình).
+- **Attainment** của 1 học viên với 1 năng lực/chuẩn đầu ra tuỳ thang của khung: **thang phần trăm** (PLO của chương trình theo môn): trung bình có trọng số điểm đã chuẩn hoá của các bài map vào chuẩn đó, đạt nếu ≥ ngưỡng (mặc định 70%); **thang mức** (SFIA của chương trình mẫu): mức mới nhất do mentor/giảng viên đánh giá, đạt nếu ≥ mức mục tiêu của nhánh.
 - **Cảnh báo** (rule-based trước, ML sau):
   - Thiếu dữ liệu: học viên không có điểm bài bắt buộc quá N ngày, chuẩn đầu ra không có bài nào map tới.
   - Bất thường: điểm ngoài khoảng hợp lệ, phân bố điểm lớp lệch mạnh (z-score), tỉ lệ đạt giảm đột ngột so với khoá trước, đồng bộ LMS thất bại liên tiếp.
-- **Báo cáo cải tiến**: LLM nhận số liệu tổng hợp (không gửi dữ liệu cá nhân), sinh đề xuất có tham chiếu tới chỉ số cụ thể; trạng thái `draft → approved` do training_manager duyệt.
+- **Báo cáo cải tiến**: LLM nhận số liệu tổng hợp (không gửi dữ liệu cá nhân), sinh đề xuất có tham chiếu tới chỉ số cụ thể; trạng thái `draft → approved` do training_manager duyệt; so sánh giữa các khoá.
 
 ## 5. Trợ lý AI (RAG có trích nguồn)
 
@@ -248,6 +257,7 @@ talent-hub/
 ├── infra/
 │   ├── docker-compose.yml   # chạy local: postgres+pgvector, redis, minio, api, worker, web
 │   └── powerbi/             # SQL views, hướng dẫn kết nối
+├── templates/               # mẫu chương trình theo tổ chức (northwind-ai-talent.yaml, demo-semester.yaml)
 ├── docs/
 └── .github/workflows/       # lint, test
 ```

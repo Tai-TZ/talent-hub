@@ -2,6 +2,8 @@
 
 Tiền tố `/api/v1`. JSON, UTF-8, thời gian ISO 8601 UTC. Lỗi theo RFC 9457 (`application/problem+json`) với `type`, `title`, `status`, `detail`, `request_id`. Phân trang bằng `?limit=&cursor=`. Tài liệu OpenAPI sinh tự động tại `/docs`.
 
+**Tổ chức (tenant):** mọi request thuộc về đúng một tổ chức, xác định từ tên miền con (`northwind.<domain>`) hoặc header `X-Organization` ở môi trường local, và phải khớp `org_id` trong token cùng membership còn hiệu lực, nếu không trả `403`. Các endpoint bên dưới luôn chạy trong ngữ cảnh một tổ chức (RLS), trừ nhóm "Nền tảng". Chi tiết: [09-multi-tenancy.md](09-multi-tenancy.md).
+
 Cột **Quyền** là permission cần có (xem bảng permission ở cuối). `own` nghĩa là chỉ trên dữ liệu của chính người gọi.
 
 ## Auth
@@ -59,12 +61,37 @@ Cột **Quyền** là permission cần có (xem bảng permission ở cuối). `
 
 `POST /transitions` trả `409` nếu `version` lỗi thời, `422` nếu chuyển không hợp lệ, `403` nếu thiếu quyền.
 
-## Đào tạo
+## Khoá học (cohort), giai đoạn, nhánh
 | Method | Path | Mô tả | Quyền |
 |---|---|---|---|
-| CRUD | `/programs`, `/programs/{id}/courses`, `/programs/{id}/outcomes` | Quản lý chương trình, môn, chuẩn đầu ra | `training.manage` |
-| CRUD | `/courses/{id}/assessments` | Bài đánh giá | `training.manage` |
-| PUT | `/assessments/{id}/outcomes` | Map bài ↔ chuẩn đầu ra (kèm trọng số) | `training.manage` |
+| CRUD | `/programs`, `/programs/{id}/phases`, `/programs/{id}/tracks` | Chương trình, giai đoạn, nhánh | `training.manage` |
+| CRUD | `/cohorts` | Khoá học | `cohort.manage` |
+| PUT | `/cohorts/{id}/phases/{phaseId}` | Mở/đóng giai đoạn, đặt lịch | `cohort.manage` |
+| CRUD | `/cohorts/{id}/classes` | Lớp theo trình độ | `cohort.manage` |
+| POST | `/cohorts/{id}/class-suggestions` | Gợi ý xếp lớp theo điểm vòng đánh giá và sức chứa | `cohort.manage` |
+| POST | `/cohorts/{id}/class-assignments` | Xác nhận xếp lớp (hàng loạt, chạy nền) | `cohort.manage` |
+| POST | `/enrollments/{id}/track` | Gán nhánh (kiểm tra sức chứa) | `cohort.manage` |
+| GET | `/enrollments` | Danh sách học viên theo khoá/lớp/nhánh/trạng thái | `cohort.read` |
+| POST | `/enrollments/{id}/qualification` | Chốt `qualified`/`not_qualified` kèm lý do (có audit) | `cohort.manage` |
+| GET | `/cohorts/{id}/qualification-suggestions` | Đề xuất xét đạt theo quy tắc của mẫu | `cohort.manage` |
+| CRUD | `/partners`, `/placements` | Đối tác thực chiến và vị trí | `cohort.manage` |
+| GET | `/mentor/learners` | Học viên mentor được giao | `mentor.assess` |
+| PUT | `/enrollments/{id}/competency-assessments` | Mentor/giảng viên đánh giá năng lực theo mức | `mentor.assess` |
+| GET/PUT | `/enrollments/{id}/stipend` | Xem / ghi nhận phụ cấp theo kỳ (không chi trả) | `cohort.manage` |
+| CRUD | `/enrollments/{id}/job-outcomes` | Kết quả việc làm | `cohort.manage` |
+
+## Điểm vòng đánh giá năng lực (nhập từ bên ngoài)
+| Method | Path | Mô tả | Quyền |
+|---|---|---|---|
+| POST | `/intakes/{id}/rounds/{round}/results/import` | Import CSV/JSON điểm; xem trước, báo lỗi theo dòng, rồi xác nhận | `application.assign` |
+| GET | `/intakes/{id}/rounds/{round}/results` | Xem điểm đã nhập | `application.read` |
+
+## Đào tạo (khung năng lực, bài đánh giá)
+| Method | Path | Mô tả | Quyền |
+|---|---|---|---|
+| CRUD | `/frameworks`, `/frameworks/{id}/competencies` | Khung năng lực / chuẩn đầu ra (thang mức hoặc phần trăm) | `training.manage` |
+| CRUD | `/programs/{id}/courses`, `/assessments` | Môn (tuỳ chọn) và bài đánh giá | `training.manage` |
+| PUT | `/assessments/{id}/outcomes` | Map bài ↔ năng lực (kèm trọng số) | `training.manage` |
 | POST | `/enrollments/{id}/results` | Nhập điểm thủ công / import CSV | `training.manage` |
 | POST | `/integrations/lms/sync` | Chạy đồng bộ ngay | `integration.manage` |
 | GET | `/training/attainment` | Attainment tổng hợp, lọc theo chương trình/khoá/chuẩn | `training.read` |
@@ -99,6 +126,16 @@ Cột **Quyền** là permission cần có (xem bảng permission ở cuối). `
 | DELETE | `/kb/documents/{id}` | Gỡ tài liệu | `kb.manage` |
 | POST | `/kb/eval/run` | Chạy bộ câu hỏi kiểm thử, trả báo cáo | `kb.manage` |
 
+## Nền tảng (chỉ `platform_admin`)
+| Method | Path | Mô tả |
+|---|---|---|
+| GET/POST | `/platform/organizations` | Danh sách / tạo tổ chức |
+| PATCH | `/platform/organizations/{id}` | Cấu hình, giới hạn gói, khoá tổ chức |
+| POST | `/platform/organizations/{id}/templates` | Nạp mẫu chương trình (kiểm tra JSON Schema, xem trước thay đổi) |
+| POST | `/platform/organizations/{id}/export` | Xuất toàn bộ dữ liệu (xác nhận hai bước, có audit) |
+
+Mọi truy cập chéo tổ chức qua nhóm này bắt buộc có `reason` và được ghi audit.
+
 ## Hệ thống
 | Method | Path | Mô tả | Quyền |
 |---|---|---|---|
@@ -124,5 +161,16 @@ Cột **Quyền** là permission cần có (xem bảng permission ở cuối). `
 | `training.read` | | | | ✓ | ✓ |
 | `training.manage` | | | | ✓ | |
 | `assistant.use` | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+Permission bổ sung cho vận hành khoá học:
+
+| Permission | cohort_manager | mentor | training_manager | admin | platform_admin |
+|---|:-:|:-:|:-:|:-:|:-:|
+| `cohort.read` | ✓ | | ✓ | ✓ | |
+| `cohort.manage` | ✓ | | | | |
+| `mentor.assess` | | ✓ | ✓ | | |
+| `platform.manage` | | | | | ✓ |
+
+Mentor chỉ thấy học viên được giao trong `placements`; ràng buộc này được kiểm tra ở tầng truy vấn, không chỉ ở giao diện.
 
 Một người có thể giữ nhiều vai trò, nhưng ràng buộc nghiệp vụ vẫn áp dụng: người đề xuất không được duyệt chính đề xuất đó.

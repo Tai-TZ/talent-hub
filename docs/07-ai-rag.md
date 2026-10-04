@@ -5,6 +5,7 @@
 - Mọi câu trả lời của trợ lý phải có trích nguồn hoặc từ chối.
 - Không gửi dữ liệu cá nhân sang LLM trừ khi tác vụ cần (chấm sơ bộ) và đợt tuyển đã bật; khi gửi thì loại trường nhạy cảm.
 - Mọi lần gọi LLM ghi lại provider, model, phiên bản prompt, số token, độ trễ.
+- **Theo tổ chức:** kho tri thức, cấu hình provider/model, quota LLM và log đều thuộc về từng tổ chức (RLS); câu hỏi và tài liệu của trường này không bao giờ lọt vào ngữ cảnh của trường khác.
 
 ## 2. Lớp provider
 
@@ -30,7 +31,7 @@ LLM_REPORT_PROVIDER=...          LLM_REPORT_MODEL=...
 EMBEDDING_PROVIDER=...           EMBEDDING_MODEL=...   EMBEDDING_DIM=...
 ```
 
-Triển khai: `anthropic`, `openai`, `gemini`, `ollama`, và `fake` (trả lời xác định để chạy test và demo không cần API key). API key đọc từ biến môi trường, không lưu DB. Nếu thiếu key thì tính năng AI tắt và UI hiển thị rõ, phần còn lại của hệ thống vẫn chạy.
+Triển khai: `anthropic`, `openai`, `gemini`, `ollama`, và `fake` (trả lời xác định để chạy test và demo không cần API key). API key mặc định đọc từ biến môi trường (khoá của nền tảng, tính vào quota của tổ chức); tổ chức có thể tự cấu hình khoá riêng, lưu **mã hoá** trong `org_llm_settings` bằng khoá chủ lấy từ biến môi trường, không bao giờ trả lại qua API. Nếu thiếu key thì tính năng AI tắt và UI hiển thị rõ, phần còn lại của hệ thống vẫn chạy.
 
 ## 3. Trợ lý hỏi đáp (RAG)
 
@@ -85,5 +86,9 @@ Triển khai: `anthropic`, `openai`, `gemini`, `ollama`, và `fake` (trả lời
 | `attainment_drop` | Tỉ lệ đạt chuẩn đầu ra giảm > 15 điểm % so với khoá trước | high |
 | `lms_sync_failing` | Đồng bộ LMS thất bại ≥ 3 lần liên tiếp | high |
 | `stale_data` | Không có điểm mới từ LMS quá 14 ngày trong học kỳ | low |
+| `placement_without_mentor` | Học viên đang ở giai đoạn thực chiến mà chưa có mentor | high |
+| `assessment_overdue` | Mentor chưa đánh giá năng lực cho học viên sau N ngày kể từ khi đóng giai đoạn | medium |
+| `track_over_capacity` | Số học viên một nhánh vượt sức chứa | medium |
+| `stipend_missing` | Học viên đủ điều kiện nhưng chưa có bản ghi phụ cấp của kỳ | low |
 
 Mỗi alert có `fingerprint` để không tạo trùng khi rule chạy lại; alert tự đóng khi điều kiện hết.

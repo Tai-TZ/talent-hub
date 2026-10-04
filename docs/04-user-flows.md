@@ -19,6 +19,10 @@
 | Cảnh báo dữ liệu | `/training/alerts` | training_manager | Danh sách cảnh báo, nhận xử lý, đóng |
 | Báo cáo cải tiến | `/training/reports` | training_manager | Bản nháp do AI soạn, duyệt, theo dõi hành động |
 | Quản trị | `/admin/*` | admin | Người dùng, đợt tuyển, rubric, kho tri thức, tích hợp, nhật ký audit |
+| Khoá học | `/cohorts`, `/cohorts/[id]` | cohort_manager | Xếp lớp, giai đoạn, nhánh, học viên, xét đạt, phụ cấp |
+| Đối tác thực chiến | `/cohorts/[id]/placements` | cohort_manager | Đối tác, vị trí, mentor |
+| Khu vực mentor | `/mentor` | mentor | Học viên được giao, đánh giá năng lực, nhận xét |
+| Nền tảng | `/platform/*` | platform_admin | Tổ chức, mẫu chương trình, giới hạn gói |
 
 ## 2. Luồng ứng viên
 
@@ -52,6 +56,20 @@
 3. Xem dashboard attainment; bấm vào chuẩn đầu ra để xem môn/bài đóng góp, phân bố điểm, xu hướng theo khoá.
 4. Xử lý cảnh báo: nhận xử lý → ghi chú → đóng (hoặc đánh dấu "không phải vấn đề").
 5. Yêu cầu hệ thống soạn **báo cáo cải tiến** từ số liệu → chỉnh sửa → duyệt → tạo các hành động cải tiến có người phụ trách và hạn; theo dõi kết quả ở kỳ sau.
+
+## 5b. Luồng cohort_manager
+
+1. Sau khi hồ sơ `ACCEPTED`, xem gợi ý **xếp lớp** theo điểm vòng đánh giá và sức chứa → chỉnh tay → xác nhận hàng loạt → hồ sơ thành `ENROLLED`.
+2. Mở/đóng từng giai đoạn của khoá theo lịch; theo dõi tiến độ và điểm danh.
+3. Sau giai đoạn nền tảng: gán nhánh cho học viên, hệ thống chặn khi vượt sức chứa nhánh.
+4. Giai đoạn thực chiến: tạo đối tác và vị trí, ghép học viên với mentor.
+5. Cuối khoá: xem đề xuất xét đạt theo quy tắc, chốt từng học viên (hoặc theo lô) kèm lý do; ghi nhận kỳ phụ cấp; nhập kết quả việc làm.
+
+## 5c. Luồng mentor
+
+1. Vào `/mentor`, chỉ thấy học viên được giao.
+2. Đánh giá từng năng lực của nhánh theo mức (có hướng dẫn mô tả mức), đính kèm bằng chứng và nhận xét; có thể đánh giá nhiều lần, hệ thống giữ lịch sử.
+3. Không thấy hồ sơ tuyển sinh, điểm vòng tuyển hay thông tin cá nhân ngoài những gì cần để hướng dẫn.
 
 ## 6. Luồng admin
 
