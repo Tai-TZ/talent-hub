@@ -1,0 +1,112 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { api } from "@/lib/api";
+import { visibleNav } from "@/lib/nav";
+import { useI18n, useMe } from "../providers";
+import { LanguageSwitch } from "../LanguageSwitch";
+import { BarsIcon, CloseIcon } from "../icons";
+import { Button } from "../ui/Button";
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "")).toUpperCase();
+}
+
+function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useI18n();
+  const me = useMe();
+  const pathname = usePathname();
+  return (
+    <nav aria-label={t.nav.primary}>
+      <ul className="nav-list">
+        {visibleNav(me.permissions).map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          return (
+            <li key={item.href}>
+              <Link href={item.href} className="nav-link" aria-current={active ? "page" : undefined} onClick={onNavigate}>
+                {item.label(t)}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+export function AppShell({ orgName, children }: { orgName: string; children: ReactNode }) {
+  const { t } = useI18n();
+  const me = useMe();
+  const router = useRouter();
+  const pathname = usePathname();
+  const drawer = useRef<HTMLDialogElement>(null);
+  const [signingOut, setSigningOut] = useState(false);
+
+  // Đóng menu di động khi chuyển trang.
+  useEffect(() => {
+    drawer.current?.close();
+  }, [pathname]);
+
+  async function logout() {
+    setSigningOut(true);
+    try {
+      await api("/auth/logout", { method: "POST" });
+    } finally {
+      router.replace("/login");
+      router.refresh();
+    }
+  }
+
+  return (
+    <div className="shell">
+      <a className="skip-link" href="#main">
+        {t.app.skipToContent}
+      </a>
+      <header className="shell__header">
+        <button type="button" className="icon-btn shell__menu-btn" aria-label={t.nav.menu} onClick={() => drawer.current?.showModal()}>
+          <BarsIcon size={20} />
+        </button>
+        <Link href="/dashboard" className="brand">
+          <span className="brand__mark">{orgName}</span>
+          <span className="brand__divider" aria-hidden="true" />
+          <span className="brand__product">{t.app.name}</span>
+        </Link>
+        <div className="shell__actions">
+          <LanguageSwitch />
+          <div className="user-chip" title={me.email}>
+            <span className="th-avatar th-avatar--sm" aria-hidden="true">
+              {initials(me.full_name)}
+            </span>
+            <span className="user-chip__name">{me.full_name}</span>
+          </div>
+          <Button variant="tertiary" size="sm" onClick={logout} loading={signingOut}>
+            {t.nav.logout}
+          </Button>
+        </div>
+      </header>
+
+      <div className="shell__body">
+        <aside className="shell__side">
+          <NavLinks />
+        </aside>
+        <main id="main" className="shell__main" tabIndex={-1}>
+          {children}
+        </main>
+      </div>
+
+      {/* <dialog> modal: trình duyệt lo focus trap, Escape và inert nền. */}
+      <dialog ref={drawer} className="nav-drawer" aria-label={t.nav.primary} onClick={(e) => e.target === drawer.current && drawer.current?.close()}>
+        <div className="nav-drawer__head">
+          <span className="brand__mark">{orgName}</span>
+          <button type="button" className="icon-btn" aria-label={t.common.close} onClick={() => drawer.current?.close()}>
+            <CloseIcon size={22} />
+          </button>
+        </div>
+        <NavLinks onNavigate={() => drawer.current?.close()} />
+      </dialog>
+    </div>
+  );
+}
