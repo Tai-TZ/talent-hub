@@ -1,0 +1,11 @@
+[run]
+source = src
+concurrency = greenlet,thread
+omit = src/cli.py
+
+[report]
+fail_under = 85
+show_missing = True
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

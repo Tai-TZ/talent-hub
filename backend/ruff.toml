@@ -1,0 +1,19 @@
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "S"]
+ignore = ["E501", "S101"]
+
+[lint.per-file-ignores]
+"tests/*" = ["S105", "S106"]
+"src/cli.py" = ["S105", "S106"]
+"migrations/*" = ["N999"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+
+[lint.flake8-bugbear]
+# Depends/Query là cách khai báo phụ thuộc của FastAPI, không phải lỗi B008.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "src.api.deps.require"]
