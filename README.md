@@ -16,6 +16,7 @@ Nền tảng hỗ trợ tuyển sinh và quản lý chất lượng đào tạo 
 - [Lộ trình & nghiệm thu](docs/08-roadmap.md)
 - [Đa tổ chức (multi-tenancy)](docs/09-multi-tenancy.md)
 - [Cấu hình Northwind University](docs/10-sample-tenant.md)
+- [Chiến lược sản phẩm, USP, WOW](docs/11-product-strategy.md)
 
 ## Stack dự kiến
 Next.js · FastAPI · PostgreSQL + pgvector · LLM adapter (đa provider) · Power BI · Docker
