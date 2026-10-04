@@ -28,3 +28,16 @@ Thumbs.db
 # Logs & data
 *.log
 uploads/
+
+# Test / coverage
+.coverage
+htmlcov/
+coverage/
+playwright-report/
+test-results/
+.next/
+next-env.d.ts
+
+# Local tooling state
+.codegraph/
+.ai-log/
