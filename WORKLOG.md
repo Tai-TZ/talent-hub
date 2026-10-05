@@ -14,12 +14,15 @@ Sản phẩm chạy được đầu-cuối trên máy local (Docker chỉ cho Po
 | Sàng lọc AI hàng loạt có bằng chứng kiểm chứng nguyên văn | Xong; đang chạy bằng động cơ luật offline, chưa thử Claude thật |
 | Vận hành khoá: ghi danh, Cohort Composer, mentor đánh giá năng lực, xét đạt, phụ cấp ↔ sổ chi phí | Xong (BE + FE), có test |
 | Phân tích: phễu, giám sát công bằng, Rubric Lab | Xong (BE + FE) |
+| Chất lượng chương trình (`/analytics/quality`): chuẩn đầu ra theo năng lực/nhánh, so khoá trước, cảnh báo dữ liệu thiếu/bất thường, đề xuất cải tiến, báo cáo Markdown | Xong (BE + FE), song ngữ |
+| LLM: Claude hoặc chuẩn OpenAI (OpenRouter mặc định, OpenAI, Gemini) qua `LLM_API_KEY` | Xong, test bằng client giả; **chưa chạy với khoá thật** |
+| Giao diện tiếng Anh | Nền tảng xong (`defineMessages`, `useT`, `useFormat`, `useLabels`); đã dịch thanh đầu trang, menu, Phân tích, Rubric Lab, Chất lượng chương trình. **Còn lại** ~850 dòng ở các khu ứng viên, nhân sự, khoá học, đợt tuyển, quản trị và thông báo lỗi backend |
 | Quản trị IT: tài khoản (mời, nhập hàng loạt, khoá), tài liệu, chi phí, cài đặt, tổng quan | Xong (BE + FE) |
 | Trợ lý hỏi đáp có trích nguồn + bộ đánh giá | Xong; động cơ offline đo được, động cơ LLM chưa đo |
 | Hồ sơ năng lực có chữ ký (Skill Passport) | **Chưa làm** |
 | Trang giới thiệu công khai (`/`) | Chưa làm |
 
-Chất lượng hiện tại: backend 190 test, độ phủ 94%, ruff/mypy sạch; frontend 23 test đơn vị + 58 kịch bản e2e (desktop và mobile, gồm quét trợ năng WCAG A/AA); semgrep, pip-audit, npm audit đều sạch.
+Chất lượng hiện tại: backend 248 test, độ phủ 95%, ruff/mypy sạch; frontend 27 test đơn vị + 58 kịch bản e2e (chạy 72, 14 bỏ qua có chủ đích) (desktop và mobile, gồm quét trợ năng WCAG A/AA); semgrep, pip-audit, npm audit đều sạch.
 
 ## Đã đo (số thật, tái lập được)
 
@@ -42,6 +45,8 @@ Chất lượng hiện tại: backend 190 test, độ phủ 94%, ruff/mypy sạc
 - Thiết kế: seed minh hoạ tạo email trùng khi nạp ở hai tổ chức (nay email theo tổ chức); phạt cụm hai từ trong trợ lý làm trợ lý nhút nhát, đã thử rồi hoàn tác.
 
 ## Việc tiếp theo (theo thứ tự nên làm)
+
+**Đối chiếu đề bài (05/10):** MVP đủ. Nâng cao: trợ lý có trích nguồn ✅, chuẩn đầu ra + cảnh báo dữ liệu + báo cáo cải tiến ✅ (trang Chất lượng chương trình). Còn thiếu theo công nghệ đề bài nêu tên: **Power BI** (schema `analytics` + role chỉ đọc + export CSV), **tích hợp CRM/LMS qua API**, **Docker đủ stack + triển khai cloud**; và sản phẩm nộp bài (JOURNAL, sơ đồ kiến trúc, bài trình bày, tự chấm 10 tiêu chí). Ưu tiên các mục này trước các mục dưới.
 
 1. **Giữ hiệu năng khi sàng lọc lại nhiều lần** (tuỳ chọn, chưa gấp): đánh dấu lượt chấm mới nhất (ví dụ cột `is_latest` có chỉ mục một phần, hoặc xoá/lưu trữ lượt cũ khi chấm lại có `force`) để bảng triage và hàng đợi không chậm dần. Báo cáo xét đạt (p95 ~276 ms) sát ngưỡng 300 ms. Đo bằng `python tools/bench_api.py --org scale` trên DB nhân bản.
 2. **Vòng QA 6 (nghiệp vụ)**: viết kiểm thử bất biến (không vượt chỉ tiêu, bốn mắt, chấm mù, điểm AI chỉ cho người có `triage.read`) chạy với dữ liệu ngẫu nhiên; rà lại trải nghiệm bàn phím cho mọi hộp thoại.
