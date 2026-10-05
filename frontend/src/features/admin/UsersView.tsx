@@ -102,13 +102,21 @@ function InviteForm({ roles, onClose }: { roles: string[]; onClose: () => void }
 
 const IMPORT_HINT = "email,họ tên,vai trò\nan.nguyen@northwind.example.edu,Nguyễn Văn An,reviewer\nbinh.tran@northwind.example.edu,Trần Thị Bình,mentor;reviewer";
 
-function ImportForm({ onClose }: { onClose: () => void }) {
+export function ImportForm({ onClose }: { onClose: () => void }) {
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const parsed = parseAccountsCsv(text);
   const run = useSend<ImportResult, { rows: typeof parsed.rows; dry_run: boolean }>("POST", "/admin/users/import", { invalidate: REFRESH });
   const result = run.data;
   const created = result && !result.dry_run;
+
+  // Kết quả kiểm tra thử chỉ đúng cho đúng nội dung đã kiểm tra: sửa danh sách thì phải kiểm tra lại,
+  // nếu không nút "Tạo" vẫn bật theo kết quả cũ và tạo luôn các dòng chưa ai xem.
+  function editText(value: string) {
+    setText(value);
+    if (run.data || run.error) run.reset();
+    setError(null);
+  }
 
   function submit(dry: boolean) {
     setError(null);
@@ -119,7 +127,7 @@ function ImportForm({ onClose }: { onClose: () => void }) {
     <div className="stack">
       {created ? null : (
         <>
-          <TextArea label="Danh sách tài khoản (dán từ Excel hoặc CSV)" rows={6} value={text} placeholder={IMPORT_HINT} onChange={(e) => setText(e.target.value)} help="Mỗi dòng: email, họ tên, vai trò (nhiều vai trò cách nhau bằng dấu ;). Tối đa 1.000 dòng." />
+          <TextArea label="Danh sách tài khoản (dán từ Excel hoặc CSV)" rows={6} value={text} placeholder={IMPORT_HINT} onChange={(e) => editText(e.target.value)} help="Mỗi dòng: email, họ tên, vai trò (nhiều vai trò cách nhau bằng dấu ;). Tối đa 1.000 dòng." />
           {parsed.problems.length > 0 ? (
             <Alert tone="warning" title="Có dòng không đọc được">
               <ul className="plain-list">
