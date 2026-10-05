@@ -975,3 +975,49 @@
 .row-voided td .muted {
   text-decoration: none;
 }
+
+/* ---------- Việc cần làm, thông báo ---------- */
+.task-card {
+  display: grid;
+  gap: var(--th-space-1);
+  padding: var(--th-space-4);
+  text-decoration: none;
+}
+
+.task-card__value {
+  color: var(--th-brand-800);
+  font: var(--th-font-medium) var(--th-text-3xl) / 1.1 var(--th-font-brand);
+}
+
+.task-card--warn .task-card__value {
+  color: var(--th-amber-700);
+}
+
+.task-card--ok .task-card__value {
+  color: var(--th-green-700);
+}
+
+.notif-list {
+  display: grid;
+  gap: var(--th-space-2);
+}
+
+.notif {
+  background: var(--th-surface-card);
+  border: 1px solid var(--th-border-subtle);
+  border-left: 3px solid transparent;
+  border-radius: var(--th-radius-md);
+  padding: var(--th-space-3) var(--th-space-4);
+}
+
+.notif--unread {
+  border-left-color: var(--th-red-700);
+}
+
+.notif__head {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3);
+  justify-content: space-between;
+}

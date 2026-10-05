@@ -100,7 +100,8 @@
   /* Semantic aliases — use these in product UI. */
   --th-text-primary: var(--th-neutral-800);
   --th-text-secondary: var(--th-neutral-600);
-  --th-text-muted: var(--th-neutral-500);
+  /* Đậm hơn bản gốc (#848484, tương phản 3,6:1) để đạt WCAG AA 4,5:1 cho chữ nhỏ trên nền trắng và nền xám nhạt. */
+  --th-text-muted: #6e6e6e;
   --th-text-inverse: var(--th-neutral-0);
   --th-text-link: var(--th-brand-700);
   --th-text-danger: var(--th-red-700);
