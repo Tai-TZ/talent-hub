@@ -25,6 +25,7 @@ from src.services import org_settings
 from src.services.audit import RequestMeta, write_audit
 from src.services.auth import load_roles
 from src.services.security import hash_token
+from src.services.sqlutil import LIKE_ESCAPE, contains_pattern
 from src.services.tenancy import OrgDb
 
 EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[^@\s]{1,190}\.[^@\s]{2,24}$")
@@ -290,8 +291,8 @@ async def list_accounts(
         )
         conditions.append(has_staff_role if audience == "staff" else ~has_staff_role)
     if q:
-        like = f"%{q.strip()}%"
-        conditions.append(User.email.ilike(like) | User.full_name.ilike(like))
+        like = contains_pattern(q)
+        conditions.append(User.email.ilike(like, escape=LIKE_ESCAPE) | User.full_name.ilike(like, escape=LIKE_ESCAPE))
     if status:
         conditions.append(OrgMembership.status == status)
     if role:

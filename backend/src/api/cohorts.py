@@ -118,6 +118,7 @@ async def enrollments(
     _: Principal = Depends(require("cohort.read")),
     db: OrgDb = Depends(org_db),
 ) -> dict[str, Any]:
+    await ops.get_cohort(db, cohort_id)  # 404 nếu không tồn tại hoặc thuộc tổ chức khác
     items, total = await ops.list_enrollments(
         db, cohort_id, status=status, class_id=class_id, track_id=track_id, q=q, limit=limit, offset=offset
     )
@@ -367,6 +368,7 @@ async def mentor_learners(
 async def qualification(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
+    await ops.get_cohort(db, cohort_id)
     return await ops.qualification_report(db, cohort_id)
 
 
@@ -396,6 +398,7 @@ async def decide(
 async def stipends(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
+    await ops.get_cohort(db, cohort_id)
     return await ops.stipend_summary(db, cohort_id)
 
 
@@ -450,6 +453,7 @@ async def composer_run(
 async def composer_runs(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
+    await ops.get_cohort(db, cohort_id)
     rows = (
         (
             await db.session.execute(

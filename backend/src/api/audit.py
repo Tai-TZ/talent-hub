@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from src.api.deps import Principal, require
+from src.errors import ValidationFailedError
 from src.models import AuditLog
 from src.services.tenancy import OrgDb, org_db
 
@@ -40,7 +41,10 @@ async def list_audit_logs(
     # UUIDv7 sắp xếp theo thời gian nên dùng id làm cursor; RLS giới hạn trong tổ chức hiện tại.
     stmt = select(AuditLog).order_by(AuditLog.id.desc()).limit(limit + 1)
     if cursor:
-        stmt = stmt.where(AuditLog.id < uuid.UUID(cursor))
+        try:
+            stmt = stmt.where(AuditLog.id < uuid.UUID(cursor))
+        except ValueError:
+            raise ValidationFailedError("Con trỏ phân trang không hợp lệ", {"cursor": "Không hợp lệ"}) from None
     if action:
         stmt = stmt.where(AuditLog.action == action)
     rows = (await db.session.execute(stmt)).scalars().all()

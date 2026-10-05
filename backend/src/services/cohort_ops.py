@@ -30,6 +30,7 @@ from src.models import (
 from src.services import org_settings
 from src.services.audit import RequestMeta, write_audit
 from src.services.notifications import notify
+from src.services.sqlutil import LIKE_ESCAPE, contains_pattern
 from src.services.tenancy import OrgDb
 from src.services.workflow import Actor, apply_transition
 
@@ -124,8 +125,12 @@ async def list_enrollments(
     if track_id:
         conditions.append(Enrollment.track_id == track_id)
     if q:
-        like = f"%{q.strip()}%"
-        conditions.append(User.full_name.ilike(like) | User.email.ilike(like) | Application.candidate_code.ilike(like))
+        like = contains_pattern(q)
+        conditions.append(
+            User.full_name.ilike(like, escape=LIKE_ESCAPE)
+            | User.email.ilike(like, escape=LIKE_ESCAPE)
+            | Application.candidate_code.ilike(like, escape=LIKE_ESCAPE)
+        )
     base = (
         select(Enrollment, User, Application)
         .join(OrgMembership, OrgMembership.id == Enrollment.membership_id)
@@ -444,32 +449,49 @@ async def place(
 
 
 # ---------- Năng lực và xét đạt ----------
-async def competency_matrix(db: OrgDb, enrollment: Enrollment) -> list[dict[str, Any]]:
-    """Mức mới nhất của từng năng lực mục tiêu của nhánh học viên so với mức yêu cầu."""
-    if enrollment.track_id is None:
-        return []
-    targets = (
+async def _targets_by_track(db: OrgDb, track_ids: set[uuid.UUID]) -> dict[uuid.UUID, list[tuple[Competency, int]]]:
+    """Năng lực mục tiêu của các nhánh bằng MỘT truy vấn."""
+    if not track_ids:
+        return {}
+    rows = (
         await db.session.execute(
-            select(Competency, TrackTarget.target_level)
-            .join(TrackTarget, TrackTarget.competency_id == Competency.id)
-            .where(TrackTarget.track_id == enrollment.track_id)
+            select(TrackTarget.track_id, Competency, TrackTarget.target_level)
+            .join(Competency, Competency.id == TrackTarget.competency_id)
+            .where(TrackTarget.track_id.in_(track_ids))
             .order_by(Competency.code)
         )
     ).all()
-    latest: dict[uuid.UUID, tuple[int, str]] = {}
+    out: dict[uuid.UUID, list[tuple[Competency, int]]] = {}
+    for track_id, competency, target in rows:
+        out.setdefault(track_id, []).append((competency, target))
+    return out
+
+
+async def _latest_assessments(
+    db: OrgDb, enrollment_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, dict[uuid.UUID, tuple[int, str]]]:
+    """Mức đánh giá mới nhất của từng (học viên, năng lực) bằng MỘT truy vấn (lịch sử chỉ thêm nên lấy bản ghi cuối)."""
+    if not enrollment_ids:
+        return {}
     rows = (
-        (
-            await db.session.execute(
-                select(CompetencyAssessment)
-                .where(CompetencyAssessment.enrollment_id == enrollment.id)
-                .order_by(CompetencyAssessment.assessed_at, CompetencyAssessment.id)
+        await db.session.execute(
+            select(
+                CompetencyAssessment.enrollment_id,
+                CompetencyAssessment.competency_id,
+                CompetencyAssessment.level,
+                CompetencyAssessment.evidence,
             )
+            .where(CompetencyAssessment.enrollment_id.in_(enrollment_ids))
+            .order_by(CompetencyAssessment.assessed_at, CompetencyAssessment.id)
         )
-        .scalars()
-        .all()
-    )
-    for row in rows:
-        latest[row.competency_id] = (row.level, row.evidence)
+    ).all()
+    out: dict[uuid.UUID, dict[uuid.UUID, tuple[int, str]]] = {}
+    for enrollment_id, competency_id, level, evidence in rows:
+        out.setdefault(enrollment_id, {})[competency_id] = (level, evidence)
+    return out
+
+
+def _matrix(targets: list[tuple[Competency, int]], latest: dict[uuid.UUID, tuple[int, str]]) -> list[dict[str, Any]]:
     return [
         {
             "competency_id": c.id,
@@ -483,6 +505,15 @@ async def competency_matrix(db: OrgDb, enrollment: Enrollment) -> list[dict[str,
         }
         for c, target in targets
     ]
+
+
+async def competency_matrix(db: OrgDb, enrollment: Enrollment) -> list[dict[str, Any]]:
+    """Mức mới nhất của từng năng lực mục tiêu của nhánh học viên so với mức yêu cầu."""
+    if enrollment.track_id is None:
+        return []
+    targets = await _targets_by_track(db, {enrollment.track_id})
+    latest = await _latest_assessments(db, [enrollment.id])
+    return _matrix(targets.get(enrollment.track_id, []), latest.get(enrollment.id, {}))
 
 
 def suggestion_from(matrix: list[dict[str, Any]]) -> str:
@@ -559,9 +590,11 @@ async def qualification_report(db: OrgDb, cohort_id: uuid.UUID) -> list[dict[str
             .order_by(User.full_name, Enrollment.id)
         )
     ).all()
+    targets = await _targets_by_track(db, {e.track_id for e, *_ in rows if e.track_id is not None})
+    latest = await _latest_assessments(db, [e.id for e, *_ in rows])
     out = []
     for e, name, code, track_name in rows:
-        matrix = await competency_matrix(db, e)
+        matrix = _matrix(targets.get(e.track_id, []) if e.track_id else [], latest.get(e.id, {}))
         out.append(
             {
                 "enrollment_id": e.id,

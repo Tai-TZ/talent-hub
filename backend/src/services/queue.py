@@ -1,6 +1,7 @@
 """Hàng đợi hồ sơ cho nhân sự: lọc, tìm kiếm, phân trang keyset, chịu được hàng nghìn hồ sơ mỗi đợt."""
 
 import base64
+import binascii
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -9,7 +10,9 @@ from typing import Any
 from sqlalchemy import and_, case, exists, func, or_, select, tuple_
 from sqlalchemy.sql.elements import ColumnElement
 
+from src.errors import ValidationFailedError
 from src.models import AiAssessment, Application, Intake, Review
+from src.services.sqlutil import LIKE_ESCAPE, contains_pattern
 from src.services.tenancy import OrgDb
 
 
@@ -30,8 +33,11 @@ def encode_cursor(submitted_at: datetime, app_id: uuid.UUID) -> str:
 
 
 def decode_cursor(cursor: str) -> tuple[datetime, uuid.UUID]:
-    stamp, _, raw_id = base64.urlsafe_b64decode(cursor.encode()).decode().partition("|")
-    return datetime.fromisoformat(stamp), uuid.UUID(raw_id)
+    try:
+        stamp, _, raw_id = base64.urlsafe_b64decode(cursor.encode()).decode().partition("|")
+        return datetime.fromisoformat(stamp), uuid.UUID(raw_id)
+    except (ValueError, UnicodeDecodeError, binascii.Error):
+        raise ValidationFailedError("Con trỏ phân trang không hợp lệ", {"cursor": "Không hợp lệ"}) from None
 
 
 def _latest_ai(column: Any) -> Any:
@@ -51,10 +57,10 @@ def build_filters(query: QueueQuery, membership_id: uuid.UUID, *, can_see_pii: b
     if query.round_key:
         conditions.append(Application.current_round == query.round_key)
     if query.q:
-        like = f"%{query.q.strip()}%"
-        match = [Application.candidate_code.ilike(like)]
+        like = contains_pattern(query.q)
+        match = [Application.candidate_code.ilike(like, escape=LIKE_ESCAPE)]
         if can_see_pii:  # chỉ tìm theo tên khi được phép thấy danh tính
-            match.append(Application.profile["full_name"].astext.ilike(like))
+            match.append(Application.profile["full_name"].astext.ilike(like, escape=LIKE_ESCAPE))
         conditions.append(or_(*match))
     if query.needs_attention is not None:
         conditions.append(_latest_ai(AiAssessment.needs_attention).is_(query.needs_attention))
