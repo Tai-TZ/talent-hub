@@ -1178,6 +1178,112 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/integrations/crm/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Crm Applications */
+        get: operations["crm_applications_api_v1_integrations_crm_applications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/exports/{dataset}.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Csv
+         * @description CSV đã khử định danh. Xác thực bằng khoá có `export.read` (Power BI) hoặc phiên đăng nhập có quyền export.read.
+         */
+        get: operations["export_csv_api_v1_integrations_exports__dataset__csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Keys */
+        get: operations["list_keys_api_v1_integrations_keys_get"];
+        put?: never;
+        /** Create Key */
+        post: operations["create_key_api_v1_integrations_keys_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/keys/{key_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke Key */
+        post: operations["revoke_key_api_v1_integrations_keys__key_id__revoke_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/lms/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lms Push */
+        post: operations["lms_push_api_v1_integrations_lms_assessments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/lms/roster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lms Roster */
+        get: operations["lms_roster_api_v1_integrations_lms_roster_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/jobs/{job_id}": {
         parameters: {
             query?: never;
@@ -2446,6 +2552,42 @@ export interface components {
             /** Weight */
             weight: number;
         };
+        /** CrmApplicationOut */
+        CrmApplicationOut: {
+            /**
+             * Application Id
+             * Format: uuid
+             */
+            application_id: string;
+            /** Candidate Code */
+            candidate_code: string;
+            /** Current Round */
+            current_round: string | null;
+            /** Email */
+            email: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Intake */
+            intake: string;
+            /** Phone */
+            phone: string | null;
+            /** Status */
+            status: string;
+            /** Submitted At */
+            submitted_at: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CrmChangesOut */
+        CrmChangesOut: {
+            /** Items */
+            items: components["schemas"]["CrmApplicationOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
         /** DemandIn */
         DemandIn: {
             /**
@@ -3018,6 +3160,35 @@ export interface components {
             /** Rounds */
             rounds: components["schemas"]["RoundOut"][];
         };
+        /** IntegrationKeyCreatedOut */
+        IntegrationKeyCreatedOut: {
+            key: components["schemas"]["IntegrationKeyOut"];
+            /** Token */
+            token: string;
+        };
+        /** IntegrationKeyOut */
+        IntegrationKeyOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Name */
+            name: string;
+            /** Prefix */
+            prefix: string;
+            /** Revoked At */
+            revoked_at: string | null;
+            /** Scopes */
+            scopes: string[];
+        };
         /** InvitationPreviewOut */
         InvitationPreviewOut: {
             /** Email */
@@ -3059,6 +3230,13 @@ export interface components {
             status: string;
             /** Total */
             total: number;
+        };
+        /** KeyIn */
+        KeyIn: {
+            /** Name */
+            name: string;
+            /** Scopes */
+            scopes: ("export.read" | "lms.read" | "lms.write" | "crm.read")[];
         };
         /** LabAnalysis */
         LabAnalysis: {
@@ -3197,6 +3375,67 @@ export interface components {
             linkedin?: string | null;
             /** Portfolio */
             portfolio?: string | null;
+        };
+        /** LmsAssessmentIn */
+        LmsAssessmentIn: {
+            /** Assessed At */
+            assessed_at?: string | null;
+            /** Candidate Code */
+            candidate_code: string;
+            /** Competency Code */
+            competency_code: string;
+            /**
+             * Evidence
+             * @default
+             */
+            evidence: string;
+            /** External Ref */
+            external_ref: string;
+            /** Level */
+            level: number;
+        };
+        /** LmsLearnerOut */
+        LmsLearnerOut: {
+            /** Candidate Code */
+            candidate_code: string;
+            /** Class Name */
+            class_name: string | null;
+            /** Email */
+            email: string;
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Full Name */
+            full_name: string;
+            /** Status */
+            status: string;
+            /** Track */
+            track: string | null;
+        };
+        /** LmsPushError */
+        LmsPushError: {
+            /** Error */
+            error: string;
+            /** External Ref */
+            external_ref: string;
+            /** Index */
+            index: number;
+        };
+        /** LmsPushIn */
+        LmsPushIn: {
+            /** Items */
+            items: components["schemas"]["LmsAssessmentIn"][];
+        };
+        /** LmsPushOut */
+        LmsPushOut: {
+            /** Created */
+            created: number;
+            /** Duplicates */
+            duplicates: number;
+            /** Errors */
+            errors: components["schemas"]["LmsPushError"][];
         };
         /** LoginIn */
         LoginIn: {
@@ -6735,6 +6974,216 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TriageStartOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crm_applications_api_v1_integrations_crm_applications_get: {
+        parameters: {
+            query?: {
+                updated_since?: string | null;
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CrmChangesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_csv_api_v1_integrations_exports__dataset__csv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_keys_api_v1_integrations_keys_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntegrationKeyOut"][];
+                };
+            };
+        };
+    };
+    create_key_api_v1_integrations_keys_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KeyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntegrationKeyCreatedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_key_api_v1_integrations_keys__key_id__revoke_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntegrationKeyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lms_push_api_v1_integrations_lms_assessments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LmsPushIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LmsPushOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lms_roster_api_v1_integrations_lms_roster_get: {
+        parameters: {
+            query: {
+                cohort: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LmsLearnerOut"][];
                 };
             };
             /** @description Validation Error */

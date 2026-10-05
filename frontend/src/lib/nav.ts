@@ -37,6 +37,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/admin/documents", label: (t) => t.nav.items.documents, group: "admin", permission: "kb.manage" },
   { href: "/admin/costs", label: (t) => t.nav.items.costs, group: "admin", permission: "cost.read" },
   { href: "/admin/settings", label: (t) => t.nav.items.settings, group: "admin", permission: "user.manage" },
+  { href: "/admin/integrations", label: (t) => t.nav.items.integrations, group: "admin", permission: "integration.manage" },
   { href: "/admin/audit-logs", label: (t) => t.nav.audit, group: "admin", permission: "audit.read" },
 ];
 

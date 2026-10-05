@@ -36,6 +36,7 @@ const vi = {
       documents: "Tài liệu",
       costs: "Chi phí",
       settings: "Cài đặt",
+      integrations: "Tích hợp",
     },
     groups: {
       admissions: "Tuyển sinh",

@@ -39,6 +39,8 @@ export type Fairness = S["FairnessOut"];
 export type Lab = S["LabOut"];
 export type LabIntake = S["LabIntakeOut"];
 export type Quality = S["QualityOut"];
+export type IntegrationKey = S["IntegrationKeyOut"];
+export type IntegrationKeyCreated = S["IntegrationKeyCreatedOut"];
 
 export type AdminOverview = S["OverviewOut"];
 export type AccountPage = S["AccountPageOut"];

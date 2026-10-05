@@ -20,6 +20,7 @@ const PAGES: { role: string; path: string; heading: RegExp }[] = [
   { role: "admin", path: "/admin/documents", heading: /Tài liệu/ },
   { role: "admin", path: "/admin/costs", heading: /Chi phí/ },
   { role: "admin", path: "/admin/settings", heading: /Cài đặt/ },
+  { role: "admin", path: "/admin/integrations", heading: /Tích hợp/ },
 ];
 
 for (const { role, path, heading } of PAGES) {

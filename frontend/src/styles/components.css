@@ -1612,9 +1612,95 @@ body:has(.sticky-actions) .assistant-fab {
 
 /* Tiêu đề hàng (tên năng lực, nhánh) giữ chữ thường như nội dung, khác tiêu đề cột. */
 .th-table tbody th[scope="row"] {
+  background: transparent;
   color: var(--th-text-primary);
   font-size: var(--th-text-sm);
   font-weight: var(--th-font-semibold);
   letter-spacing: normal;
   text-transform: none;
+}
+
+/* ---------- Quản trị › Tích hợp ---------- */
+.panel-head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3);
+  justify-content: space-between;
+}
+
+.scope-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-1);
+}
+
+.scope-option {
+  display: grid;
+  gap: 2px;
+}
+
+.scope-option .muted {
+  font-size: var(--th-text-xs);
+}
+
+.key-name {
+  display: grid;
+  gap: 2px;
+}
+
+.key-name .muted {
+  font-size: var(--th-text-xs);
+  font-weight: var(--th-font-regular);
+}
+
+/* Khoá đã thu hồi: chữ phụ + gạch ngang (không giảm opacity để giữ tương phản AA). */
+tr[data-revoked="true"] .key-name {
+  color: var(--th-text-muted);
+  text-decoration: line-through;
+}
+
+.secret {
+  align-items: center;
+  background: var(--th-surface-subtle);
+  border: 1px dashed var(--th-border-strong);
+  border-radius: var(--th-radius-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3);
+  justify-content: space-between;
+  padding: var(--th-space-3) var(--th-space-4);
+}
+
+.secret code {
+  font-size: var(--th-text-sm);
+  overflow-wrap: anywhere;
+}
+
+.code-block {
+  background: var(--th-neutral-900);
+  border-radius: var(--th-radius-md);
+  color: var(--th-neutral-100);
+  overflow: hidden;
+}
+
+.code-block__bar {
+  background: var(--th-neutral-800);
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--th-space-1) var(--th-space-3);
+}
+
+.code-block__bar .link-button {
+  color: var(--th-brand-200);
+  font-size: var(--th-text-xs);
+}
+
+.code-block pre {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: var(--th-text-xs);
+  line-height: 1.6;
+  margin: 0;
+  overflow-x: auto;
+  padding: var(--th-space-3) var(--th-space-4);
 }

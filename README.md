@@ -11,7 +11,7 @@ AI đọc hồ sơ có dẫn chứng kiểm chứng được · con người quy
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_RLS-4169E1?logo=postgresql&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-252_backend_·_72_e2e-2f9a62)
+![Tests](https://img.shields.io/badge/tests-252_backend_·_76_e2e-2f9a62)
 ![i18n](https://img.shields.io/badge/UI-Ti%E1%BA%BFng_Vi%E1%BB%87t_·_English-134d8b)
 
 <br/>
@@ -253,7 +253,7 @@ cd frontend && npm run e2e                   # cần backend chạy; desktop và
 | Sàng lọc AI hàng loạt có bằng chứng kiểm chứng | Hoàn thành; ~2.000 hồ sơ/giây offline; chưa đo với LLM thật |
 | Vận hành khoá, Cohort Composer, mentor, xét đạt, phụ cấp | Hoàn thành (BE + FE), có test |
 | Phễu, giám sát công bằng, Rubric Lab, chất lượng chương trình | Hoàn thành (BE + FE), song ngữ |
-| Tích hợp Power BI, LMS, CRM bằng khoá API | Backend và tài liệu hoàn thành; trang quản lý khoá trên giao diện đang làm |
+| Tích hợp Power BI, LMS, CRM bằng khoá API | Hoàn thành (BE + FE: Quản trị › Tích hợp), có test và e2e |
 | Trợ lý hỏi đáp có trích nguồn và bộ đánh giá ([eval/](eval/README.md)) | Hoàn thành; động cơ offline đã đo trên bộ giữ riêng |
 | Giao diện tiếng Anh | Thanh đầu trang, menu, khu phân tích; các khu khác đang dịch |
 | Triển khai cloud, hồ sơ năng lực có chữ ký, trang giới thiệu công khai | Chưa làm |

@@ -2479,6 +2479,123 @@
         "title": "CriterionOut",
         "type": "object"
       },
+      "CrmApplicationOut": {
+        "properties": {
+          "application_id": {
+            "format": "uuid",
+            "title": "Application Id",
+            "type": "string"
+          },
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "current_round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Round"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "intake": {
+            "title": "Intake",
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "candidate_code",
+          "full_name",
+          "email",
+          "phone",
+          "intake",
+          "status",
+          "current_round",
+          "submitted_at",
+          "updated_at"
+        ],
+        "title": "CrmApplicationOut",
+        "type": "object"
+      },
+      "CrmChangesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CrmApplicationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "CrmChangesOut",
+        "type": "object"
+      },
       "DemandIn": {
         "properties": {
           "partner_id": {
@@ -3846,6 +3963,87 @@
         "title": "IntakeRef",
         "type": "object"
       },
+      "IntegrationKeyCreatedOut": {
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/IntegrationKeyOut"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "token"
+        ],
+        "title": "IntegrationKeyCreatedOut",
+        "type": "object"
+      },
+      "IntegrationKeyOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "prefix": {
+            "title": "Prefix",
+            "type": "string"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "prefix",
+          "scopes",
+          "created_at",
+          "last_used_at",
+          "revoked_at"
+        ],
+        "title": "IntegrationKeyOut",
+        "type": "object"
+      },
       "InvitationPreviewOut": {
         "properties": {
           "email": {
@@ -3977,6 +4175,37 @@
           "finished_at"
         ],
         "title": "JobOut",
+        "type": "object"
+      },
+      "KeyIn": {
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Name",
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "enum": [
+                "export.read",
+                "lms.read",
+                "lms.write",
+                "crm.read"
+              ],
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Scopes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "scopes"
+        ],
+        "title": "KeyIn",
         "type": "object"
       },
       "LabAnalysis": {
@@ -4415,6 +4644,185 @@
           }
         },
         "title": "LinksOut",
+        "type": "object"
+      },
+      "LmsAssessmentIn": {
+        "properties": {
+          "assessed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessed At"
+          },
+          "candidate_code": {
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "competency_code": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Competency Code",
+            "type": "string"
+          },
+          "evidence": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Evidence",
+            "type": "string"
+          },
+          "external_ref": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "External Ref",
+            "type": "string"
+          },
+          "level": {
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "external_ref",
+          "candidate_code",
+          "competency_code",
+          "level"
+        ],
+        "title": "LmsAssessmentIn",
+        "type": "object"
+      },
+      "LmsLearnerOut": {
+        "properties": {
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "class_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Name"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "candidate_code",
+          "email",
+          "full_name",
+          "status",
+          "track",
+          "class_name"
+        ],
+        "title": "LmsLearnerOut",
+        "type": "object"
+      },
+      "LmsPushError": {
+        "properties": {
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "external_ref": {
+            "title": "External Ref",
+            "type": "string"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "index",
+          "external_ref",
+          "error"
+        ],
+        "title": "LmsPushError",
+        "type": "object"
+      },
+      "LmsPushIn": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LmsAssessmentIn"
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "LmsPushIn",
+        "type": "object"
+      },
+      "LmsPushOut": {
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "integer"
+          },
+          "duplicates": {
+            "title": "Duplicates",
+            "type": "integer"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/LmsPushError"
+            },
+            "title": "Errors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "created",
+          "duplicates",
+          "errors"
+        ],
+        "title": "LmsPushOut",
         "type": "object"
       },
       "LoginIn": {
@@ -11330,6 +11738,317 @@
         "summary": "Start Triage",
         "tags": [
           "triage"
+        ]
+      }
+    },
+    "/api/v1/integrations/crm/applications": {
+      "get": {
+        "operationId": "crm_applications_api_v1_integrations_crm_applications_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "updated_since",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Updated Since"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrmChangesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crm Applications",
+        "tags": [
+          "integrations"
+        ]
+      }
+    },
+    "/api/v1/integrations/exports/{dataset}.csv": {
+      "get": {
+        "description": "CSV đã khử định danh. Xác thực bằng khoá có `export.read` (Power BI) hoặc phiên đăng nhập có quyền export.read.",
+        "operationId": "export_csv_api_v1_integrations_exports__dataset__csv_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset",
+            "required": true,
+            "schema": {
+              "title": "Dataset",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Csv",
+        "tags": [
+          "integrations"
+        ]
+      }
+    },
+    "/api/v1/integrations/keys": {
+      "get": {
+        "operationId": "list_keys_api_v1_integrations_keys_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/IntegrationKeyOut"
+                  },
+                  "title": "Response List Keys Api V1 Integrations Keys Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Keys",
+        "tags": [
+          "integrations"
+        ]
+      },
+      "post": {
+        "operationId": "create_key_api_v1_integrations_keys_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationKeyCreatedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Key",
+        "tags": [
+          "integrations"
+        ]
+      }
+    },
+    "/api/v1/integrations/keys/{key_id}/revoke": {
+      "post": {
+        "operationId": "revoke_key_api_v1_integrations_keys__key_id__revoke_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Key Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationKeyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke Key",
+        "tags": [
+          "integrations"
+        ]
+      }
+    },
+    "/api/v1/integrations/lms/assessments": {
+      "post": {
+        "operationId": "lms_push_api_v1_integrations_lms_assessments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LmsPushIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LmsPushOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lms Push",
+        "tags": [
+          "integrations"
+        ]
+      }
+    },
+    "/api/v1/integrations/lms/roster": {
+      "get": {
+        "operationId": "lms_roster_api_v1_integrations_lms_roster_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cohort",
+            "required": true,
+            "schema": {
+              "maxLength": 40,
+              "minLength": 1,
+              "title": "Cohort",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LmsLearnerOut"
+                  },
+                  "title": "Response Lms Roster Api V1 Integrations Lms Roster Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lms Roster",
+        "tags": [
+          "integrations"
         ]
       }
     },

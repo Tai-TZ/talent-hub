@@ -38,6 +38,7 @@ const en: Messages = {
       documents: "Documents",
       costs: "Costs",
       settings: "Settings",
+      integrations: "Integrations",
     },
     groups: {
       admissions: "Admissions",

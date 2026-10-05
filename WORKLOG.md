@@ -46,7 +46,7 @@ Chất lượng hiện tại: backend 248 test, độ phủ 95%, ruff/mypy sạc
 
 ## Việc tiếp theo (theo thứ tự nên làm)
 
-**Đối chiếu đề bài (05/10):** MVP đủ. Nâng cao: trợ lý có trích nguồn ✅, chuẩn đầu ra + cảnh báo dữ liệu + báo cáo cải tiến ✅ (trang Chất lượng chương trình). Còn thiếu theo công nghệ đề bài nêu tên: **Power BI** (schema `analytics` + role chỉ đọc + export CSV), **tích hợp CRM/LMS qua API**, **Docker đủ stack + triển khai cloud**; và sản phẩm nộp bài (JOURNAL, sơ đồ kiến trúc, bài trình bày, tự chấm 10 tiêu chí). Ưu tiên các mục này trước các mục dưới.
+**Đối chiếu đề bài (05/10):** MVP đủ. Nâng cao: trợ lý có trích nguồn ✅, chuẩn đầu ra + cảnh báo dữ liệu + báo cáo cải tiến ✅ (trang Chất lượng chương trình). Đã có Power BI (export CSV qua khoá API) và tích hợp LMS/CRM (Quản trị › Tích hợp, `docs/12-integrations.md`). Còn thiếu: **Docker đủ stack + triển khai cloud**; và sản phẩm nộp bài (JOURNAL, sơ đồ kiến trúc, bài trình bày, tự chấm 10 tiêu chí). Ưu tiên các mục này trước các mục dưới.
 
 1. **Giữ hiệu năng khi sàng lọc lại nhiều lần** (tuỳ chọn, chưa gấp): đánh dấu lượt chấm mới nhất (ví dụ cột `is_latest` có chỉ mục một phần, hoặc xoá/lưu trữ lượt cũ khi chấm lại có `force`) để bảng triage và hàng đợi không chậm dần. Báo cáo xét đạt (p95 ~276 ms) sát ngưỡng 300 ms. Đo bằng `python tools/bench_api.py --org scale` trên DB nhân bản.
 2. **Vòng QA 6 (nghiệp vụ)**: viết kiểm thử bất biến (không vượt chỉ tiêu, bốn mắt, chấm mù, điểm AI chỉ cho người có `triage.read`) chạy với dữ liệu ngẫu nhiên; rà lại trải nghiệm bàn phím cho mọi hộp thoại.
