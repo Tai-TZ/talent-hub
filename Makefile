@@ -9,7 +9,7 @@ endif
 
 # ---- Hạ tầng local ----
 db-up:
-	docker compose up -d postgres redis
+	docker compose up -d postgres
 
 db-down:
 	docker compose down

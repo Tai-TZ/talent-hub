@@ -1,3 +1,16 @@
+from src.models.admissions import (
+    AiAssessment,
+    Application,
+    ApplicationEvent,
+    Cohort,
+    Decision,
+    Intake,
+    Job,
+    Notification,
+    Program,
+    Review,
+    Rubric,
+)
 from src.models.base import Base
 from src.models.identity import (
     AuditLog,
@@ -10,7 +23,18 @@ from src.models.identity import (
 )
 
 __all__ = [
+    "AiAssessment",
+    "Application",
+    "ApplicationEvent",
     "AuditLog",
+    "Cohort",
+    "Decision",
+    "Intake",
+    "Job",
+    "Notification",
+    "Program",
+    "Review",
+    "Rubric",
     "Base",
     "OrgMembership",
     "Organization",
