@@ -56,7 +56,7 @@ def _me_from_session(result: SessionResult, db: OrgDb) -> MeOut:
     )
 
 
-def _set_cookies(response: Response, tokens: SessionTokens) -> None:
+def set_auth_cookies(response: Response, tokens: SessionTokens) -> None:
     settings = get_settings()
     response.set_cookie(
         "access_token",
@@ -83,7 +83,7 @@ def _clear_cookies(response: Response) -> None:
     response.delete_cookie("refresh_token", path=REFRESH_COOKIE_PATH)
 
 
-async def _throttle_login(request: Request, meta: RequestMeta) -> None:
+async def throttle_login(request: Request, meta: RequestMeta) -> None:
     result = await request.app.state.limiter.hit(f"login:{meta.ip}", get_settings().login_rate_limit_per_minute, 60)
     if not result.allowed:
         raise RateLimitedError(result.retry_after_s)
@@ -92,9 +92,9 @@ async def _throttle_login(request: Request, meta: RequestMeta) -> None:
 @router.post("/login", response_model=MeOut)
 async def login(body: LoginIn, request: Request, response: Response, db: OrgDb = Depends(org_db)) -> MeOut:
     meta = request_meta(request)
-    await _throttle_login(request, meta)
+    await throttle_login(request, meta)
     result = await auth_service.login(db, email=body.email, password=body.password, meta=meta)
-    _set_cookies(response, result.tokens)
+    set_auth_cookies(response, result.tokens)
     return _me_from_session(result, db)
 
 
@@ -104,7 +104,7 @@ async def refresh(request: Request, response: Response, db: OrgDb = Depends(org_
     if not raw:
         raise InvalidRefreshTokenError("Thiếu refresh token")
     result = await auth_service.refresh(db, raw_token=raw, meta=request_meta(request))
-    _set_cookies(response, result.tokens)
+    set_auth_cookies(response, result.tokens)
     return _me_from_session(result, db)
 
 
@@ -136,7 +136,7 @@ async def change_password(
     except InvalidCredentialsError as exc:
         # Sai mật khẩu hiện tại là lỗi của yêu cầu, không phải phiên hết hạn.
         raise HTTPException(status_code=400, detail=exc.message) from None
-    _set_cookies(response, result.tokens)
+    set_auth_cookies(response, result.tokens)
 
 
 @me_router.get("/me", response_model=MeOut)
@@ -164,7 +164,7 @@ def _mask_email(email: str) -> str:
 
 @router.get("/invitations/{token}", response_model=InvitationPreviewOut)
 async def invitation_preview(token: str, request: Request, db: OrgDb = Depends(org_db)) -> dict[str, object]:
-    await _throttle_login(request, request_meta(request))
+    await throttle_login(request, request_meta(request))
     _, membership, user = await accounts.accept_invitation(db, token=token, password=None)
     inv_kind = "reset" if membership.status == "active" else "invite"
     return {
@@ -179,9 +179,9 @@ async def invitation_preview(token: str, request: Request, db: OrgDb = Depends(o
 @router.post("/invitations/accept", response_model=MeOut)
 async def accept_invitation(body: AcceptIn, request: Request, response: Response, db: OrgDb = Depends(org_db)) -> MeOut:
     meta = request_meta(request)
-    await _throttle_login(request, meta)
+    await throttle_login(request, meta)
     result = await accounts.accept(db, token=body.token, password=body.password, meta=meta)
     out = _me_from_session(result, db)
     await db.commit()
-    _set_cookies(response, result.tokens)
+    set_auth_cookies(response, result.tokens)
     return out

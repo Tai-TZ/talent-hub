@@ -8,6 +8,7 @@ ignore = ["E501", "S101"]
 [lint.per-file-ignores]
 "tests/*" = ["S105", "S106", "S311"]
 "src/cli.py" = ["S105", "S106"]
+"tools/*" = ["S105", "S106"]  # công cụ dev cục bộ, bí mật giả cố định
 "migrations/*" = ["N999"]
 
 [format]

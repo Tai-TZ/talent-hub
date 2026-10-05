@@ -13,6 +13,7 @@ export interface OrgInfo {
   name: string;
   default_locale: string;
   branding: Record<string, unknown>;
+  login_providers: string[];
 }
 
 export interface AuditLogItem {

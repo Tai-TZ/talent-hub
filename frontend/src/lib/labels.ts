@@ -118,6 +118,8 @@ export const SETTING_LABELS: Record<string, string> = {
   ai_engine: "Động cơ sàng lọc AI",
   stipend_vnd_per_month: "Phụ cấp mỗi học viên mỗi tháng (VND)",
   invite_ttl_hours: "Thời hạn link lời mời (giờ)",
+  microsoft_signup: "Ứng viên tự đăng ký bằng Microsoft",
+  microsoft_allowed_tenants: "Giới hạn tenant Microsoft được phép",
 };
 
 export const FIELD_LABELS: Record<string, string> = {

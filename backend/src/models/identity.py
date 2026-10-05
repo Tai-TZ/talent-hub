@@ -48,6 +48,24 @@ class User(IdMixin, TimestampMixin, Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class OAuthAccount(IdMixin, Base):
+    """Liên kết danh tính ngoài (Microsoft Entra) với người dùng. Toàn cục như bảng users.
+
+    Định danh duy nhất là (issuer, subject): KHÔNG BAO GIỜ khớp theo email vì claim email của Entra
+    không được xác minh (nOAuth). Không lưu token của nhà cung cấp.
+    """
+
+    __tablename__ = "oauth_accounts"
+    __table_args__ = (UniqueConstraint("issuer", "subject", name="uq_oauth_issuer_subject"),)
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    provider: Mapped[str] = mapped_column(String(20), nullable=False)
+    issuer: Mapped[str] = mapped_column(String(255), nullable=False)
+    subject: Mapped[str] = mapped_column(String(255), nullable=False)
+    tenant_id: Mapped[str | None] = mapped_column(String(64))
+    linked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
 class Role(IdMixin, Base):
     """Toàn cục. Tập permission của từng vai trò định nghĩa trong src.services.rbac."""
 

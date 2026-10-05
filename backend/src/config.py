@@ -60,6 +60,15 @@ class Settings(BaseSettings):
     # Gốc URL của giao diện, dùng để dựng link trong email (lời mời, đặt lại mật khẩu).
     public_base_url: str = "http://localhost:3000"
 
+    # Đăng nhập Microsoft (Entra ID, OIDC code flow + PKCE). Tắt khi chưa có client_id.
+    microsoft_client_id: str | None = None
+    microsoft_client_secret: str | None = None
+    # "common" nhận cả tài khoản cơ quan và cá nhân; có thể đặt GUID tenant của trường để giới hạn.
+    microsoft_tenant: str = "common"
+    microsoft_authority: str = "https://login.microsoftonline.com"
+    # Mặc định đi qua giao diện (BFF) để cookie cùng origin: <public_base_url>/api/v1/auth/microsoft/callback
+    microsoft_redirect_uri: str | None = None
+
     # AI: "heuristic" chạy offline không cần khoá; "llm" dùng Claude và tự lùi về luật khi dịch vụ lỗi.
     ai_engine: str = "heuristic"
     anthropic_api_key: str | None = None
@@ -69,6 +78,14 @@ class Settings(BaseSettings):
     @property
     def is_local(self) -> bool:
         return self.environment == "local"
+
+    @property
+    def microsoft_enabled(self) -> bool:
+        return bool(self.microsoft_client_id and self.microsoft_client_secret)
+
+    @property
+    def microsoft_callback_url(self) -> str:
+        return self.microsoft_redirect_uri or f"{self.public_base_url.rstrip('/')}/api/v1/auth/microsoft/callback"
 
     @model_validator(mode="after")
     def _reject_unsafe_production(self) -> "Settings":

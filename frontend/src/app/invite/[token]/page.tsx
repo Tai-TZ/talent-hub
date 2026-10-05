@@ -19,7 +19,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
       </section>
       <main className="auth__panel" id="main">
         <QueryProvider>
-          <InviteForm token={token} />
+          <InviteForm token={token} microsoft={Boolean(org?.login_providers.includes("microsoft"))} />
         </QueryProvider>
       </main>
     </div>

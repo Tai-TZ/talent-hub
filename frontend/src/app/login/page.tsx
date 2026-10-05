@@ -7,8 +7,8 @@ import { getOrgInfo, getSession, getT } from "@/lib/server";
 
 export const metadata: Metadata = { title: "Đăng nhập" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const { next } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
+  const { next, error } = await searchParams;
   const target = safeNextPath(next);
 
   const session = await getSession();
@@ -29,7 +29,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <div className="auth__lang">
           <LanguageSwitch />
         </div>
-        <LoginForm next={target} />
+        <LoginForm next={target} microsoft={Boolean(org?.login_providers.includes("microsoft"))} errorCode={error} />
       </main>
     </div>
   );

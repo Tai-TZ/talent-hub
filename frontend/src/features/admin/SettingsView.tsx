@@ -11,7 +11,15 @@ import type { SettingsT } from "@/lib/contracts";
 import { errorText, useGet, useSend } from "@/lib/hooks";
 import { SETTING_LABELS } from "@/lib/labels";
 
-function Form({ initial, spec }: { initial: Record<string, unknown>; spec: Record<string, string> }) {
+type Spec = SettingsT["spec"][string];
+
+/** Nhãn dễ hiểu cho các lựa chọn; giá trị gửi lên vẫn là mã gốc. */
+const OPTION_LABELS: Record<string, Record<string, string>> = {
+  ai_engine: { heuristic: "Offline (heuristic): không tốn chi phí", llm: "LLM (Claude): cần khoá API và ngân sách" },
+  microsoft_signup: { on: "Cho phép", off: "Không cho phép (chỉ người được mời)" },
+};
+
+function Form({ initial, spec }: { initial: Record<string, unknown>; spec: Record<string, Spec> }) {
   const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(Object.entries(initial).map(([k, v]) => [k, String(v)])));
   const [message, setMessage] = useState<{ tone: "success" | "danger"; text: string; fields?: Record<string, string> } | null>(null);
   const save = useSend<unknown, { values: Record<string, unknown> }>("PUT", "/admin/settings", { invalidate: ["/admin/settings", "/admin/overview", "/admin/costs"] });
@@ -23,7 +31,7 @@ function Form({ initial, spec }: { initial: Record<string, unknown>; spec: Recor
     const payload: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(values)) {
       if (v === String(initial[k])) continue;
-      payload[k] = typeof initial[k] === "number" ? Number(v) : v;
+      payload[k] = spec[k]?.kind === "number" ? Number(v) : v;
     }
     save.mutate({ values: payload }, { onSuccess: () => setMessage({ tone: "success", text: "Đã lưu cài đặt." }), onError: (e) => setMessage({ tone: "danger", text: errorText(e), fields: e.fields }) });
   }
@@ -36,16 +44,22 @@ function Form({ initial, spec }: { initial: Record<string, unknown>; spec: Recor
         submit();
       }}
     >
-      {Object.keys(spec).map((key) =>
-        key === "ai_engine" ? (
-          <SelectField key={key} label={SETTING_LABELS[key] ?? key} value={values[key] ?? ""} help={spec[key]} error={message?.fields?.[key]} onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))}>
-            <option value="heuristic">Offline (heuristic) – không tốn chi phí</option>
-            <option value="llm">LLM (Claude) – cần khoá API và ngân sách</option>
+      {Object.entries(spec).map(([key, s]) => {
+        const label = SETTING_LABELS[key] ?? key;
+        const error = message?.fields?.[key];
+        const set = (v: string) => setValues((prev) => ({ ...prev, [key]: v }));
+        return s.kind === "choice" ? (
+          <SelectField key={key} label={label} value={values[key] ?? ""} help={s.description} error={error} onChange={(e) => set(e.target.value)}>
+            {s.options.map((o) => (
+              <option key={o} value={o}>
+                {OPTION_LABELS[key]?.[o] ?? o}
+              </option>
+            ))}
           </SelectField>
         ) : (
-          <TextField key={key} label={SETTING_LABELS[key] ?? key} type="number" step="any" value={values[key] ?? ""} help={spec[key]} error={message?.fields?.[key]} onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))} />
-        ),
-      )}
+          <TextField key={key} label={label} type={s.kind === "number" ? "number" : "text"} step={s.kind === "number" ? "any" : undefined} value={values[key] ?? ""} help={s.description} error={error} onChange={(e) => set(e.target.value)} />
+        );
+      })}
       {message ? <Alert tone={message.tone}>{message.text}</Alert> : null}
       <div>
         <Button type="submit" loading={save.isPending} disabled={!dirty}>
@@ -64,8 +78,8 @@ export function SettingsView() {
       <QueryState query={query} lines={5}>
         {(s) => <Form key={JSON.stringify(s.values)} initial={s.values} spec={s.spec} />}
       </QueryState>
-      <Alert tone="info" title="Khoá API của nhà cung cấp AI">
-        Khoá API được cấu hình ở biến môi trường của máy chủ (không lưu trong giao diện hay cơ sở dữ liệu). Khi chưa có khoá, hệ thống tự dùng chế độ sàng lọc offline.
+      <Alert tone="info" title="Khoá API và đăng nhập Microsoft">
+        Khoá API của nhà cung cấp AI và thông tin ứng dụng Microsoft (client id/secret) được cấu hình ở biến môi trường của máy chủ, không lưu trong giao diện hay cơ sở dữ liệu. Khi chưa có khoá AI, hệ thống tự dùng chế độ sàng lọc offline.
       </Alert>
     </div>
   );

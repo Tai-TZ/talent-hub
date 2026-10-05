@@ -47,9 +47,15 @@ class OverviewOut(Out):
 # ---------- Cài đặt ----------
 
 
+class SettingSpecOut(Out):
+    description: str
+    kind: Literal["number", "choice", "text"]
+    options: list[str]
+
+
 class SettingsOut(Out):
     values: dict[str, Any]
-    spec: dict[str, str]
+    spec: dict[str, SettingSpecOut]
 
 
 class SettingsValuesOut(Out):

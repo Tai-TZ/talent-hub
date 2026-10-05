@@ -8,6 +8,7 @@ import type { InvitationPreview } from "@/lib/contracts";
 import type { Me } from "@/lib/types";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
+import { MicrosoftMark } from "./icons";
 import { Skeleton } from "./ui/Skeleton";
 import { TextField } from "./ui/TextField";
 
@@ -15,7 +16,7 @@ const MIN_PASSWORD_LENGTH = 10;
 const SHOW = "Hiện mật khẩu";
 const HIDE = "Ẩn mật khẩu";
 
-function Form({ token, preview }: { token: string; preview: InvitationPreview }) {
+function Form({ token, preview, microsoft }: { token: string; preview: InvitationPreview; microsoft: boolean }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -72,11 +73,22 @@ function Form({ token, preview }: { token: string; preview: InvitationPreview })
       <Button type="submit" size="lg" block loading={submitting}>
         {isReset ? "Đặt mật khẩu" : "Kích hoạt tài khoản"}
       </Button>
+      {microsoft && !isReset ? (
+        <>
+          <p className="auth__or" aria-hidden="true">
+            hoặc
+          </p>
+          <a className="th-button th-button--secondary th-button--lg th-button--block" href={`/api/v1/auth/microsoft/start?mode=invite&token=${encodeURIComponent(token)}`}>
+            <MicrosoftMark />
+            Kích hoạt bằng tài khoản Microsoft
+          </a>
+        </>
+      ) : null}
     </form>
   );
 }
 
-export function InviteForm({ token }: { token: string }) {
+export function InviteForm({ token, microsoft = false }: { token: string; microsoft?: boolean }) {
   const preview = useQuery<InvitationPreview, ApiError>({
     queryKey: ["invite", token],
     queryFn: () => api<InvitationPreview>(`/auth/invitations/${encodeURIComponent(token)}`),
@@ -94,5 +106,5 @@ export function InviteForm({ token }: { token: string }) {
       </div>
     );
   }
-  return <Form token={token} preview={preview.data} />;
+  return <Form token={token} preview={preview.data} microsoft={microsoft} />;
 }

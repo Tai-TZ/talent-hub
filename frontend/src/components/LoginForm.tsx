@@ -7,12 +7,13 @@ import type { Me } from "@/lib/types";
 import { useI18n } from "./providers";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
+import { MicrosoftMark } from "./icons";
 import { TextField } from "./ui/TextField";
 
-export function LoginForm({ next }: { next: string }) {
+export function LoginForm({ next, microsoft = false, errorCode }: { next: string; microsoft?: boolean; errorCode?: string }) {
   const { t } = useI18n();
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(errorCode ? (t.login.errors[errorCode] ?? t.login.errors["failed"] ?? null) : null);
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -61,6 +62,18 @@ export function LoginForm({ next }: { next: string }) {
       <Button type="submit" size="lg" block loading={submitting}>
         {submitting ? t.login.submitting : t.login.submit}
       </Button>
+      {microsoft ? (
+        <>
+          <p className="auth__or" aria-hidden="true">
+            {t.login.or}
+          </p>
+          {/* Điều hướng toàn trang (không dùng fetch): Microsoft cần trình duyệt chuyển hướng. */}
+          <a className="th-button th-button--secondary th-button--lg th-button--block" href={`/api/v1/auth/microsoft/start?next=${encodeURIComponent(next)}`}>
+            <MicrosoftMark />
+            {t.login.microsoft}
+          </a>
+        </>
+      ) : null}
     </form>
   );
 }

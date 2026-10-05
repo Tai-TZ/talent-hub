@@ -1021,3 +1021,29 @@
   gap: var(--th-space-3);
   justify-content: space-between;
 }
+
+
+/* ---------- Đăng nhập: dải phân cách "hoặc" và nút nhà cung cấp ngoài ---------- */
+.auth__or {
+  align-items: center;
+  color: var(--th-text-muted);
+  display: flex;
+  font-size: var(--th-text-sm);
+  gap: var(--th-space-3);
+  margin: 0;
+}
+
+.auth__or::before,
+.auth__or::after {
+  background: var(--th-border-default);
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+
+a.th-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  text-decoration: none;
+}

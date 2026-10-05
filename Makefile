@@ -1,4 +1,4 @@
-.PHONY: api-types db-up db-down migrate seed run-be run-fe test-be test-fe lint typecheck check e2e audit
+.PHONY: run-idp run-be-idp api-types db-up db-down migrate seed run-be run-fe test-be test-fe lint typecheck check e2e audit
 
 BE = backend
 FE = frontend
@@ -24,6 +24,13 @@ seed:
 run-be:
 	cd $(BE) && ../$(PY) -m uvicorn src.main:app --reload --port 8000
 
+# IdP Microsoft giả cho phát triển cục bộ (cổng 9100). Chạy kèm: make run-be-idp
+run-idp:
+	cd $(BE) && ../$(PY) tools/mock_idp.py
+
+run-be-idp:
+	cd $(BE) && MICROSOFT_AUTHORITY=http://localhost:9100 MICROSOFT_TENANT=common MICROSOFT_CLIENT_ID=dev-client MICROSOFT_CLIENT_SECRET=dev-secret ../$(PY) -m uvicorn src.main:app --reload --port 8000
+
 test-be:
 	cd $(BE) && ../$(PY) -m pytest --cov
 
@@ -44,7 +51,7 @@ api-types:
 
 # ---- Chất lượng ----
 lint:
-	cd $(BE) && ../$(PY) -m ruff check src tests migrations && ../$(PY) -m ruff format --check src tests migrations
+	cd $(BE) && ../$(PY) -m ruff check src tests migrations tools && ../$(PY) -m ruff format --check src tests migrations tools
 	cd $(FE) && npm run lint
 
 typecheck:

@@ -17,6 +17,7 @@ from src.api.cohorts import router as cohorts_router
 from src.api.errors import register_error_handlers
 from src.api.intakes import router as intakes_router
 from src.api.notifications import router as notifications_router
+from src.api.oidc import router as oidc_router
 from src.api.org import router as org_router
 from src.api.staff import router as staff_router
 from src.api.triage import router as triage_router
@@ -88,6 +89,7 @@ def create_app() -> FastAPI:
         return {"status": "ready"}
 
     app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(oidc_router, prefix="/api/v1")
     app.include_router(me_router, prefix="/api/v1")
     app.include_router(audit_router, prefix="/api/v1")
     app.include_router(org_router, prefix="/api/v1")

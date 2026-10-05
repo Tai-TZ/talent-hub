@@ -52,7 +52,10 @@ class SettingsIn(BaseModel):
 @router.get("/settings", response_model=SettingsOut)
 async def get_settings_(_: Principal = Depends(require("user.manage")), db: OrgDb = Depends(org_db)) -> dict[str, Any]:
     values = await org_settings.get_all(db)
-    return {"values": values, "spec": {k: v[2] for k, v in org_settings.SPEC.items()}}
+    spec = {
+        k: {"description": v[2], "kind": v[1].kind, "options": list(v[1].options)} for k, v in org_settings.SPEC.items()
+    }
+    return {"values": values, "spec": spec}
 
 
 @router.put("/settings", response_model=SettingsValuesOut)

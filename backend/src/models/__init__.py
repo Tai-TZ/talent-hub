@@ -31,6 +31,7 @@ from src.models.cohort import (
 )
 from src.models.identity import (
     AuditLog,
+    OAuthAccount,
     Organization,
     OrgMembership,
     RefreshToken,
@@ -40,6 +41,7 @@ from src.models.identity import (
 )
 
 __all__ = [
+    "OAuthAccount",
     "CohortClass",
     "CohortTrack",
     "Competency",
