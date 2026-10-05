@@ -227,6 +227,44 @@ async def test_staff_invitation_binds_microsoft_without_matching_email(
         assert (await c3.get("/api/v1/me")).json()["roles"] == ["reviewer"]
 
 
+async def test_invite_cannot_attach_microsoft_to_an_account_that_already_has_a_credential(
+    app_instance: FastAPI, idp: FakeProvider, login_as: Callable[..., Any]
+) -> None:
+    """Admin tổ chức A mời một người đã có tài khoản (mật khẩu) ở tổ chức B rồi tự dùng link mời với Microsoft
+    của mình: không được chiếm danh tính đó (giống luồng mật khẩu trong test_admin)."""
+    beta_admin = await login_as("admin", "beta")
+    victim = f"victim.{uuid.uuid4().hex[:8]}@beta.test"
+    beta_invite = (
+        await beta_admin.post(
+            "/api/v1/admin/users", json={"email": victim, "full_name": "Nạn Nhân", "roles": ["mentor"]}
+        )
+    ).json()
+    async with _client(app_instance, "beta") as v:
+        accepted = await v.post(
+            "/api/v1/auth/invitations/accept",
+            json={"token": beta_invite["invite_link"].rsplit("/", 1)[1], "password": "Mật-khẩu-của-nạn-nhân-77"},
+        )
+        assert accepted.status_code == 200
+
+    admin = await login_as("admin")
+    created = (
+        await admin.post("/api/v1/admin/users", json={"email": victim, "full_name": "Kẻ Tấn Công", "roles": ["mentor"]})
+    ).json()
+    token = created["invite_link"].rsplit("/", 1)[1]
+    attacker_sub = f"attacker-{uuid.uuid4().hex}"
+    async with _client(app_instance) as c:
+        res = await _sign_in(
+            c, idp, idp.add("hijack", sub=attacker_sub, email=None), extra=f"mode=invite&token={token}"
+        )
+        assert _error(res) == "account_exists"
+
+    # Microsoft của kẻ tấn công không gắn vào nạn nhân: đăng nhập Microsoft ở tổ chức B không vào được tài khoản đó.
+    async with _client(app_instance, "beta") as b:
+        res = await _sign_in(b, idp, idp.add("probe", sub=attacker_sub, email=None))
+        if res.headers["location"] == "/dashboard":
+            assert (await b.get("/api/v1/me")).json()["email"] != victim
+
+
 async def test_link_mode_requires_login_and_prevents_double_linking(
     app_instance: FastAPI, idp: FakeProvider, login_as: Callable[..., Any]
 ) -> None:
