@@ -117,6 +117,8 @@ class CompetencyAssessment(IdMixin, OrgScopedMixin, Base):
     evidence: Mapped[str] = mapped_column(Text, nullable=False, default="")
     assessor_membership_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("org_memberships.id"), nullable=False)
     assessed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    # Mã tham chiếu của hệ thống nguồn (LMS) để đẩy lại không tạo bản ghi trùng; duy nhất trong tổ chức.
+    external_ref: Mapped[str | None] = mapped_column(String(200))
 
 
 class Partner(IdMixin, TimestampMixin, OrgScopedMixin, Base):

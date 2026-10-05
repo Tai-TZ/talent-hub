@@ -18,6 +18,7 @@ from src.api.auth import router as auth_router
 from src.api.cohorts import router as cohorts_router
 from src.api.errors import register_error_handlers
 from src.api.intakes import router as intakes_router
+from src.api.integrations import router as integrations_router
 from src.api.notifications import router as notifications_router
 from src.api.oidc import router as oidc_router
 from src.api.org import router as org_router
@@ -106,6 +107,7 @@ def create_app() -> FastAPI:
         admin_router,
         cohorts_router,
         analytics_router,
+        integrations_router,
     ):
         app.include_router(router, prefix="/api/v1")
     return app

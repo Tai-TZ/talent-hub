@@ -48,9 +48,11 @@ from src.models.identity import (
     User,
     UserRole,
 )
+from src.models.integration import IntegrationKey
 
 __all__ = [
     "AssistantQuery",
+    "IntegrationKey",
     "OAuthAccount",
     "CohortClass",
     "CohortTrack",

@@ -17,4 +17,4 @@ indent-style = "space"
 
 [lint.flake8-bugbear]
 # Depends/Query là cách khai báo phụ thuộc của FastAPI, không phải lỗi B008.
-extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "src.api.deps.require"]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "src.api.deps.require", "src.api.integrations.require_scope"]

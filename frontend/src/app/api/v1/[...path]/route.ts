@@ -77,6 +77,8 @@ async function forward(request: NextRequest, { params }: { params: Promise<{ pat
     contentType: request.headers.get("content-type"),
     origin: request.headers.get("origin"),
     accept: request.headers.get("accept"),
+    // Hệ thống ngoài gọi API tích hợp bằng khoá (Bearer); các API khác chỉ dùng cookie phiên.
+    authorization: path[0] === "integrations" ? request.headers.get("authorization") : null,
   });
 
   let upstream: Response;
