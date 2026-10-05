@@ -81,6 +81,12 @@ class Links(_Strict):
     _check = field_validator("github", "linkedin", "portfolio")(_url)
 
 
+class Preferences(_Strict):
+    """Nguyện vọng nhánh của ứng viên (theo thứ tự ưu tiên); không dùng để chấm điểm."""
+
+    tracks: list[Annotated[Text, Field(min_length=1, max_length=40)]] = Field(default_factory=list, max_length=3)
+
+
 class Content(_Strict):
     education: list[Education] = Field(default_factory=list, max_length=10)
     experience: list[Experience] = Field(default_factory=list, max_length=15)
@@ -89,6 +95,7 @@ class Content(_Strict):
     essays: Essays = Field(default_factory=Essays)
     links: Links = Field(default_factory=Links)
     cv_text: Annotated[Text, Field(max_length=20000)] = ""
+    preferences: Preferences = Field(default_factory=Preferences)
 
 
 MIN_ESSAY_CHARS = 200
