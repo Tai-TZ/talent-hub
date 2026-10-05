@@ -476,6 +476,7 @@ async def competency_matrix(db: OrgDb, enrollment: Enrollment) -> list[dict[str,
             "code": c.code,
             "name": c.name,
             "target": target,
+            "max_level": c.max_level,
             "level": latest.get(c.id, (None, ""))[0],
             "evidence": latest.get(c.id, (None, ""))[1],
             "met": (latest[c.id][0] >= target) if c.id in latest else None,
@@ -547,17 +548,26 @@ async def add_assessment(
 
 
 async def qualification_report(db: OrgDb, cohort_id: uuid.UUID) -> list[dict[str, Any]]:
-    enrollments = (
-        (await db.session.execute(select(Enrollment).where(Enrollment.cohort_id == cohort_id).order_by(Enrollment.id)))
-        .scalars()
-        .all()
-    )
+    rows = (
+        await db.session.execute(
+            select(Enrollment, User.full_name, Application.candidate_code, Track.name)
+            .join(OrgMembership, OrgMembership.id == Enrollment.membership_id)
+            .join(User, User.id == OrgMembership.user_id)
+            .join(Application, Application.id == Enrollment.application_id)
+            .outerjoin(Track, Track.id == Enrollment.track_id)
+            .where(Enrollment.cohort_id == cohort_id)
+            .order_by(User.full_name, Enrollment.id)
+        )
+    ).all()
     out = []
-    for e in enrollments:
+    for e, name, code, track_name in rows:
         matrix = await competency_matrix(db, e)
         out.append(
             {
                 "enrollment_id": e.id,
+                "name": name,
+                "candidate_code": code,
+                "track_name": (track_name or {}).get("vi") if track_name else None,
                 "status": e.status,
                 "suggestion": suggestion_from(matrix),
                 "met": sum(1 for m in matrix if m["met"]),

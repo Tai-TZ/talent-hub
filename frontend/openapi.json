@@ -1443,6 +1443,10 @@
             "title": "Matrix",
             "type": "array"
           },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
           "status": {
             "title": "Status",
             "type": "string"
@@ -1462,11 +1466,24 @@
               }
             ],
             "title": "Track Id"
+          },
+          "track_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Name"
           }
         },
         "required": [
           "enrollment_id",
+          "name",
           "track_id",
+          "track_name",
           "matrix",
           "suggestion",
           "status"
@@ -4240,6 +4257,10 @@
             ],
             "title": "Level"
           },
+          "max_level": {
+            "title": "Max Level",
+            "type": "integer"
+          },
           "met": {
             "anyOf": [
               {
@@ -4265,6 +4286,7 @@
           "code",
           "name",
           "target",
+          "max_level",
           "level",
           "evidence",
           "met"
@@ -4338,6 +4360,10 @@
             "title": "Partner Id",
             "type": "string"
           },
+          "partner_name": {
+            "title": "Partner Name",
+            "type": "string"
+          },
           "project": {
             "title": "Project",
             "type": "string"
@@ -4353,14 +4379,27 @@
               }
             ],
             "title": "Track Id"
+          },
+          "track_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Name"
           }
         },
         "required": [
           "enrollment_id",
           "name",
           "track_id",
+          "track_name",
           "project",
-          "partner_id"
+          "partner_id",
+          "partner_name"
         ],
         "title": "MentorLearnerOut",
         "type": "object"
@@ -5190,6 +5229,10 @@
       },
       "QualificationRowOut": {
         "properties": {
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
           "enrollment_id": {
             "format": "uuid",
             "title": "Enrollment Id",
@@ -5198,6 +5241,10 @@
           "met": {
             "title": "Met",
             "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
           },
           "status": {
             "title": "Status",
@@ -5210,10 +5257,24 @@
           "total": {
             "title": "Total",
             "type": "integer"
+          },
+          "track_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Name"
           }
         },
         "required": [
           "enrollment_id",
+          "name",
+          "candidate_code",
+          "track_name",
           "status",
           "suggestion",
           "met",

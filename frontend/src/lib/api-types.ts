@@ -1887,12 +1887,16 @@ export interface components {
             enrollment_id: string;
             /** Matrix */
             matrix: components["schemas"]["MatrixRowOut"][];
+            /** Name */
+            name: string;
             /** Status */
             status: string;
             /** Suggestion */
             suggestion: string;
             /** Track Id */
             track_id: string | null;
+            /** Track Name */
+            track_name: string | null;
         };
         /** ComposerAppliedOut */
         ComposerAppliedOut: {
@@ -2995,6 +2999,8 @@ export interface components {
             evidence: string;
             /** Level */
             level: number | null;
+            /** Max Level */
+            max_level: number;
             /** Met */
             met: boolean | null;
             /** Name */
@@ -3036,10 +3042,14 @@ export interface components {
              * Format: uuid
              */
             partner_id: string;
+            /** Partner Name */
+            partner_name: string;
             /** Project */
             project: string;
             /** Track Id */
             track_id: string | null;
+            /** Track Name */
+            track_name: string | null;
         };
         /** MovedOut */
         MovedOut: {
@@ -3369,6 +3379,8 @@ export interface components {
         };
         /** QualificationRowOut */
         QualificationRowOut: {
+            /** Candidate Code */
+            candidate_code: string;
             /**
              * Enrollment Id
              * Format: uuid
@@ -3376,12 +3388,16 @@ export interface components {
             enrollment_id: string;
             /** Met */
             met: number;
+            /** Name */
+            name: string;
             /** Status */
             status: string;
             /** Suggestion */
             suggestion: string;
             /** Total */
             total: number;
+            /** Track Name */
+            track_name: string | null;
         };
         /** QueueItemOut */
         QueueItemOut: {

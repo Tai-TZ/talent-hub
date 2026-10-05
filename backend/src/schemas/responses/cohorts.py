@@ -120,6 +120,7 @@ class MatrixRowOut(Out):
     code: str
     name: str
     target: int
+    max_level: int
     level: int | None
     evidence: str
     met: bool | None
@@ -127,7 +128,9 @@ class MatrixRowOut(Out):
 
 class CompetenciesOut(Out):
     enrollment_id: uuid.UUID
+    name: str
     track_id: uuid.UUID | None
+    track_name: str | None
     matrix: list[MatrixRowOut]
     suggestion: str
     status: str
@@ -137,12 +140,17 @@ class MentorLearnerOut(Out):
     enrollment_id: uuid.UUID
     name: str
     track_id: uuid.UUID | None
+    track_name: str | None
     project: str
     partner_id: uuid.UUID
+    partner_name: str
 
 
 class QualificationRowOut(Out):
     enrollment_id: uuid.UUID
+    name: str
+    candidate_code: str
+    track_name: str | None
     status: str
     suggestion: str
     met: int

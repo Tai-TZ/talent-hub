@@ -291,9 +291,20 @@ async def competencies(
 ) -> dict[str, Any]:
     e = await ops.get_enrollment(db, enrollment_id)
     matrix = await ops.competency_matrix(db, e)
+    learner = (
+        await db.session.execute(
+            select(User.full_name, Track.name)
+            .select_from(OrgMembership)
+            .join(User, User.id == OrgMembership.user_id)
+            .outerjoin(Track, Track.id == e.track_id)
+            .where(OrgMembership.id == e.membership_id)
+        )
+    ).one()
     return {
         "enrollment_id": e.id,
+        "name": learner[0],
         "track_id": e.track_id,
+        "track_name": (learner[1] or {}).get("vi") if learner[1] else None,
         "matrix": matrix,
         "suggestion": ops.suggestion_from(matrix),
         "status": e.status,
@@ -327,10 +338,12 @@ async def mentor_learners(
     principal: Principal = Depends(require("mentor.assess")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
     stmt = (
-        select(Enrollment, User, Placement)
+        select(Enrollment, User, Placement, Track.name, Partner.name)
         .join(Placement, Placement.enrollment_id == Enrollment.id)
+        .join(Partner, Partner.id == Placement.partner_id)
         .join(OrgMembership, OrgMembership.id == Enrollment.membership_id)
         .join(User, User.id == OrgMembership.user_id)
+        .outerjoin(Track, Track.id == Enrollment.track_id)
         .where(Enrollment.status == "active")
     )
     if "training.manage" not in principal.permissions:
@@ -341,10 +354,12 @@ async def mentor_learners(
             "enrollment_id": e.id,
             "name": u.full_name,
             "track_id": e.track_id,
+            "track_name": (track_name or {}).get("vi") if track_name else None,
             "project": p.project,
             "partner_id": p.partner_id,
+            "partner_name": partner_name,
         }
-        for e, u, p in rows
+        for e, u, p, track_name, partner_name in rows
     ]
 
 
