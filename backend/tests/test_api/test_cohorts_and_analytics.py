@@ -1,4 +1,11 @@
+import uuid
+
 import pytest
+from sqlalchemy import select
+
+from src.db import set_org_context
+from src.models import Application, Enrollment
+from src.services import analytics
 
 GAMMA = "gamma"
 
@@ -61,6 +68,47 @@ async def test_rubric_lab_finds_predictive_criteria_and_simulates_new_weights(lo
     assert bad.status_code == 422
     applicant = await login_as("applicant", GAMMA)
     assert (await applicant.post("/api/v1/analytics/lab", json={"intake_ids": ids})).status_code == 403
+
+
+async def test_rubric_lab_reuses_analysis_until_data_changes(login_as, demo_env, owner_maker, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """Chỉnh trọng số không phân tích lại; dữ liệu đổi (kết quả của một học viên) thì tính lại. Kết quả ổn định."""
+    reviewer = await login_as("reviewer", GAMMA)
+    intakes = await _intakes(reviewer)
+    ids = [intakes[f"[Minh hoạ] Đợt tuyển khoá {k}"]["id"] for k in (1, 2, 3)]
+    analytics._LAB_CACHE.clear()
+    calls: list[int] = []
+    real_analyse = analytics.lab.analyse
+    monkeypatch.setattr(analytics.lab, "analyse", lambda *a, **k: calls.append(1) or real_analyse(*a, **k))
+
+    first = (await reviewer.post("/api/v1/analytics/lab", json={"intake_ids": ids})).json()
+    weights = {c["id"]: 1 for c in first["criteria"]}
+    sim = await reviewer.post("/api/v1/analytics/lab", json={"intake_ids": ids, "weights": weights})
+    again = (await reviewer.post("/api/v1/analytics/lab", json={"intake_ids": ids})).json()
+    assert sim.status_code == 200 and again == first and len(calls) == 1
+    analytics._LAB_CACHE.clear()
+    assert (
+        await reviewer.post("/api/v1/analytics/lab", json={"intake_ids": ids})
+    ).json() == first  # tính lại vẫn y hệt
+
+    async with owner_maker() as session, session.begin():
+        await set_org_context(session, uuid.UUID(demo_env["org_id"]))
+        enrollment = (
+            await session.execute(
+                select(Enrollment)
+                .join(Application, Application.id == Enrollment.application_id)
+                .where(Application.intake_id == uuid.UUID(ids[0]), Enrollment.status == "qualified")
+                .limit(1)
+            )
+        ).scalar_one()
+        enrollment.status = "not_qualified"
+    try:
+        changed = (await reviewer.post("/api/v1/analytics/lab", json={"intake_ids": ids})).json()
+        assert len(calls) == 3
+        assert changed["analysis"]["events"] == first["analysis"]["events"] - 1
+    finally:  # trả lại dữ liệu minh hoạ dùng chung cho các test phân tích khác
+        async with owner_maker() as session, session.begin():
+            await set_org_context(session, uuid.UUID(demo_env["org_id"]))
+            (await session.get(Enrollment, enrollment.id)).status = "qualified"  # type: ignore[union-attr]
 
 
 async def test_fairness_monitor_reports_group_rates(login_as, demo_env) -> None:  # type: ignore[no-untyped-def]

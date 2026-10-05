@@ -65,6 +65,55 @@ def fit_logistic(x: np.ndarray, y: np.ndarray, l2: float = 1.0, iters: int = 60)
     return beta[:d], float(beta[d])
 
 
+def bootstrap_coefs(
+    x: np.ndarray,
+    y: np.ndarray,
+    counts: np.ndarray,
+    start: np.ndarray | None = None,
+    l2: float = 1.0,
+    iters: int = 60,
+    chunk: int = 50,
+) -> np.ndarray:
+    """Hệ số (thang chuẩn hoá) của `fit_logistic` trên từng mẫu bootstrap, giải đồng thời cả loạt.
+
+    Mẫu bootstrap thứ b là số lần mỗi dòng được rút (`counts[b]`, tổng = n); bỏ mẫu chỉ có một lớp. Tương đương với
+    chuẩn hoá `x[mẫu]` rồi gọi `fit_logistic` cho từng mẫu (cùng nghiệm tối ưu duy nhất), nhưng làm trên dữ liệu gốc
+    có trọng số: chuẩn hoá theo trọng số, đổi phạt L2 sang thang gốc (l2·sd²) rồi quy đổi hệ số về thang chuẩn hoá.
+    Nhanh hơn nhiều so với vòng lặp vì mỗi bước IRLS là vài phép nhân ma trận cho cả loạt. `start` (hệ số thang gốc,
+    kèm hằng số ở cuối) là điểm xuất phát, thường lấy từ mô hình trên toàn bộ dữ liệu để hội tụ sau ít vòng hơn.
+    """
+    n, d = x.shape
+    total = counts.sum(axis=1)
+    positives = counts @ y
+    counts = counts[(positives > 0) & (positives < total)]
+    if len(counts) == 0:
+        return np.zeros((0, d))
+    xb = np.hstack([x, np.ones((n, 1))])
+    outer = (xb[:, :, None] * xb[:, None, :]).reshape(n, (d + 1) ** 2)  # x_i x_iᵀ của từng dòng, trải phẳng
+    out = []
+    for first in range(0, len(counts), chunk):
+        c = counts[first : first + chunk]  # (B, n)
+        size = c.sum(axis=1, keepdims=True)
+        mu = c @ x / size
+        sd = np.sqrt(np.maximum(c @ (x * x) / size - mu * mu, 0.0))
+        sd[sd < 1e-9] = 1.0
+        reg = np.zeros((len(c), d + 1, d + 1))
+        reg[:, np.arange(d), np.arange(d)] = l2 * sd * sd
+        beta = np.tile(start, (len(c), 1)) if start is not None else np.zeros((len(c), d + 1))
+        for _ in range(iters):
+            z = np.clip(beta @ xb.T, -30, 30)  # (B, n)
+            p = 1 / (1 + np.exp(-z))
+            w = np.clip(p * (1 - p), 1e-6, None) * c
+            grad = ((y - p) * c) @ xb - np.einsum("bij,bj->bi", reg, beta)
+            hess = (w @ outer).reshape(len(c), d + 1, d + 1) + reg
+            step = np.linalg.solve(hess, grad[:, :, None])[:, :, 0]
+            beta += step
+            if np.max(np.abs(step * np.hstack([sd, np.ones((len(c), 1))]))) < 1e-7:
+                break
+        out.append(beta[:, :d] * sd)
+    return np.vstack(out)
+
+
 def _standardise(x: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     mu = x.mean(axis=0)
     sd = x.std(axis=0)
@@ -106,18 +155,16 @@ def analyse(rows: list[Applicant], criteria: list[str], *, bootstrap: int = 200,
         return {"n": n, "events": events, "criteria": [], "model_auc": None, "warnings": warnings, "reliable": False}
 
     x = _matrix(labelled, criteria)
-    xs, _, _ = _standardise(x)
-    coef, _ = fit_logistic(xs, y)
+    xs, mu, sd = _standardise(x)
+    coef, intercept = fit_logistic(xs, y)
 
     rng = np.random.default_rng(seed)
-    boots = []
-    for _ in range(bootstrap):
-        sample = rng.integers(0, n, n)
-        if len(np.unique(y[sample])) < 2:
-            continue
-        bs, _, _ = _standardise(x[sample])
-        boots.append(fit_logistic(bs, y[sample])[0])
-    boot_arr = np.array(boots) if boots else np.zeros((1, len(criteria)))
+    counts = np.array([np.bincount(rng.integers(0, n, n), minlength=n) for _ in range(bootstrap)], dtype=float)
+    # Mẫu bootstrap xuất phát từ mô hình trên toàn bộ dữ liệu (quy về thang gốc): gần nghiệm nên hội tụ nhanh.
+    start = np.append(coef / sd, intercept - float(np.sum(coef * mu / sd)))
+    boot_arr = bootstrap_coefs(x, y, counts, start)
+    if len(boot_arr) == 0:
+        boot_arr = np.zeros((1, len(criteria)))
     lo, hi = np.percentile(boot_arr, [5, 95], axis=0)
 
     per = []

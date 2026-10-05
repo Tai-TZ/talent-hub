@@ -1,7 +1,17 @@
 import numpy as np
 import pytest
 
-from src.analytics.lab import Applicant, analyse, auc, predict_probabilities, selection_rates, simulate
+from src.analytics.lab import (
+    Applicant,
+    _standardise,
+    analyse,
+    auc,
+    bootstrap_coefs,
+    fit_logistic,
+    predict_probabilities,
+    selection_rates,
+    simulate,
+)
 
 CRITERIA = ["projects", "programming", "motivation", "noise"]
 TRUE = {"projects": 1.6, "programming": 0.9, "motivation": 0.0, "noise": 0.0}
@@ -101,3 +111,22 @@ def test_zero_weights_are_rejected() -> None:
     pool = synthetic(n=50)
     with pytest.raises(ValueError):
         simulate(pool, {"projects": 1}, {"projects": 0}, 10)
+
+
+def test_batched_bootstrap_matches_refitting_each_resample() -> None:
+    """Giải cả loạt mẫu bootstrap bằng trọng số phải cho cùng hệ số như chuẩn hoá lại và khớp từng mẫu riêng."""
+    rng = np.random.default_rng(5)
+    n = 80
+    x = np.round(rng.uniform(0, 1, size=(n, 3)) * 4) / 4  # điểm theo nấc: nhiều đồng hạng như dữ liệu thật
+    x[:, 2] = 0.5  # một cột hằng số (độ lệch chuẩn bằng 0)
+    y = (rng.uniform(size=n) < 1 / (1 + np.exp(-(x[:, 0] * 3 - 1.5)))).astype(float)
+    samples = [rng.integers(0, n, n) for _ in range(30)] + [np.flatnonzero(y == 1)[np.zeros(n, dtype=int)]]
+    counts = np.array([np.bincount(s, minlength=n) for s in samples], dtype=float)
+
+    expected = [fit_logistic(_standardise(x[s])[0], y[s])[0] for s in samples if len(np.unique(y[s])) == 2]
+    xs, mu, sd = _standardise(x)
+    coef, b = fit_logistic(xs, y)
+    for start in (None, np.append(coef / sd, b - float(np.sum(coef * mu / sd)))):
+        got = bootstrap_coefs(x, y, counts, start, chunk=7)
+        assert got.shape == (len(expected), 3)  # mẫu chỉ có một lớp bị bỏ
+        assert np.allclose(got, np.array(expected), atol=1e-6)

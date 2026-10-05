@@ -1,10 +1,14 @@
 """Phân tích cho ban điều hành: phễu tuyển sinh, giám sát công bằng, Rubric Lab trên dữ liệu thật."""
 
+import copy
+import json
 import uuid
+from collections import OrderedDict
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import func, select, text
+from sqlalchemy import Float, func, select, text
 
 from src.analytics import lab
 from src.errors import NotFoundError, ValidationFailedError
@@ -140,13 +144,38 @@ async def fairness(db: OrgDb, intake_id: uuid.UUID) -> dict[str, Any]:
     return out
 
 
-async def _lab_pool(
-    db: OrgDb, intake_ids: list[uuid.UUID]
-) -> tuple[list[lab.Applicant], list[dict[str, Any]], dict[str, float]]:
+@dataclass(frozen=True)
+class _LabSetup:
+    definitions: list[dict[str, Any]]  # tiêu chí chung, lấy định nghĩa của đợt đầu tiên
+    first_rounds: dict[uuid.UUID, str]
+    rubrics_json: str  # toàn bộ tiêu chí của các đợt, dùng làm một phần khoá bộ nhớ đệm
+
+    @property
+    def criteria(self) -> list[str]:
+        return [c["id"] for c in self.definitions]
+
+
+@dataclass
+class _LabData:
+    pool: list[lab.Applicant]
+    analysis: dict[str, Any]
+    probs: dict[str, float] | None = None  # xác suất đạt ước lượng, chỉ tính khi cần mô phỏng
+
+
+# Bộ nhớ đệm trong tiến trình cho phần nặng của Rubric Lab (nạp dữ liệu + phân tích bootstrap). Màn Lab gọi lại mỗi lần
+# người dùng chỉnh trọng số; các phần này không phụ thuộc trọng số và dữ liệu đợt cũ hiếm khi đổi. Khoá gồm tổ chức,
+# danh sách đợt, rubric và dấu vân tay dữ liệu, nên dữ liệu đổi là tự tính lại.
+_LAB_CACHE: OrderedDict[tuple[Any, ...], _LabData] = OrderedDict()
+LAB_CACHE_SIZE = 8
+
+
+async def _lab_setup(db: OrgDb, intake_ids: list[uuid.UUID]) -> _LabSetup:
     criteria_by_intake: list[list[dict[str, Any]]] = []
+    first_rounds: dict[uuid.UUID, str] = {}
     for iid in intake_ids:
         intake = await _intake(db, iid)
-        rubric = await active_rubric(db, iid, intake.rounds[0]["key"])
+        first_rounds[iid] = intake.rounds[0]["key"]
+        rubric = await active_rubric(db, iid, first_rounds[iid])
         if rubric is None:
             raise ValidationFailedError("Một đợt tuyển chưa có rubric", {"intake_ids": str(iid)})
         criteria_by_intake.append(rubric.criteria)
@@ -159,34 +188,77 @@ async def _lab_pool(
         raise ValidationFailedError(
             "Các đợt tuyển không có tiêu chí chung để so sánh", {"intake_ids": "Không có tiêu chí chung"}
         )
-    definitions = [c for c in criteria_by_intake[0] if c["id"] in common]
-    old_weights = {c["id"]: float(c["weight"]) for c in definitions}
-    max_by = {c["id"]: float(c["max"]) for c in definitions}
+    return _LabSetup(
+        definitions=[c for c in criteria_by_intake[0] if c["id"] in common],
+        first_rounds=first_rounds,
+        rubrics_json=json.dumps(criteria_by_intake, sort_keys=True, default=str),
+    )
 
+
+async def _lab_fingerprint(db: OrgDb, intake_ids: list[uuid.UUID]) -> tuple[Any, ...]:
+    """Dấu vân tay dữ liệu đầu vào của Lab: đổi khi thêm hay sửa hồ sơ, bài chấm hoặc ghi danh của các đợt.
+
+    Dùng số dòng và *tổng* `updated_at` (numeric, chính xác tới micro giây) thay vì `max`: một giao dịch bắt đầu sớm
+    nhưng commit muộn ghi `updated_at` nhỏ hơn max đã thấy, `max` sẽ bỏ sót còn tổng thì không. Ba bảng này không có
+    thao tác xoá; mọi cập nhật đều đặt lại `updated_at` (ORM `onupdate` hoặc gán trực tiếp trong SQL).
+    """
+    in_intakes = Application.intake_id.in_(intake_ids)
+    out: list[Any] = []
+    for stmt in (
+        select(func.count(), func.sum(func.extract("epoch", Application.updated_at))).where(in_intakes),
+        select(func.count(), func.sum(func.extract("epoch", Review.updated_at)))
+        .join(Application, Application.id == Review.application_id)
+        .where(in_intakes),
+        select(func.count(), func.sum(func.extract("epoch", Enrollment.updated_at)))
+        .join(Application, Application.id == Enrollment.application_id)
+        .where(in_intakes),
+    ):
+        out.extend((await db.session.execute(stmt)).one())
+    return tuple(out)
+
+
+async def _lab_pool(db: OrgDb, intake_ids: list[uuid.UUID], setup: _LabSetup) -> list[lab.Applicant]:
+    common = setup.criteria
+    max_by = {c["id"]: float(c["max"]) for c in setup.definitions}
     pool: list[lab.Applicant] = []
     for iid in intake_ids:
-        intake = await _intake(db, iid)
-        first_round = intake.rounds[0]["key"]
+        # Chỉ lấy đúng các trường cần (giới tính, tỉnh/thành, điểm các tiêu chí chung) thay vì giải mã cả JSONB
+        # hồ sơ và bảng điểm: với hàng chục nghìn hồ sơ, phần giải mã chiếm phần lớn thời gian.
         rows = (
             await db.session.execute(
-                select(Application.id, Application.profile, Application.status, Enrollment.status)
+                select(
+                    Application.id,
+                    Application.profile["gender"].astext,
+                    Application.profile["city"].astext,
+                    Application.status,
+                    Enrollment.status,
+                )
                 .outerjoin(Enrollment, Enrollment.application_id == Application.id)
                 .where(Application.intake_id == iid, Application.status != "DRAFT")
+                # Thứ tự cố định: mẫu bootstrap phụ thuộc thứ tự dòng, thiếu ORDER BY thì khoảng tin cậy đổi giữa các lần xem.
+                .order_by(Application.id)
             )
         ).all()
-        scores: dict[uuid.UUID, dict[str, list[float]]] = {}
-        for app_id, raw in (
-            await db.session.execute(
-                select(Review.application_id, Review.scores)
-                .join(Application, Application.id == Review.application_id)
-                .where(Application.intake_id == iid, Review.round == first_round, Review.submitted_at.is_not(None))
-            )
-        ).all():
-            bucket = scores.setdefault(app_id, {})
-            for cid in common:
-                if cid in raw:
-                    bucket.setdefault(cid, []).append(float(raw[cid]) / max_by[cid])
-        for app_id, profile, status, enrollment_status in rows:
+        # Điểm trung bình (chuẩn hoá 0..1) của các bài chấm vòng đầu theo từng tiêu chí, tính ngay trong DB.
+        scores: dict[uuid.UUID, dict[str, float]] = {
+            app_id: {cid: value for cid, value in zip(common, averages, strict=True) if value is not None}
+            for app_id, *averages in (
+                await db.session.execute(
+                    select(
+                        Review.application_id,
+                        *(func.avg(Review.scores[cid].astext.cast(Float) / max_by[cid]) for cid in common),
+                    )
+                    .join(Application, Application.id == Review.application_id)
+                    .where(
+                        Application.intake_id == iid,
+                        Review.round == setup.first_rounds[iid],
+                        Review.submitted_at.is_not(None),
+                    )
+                    .group_by(Review.application_id)
+                )
+            ).all()
+        }
+        for app_id, gender, city, status, enrollment_status in rows:
             if app_id not in scores:
                 continue  # chưa có điểm vòng đầu thì không đưa vào phân tích
             admitted = status in ("ACCEPTED", "ENROLLED")
@@ -194,22 +266,35 @@ async def _lab_pool(
             pool.append(
                 lab.Applicant(
                     id=str(app_id),
-                    scores={cid: sum(v) / len(v) for cid, v in scores[app_id].items()},
+                    scores=scores[app_id],
                     admitted=admitted,
                     outcome=outcome,
-                    groups={
-                        "gender": (profile or {}).get("gender") or "khong_khai",
-                        "region": _region((profile or {}).get("city")),
-                    },
+                    groups={"gender": gender or "khong_khai", "region": _region(city)},
                 )
             )
-    return pool, definitions, old_weights
+    return pool
+
+
+async def _lab_data(db: OrgDb, intake_ids: list[uuid.UUID], setup: _LabSetup) -> _LabData:
+    key = (db.org.id, tuple(intake_ids), setup.rubrics_json, await _lab_fingerprint(db, intake_ids))
+    data = _LAB_CACHE.get(key)
+    if data is not None:
+        _LAB_CACHE.move_to_end(key)
+        return data
+    pool = await _lab_pool(db, intake_ids, setup)
+    data = _LabData(pool=pool, analysis=lab.analyse(pool, setup.criteria))
+    _LAB_CACHE[key] = data
+    while len(_LAB_CACHE) > LAB_CACHE_SIZE:
+        _LAB_CACHE.popitem(last=False)
+    return data
 
 
 async def lab_report(db: OrgDb, intake_ids: list[uuid.UUID], new_weights: dict[str, float] | None) -> dict[str, Any]:
-    pool, definitions, old_weights = await _lab_pool(db, intake_ids)
-    criteria = [c["id"] for c in definitions]
-    analysis = lab.analyse(pool, criteria)
+    setup = await _lab_setup(db, intake_ids)
+    data = await _lab_data(db, intake_ids, setup)
+    pool, criteria, definitions = data.pool, setup.criteria, setup.definitions
+    old_weights = {c["id"]: float(c["weight"]) for c in definitions}
+    analysis = copy.deepcopy(data.analysis)  # bản riêng cho mỗi phản hồi, không để lộ đối tượng trong bộ nhớ đệm
     admitted = sum(1 for p in pool if p.admitted)
     result: dict[str, Any] = {
         "criteria": [{"id": c["id"], "name": c["name"], "weight": float(c["weight"])} for c in definitions],
@@ -222,13 +307,14 @@ async def lab_report(db: OrgDb, intake_ids: list[uuid.UUID], new_weights: dict[s
         cleaned = {k: float(v) for k, v in new_weights.items() if k in criteria}
         if not cleaned or sum(max(w, 0) for w in cleaned.values()) <= 0:
             raise ValidationFailedError("Trọng số mới phải có ít nhất một giá trị dương", {"weights": "Không hợp lệ"})
-        probs = (
-            lab.predict_probabilities(pool, pool, criteria)
-            if analysis.get("reliable") or analysis.get("n", 0) >= 10
-            else {}
-        )
+        if data.probs is None:
+            data.probs = (
+                lab.predict_probabilities(pool, pool, criteria)
+                if analysis.get("reliable") or analysis.get("n", 0) >= 10
+                else {}
+            )
         result["simulation"] = lab.simulate(
-            pool, old_weights, {c: max(cleaned.get(c, 0.0), 0.0) for c in criteria}, admitted, probs
+            pool, old_weights, {c: max(cleaned.get(c, 0.0), 0.0) for c in criteria}, admitted, data.probs
         )
         result["new_weights"] = cleaned
     return result
