@@ -54,6 +54,11 @@ jobs:
       - name: Type check
         run: mypy src
 
+      - name: OpenAPI schema is up to date
+        run: |
+          python -m src.cli openapi --out ../frontend/openapi.json
+          git diff --exit-code ../frontend/openapi.json || (echo "::error::frontend/openapi.json lỗi thời: chạy make openapi rồi commit" && exit 1)
+
       - name: Test (với kiểm tra độ phủ)
         run: pytest --cov
 
@@ -88,6 +93,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - name: API types are up to date
+        run: |
+          npm run api:types
+          git diff --exit-code src/lib/api-types.ts || (echo "::error::src/lib/api-types.ts lỗi thời: chạy npm run api:types rồi commit" && exit 1)
       - run: npm test
       - run: npm run build
         env:
