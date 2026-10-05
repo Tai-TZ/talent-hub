@@ -57,7 +57,7 @@ jobs:
       - name: OpenAPI schema is up to date
         run: |
           python -m src.cli openapi --out ../frontend/openapi.json
-          git diff --exit-code ../frontend/openapi.json || (echo "::error::frontend/openapi.json lỗi thời: chạy make openapi rồi commit" && exit 1)
+          git diff --exit-code ../frontend/openapi.json || (echo "::error::frontend/openapi.json lỗi thời: chạy make api-types rồi commit" && exit 1)
 
       - name: Test (với kiểm tra độ phủ)
         run: pytest --cov
@@ -69,7 +69,9 @@ jobs:
     name: Security scan (Semgrep)
     runs-on: ubuntu-latest
     container:
-      image: semgrep/semgrep:latest
+      # Ghim phiên bản để luật/engine mới không âm thầm làm đỏ CI; Dependabot (github-actions/docker) không nâng
+      # image trong container job, nên nâng tay khi cần.
+      image: semgrep/semgrep:1.179.0
     steps:
       - uses: actions/checkout@v4
       - name: Semgrep
