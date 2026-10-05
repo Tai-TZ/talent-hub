@@ -4089,7 +4089,7 @@ export interface components {
              */
             comment: string;
             /** Recommendation */
-            recommendation?: string | null;
+            recommendation?: ("advance" | "reject" | "waitlist") | null;
             /** Scores */
             scores?: {
                 [key: string]: number;

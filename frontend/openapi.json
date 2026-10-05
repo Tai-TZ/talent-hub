@@ -6623,6 +6623,11 @@
           "recommendation": {
             "anyOf": [
               {
+                "enum": [
+                  "advance",
+                  "reject",
+                  "waitlist"
+                ],
                 "type": "string"
               },
               {

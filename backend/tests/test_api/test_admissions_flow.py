@@ -303,6 +303,20 @@ async def test_concurrent_approvals_cannot_exceed_quota(login_as, monkeypatch) -
     assert sorted(r.status_code for r in results) == [200, 409], [r.text for r in results]
 
 
+async def test_unknown_recommendation_is_rejected_even_for_a_draft_review(login_as) -> None:  # type: ignore[no-untyped-def]
+    admin = await login_as("admin")
+    reviewer = await login_as("reviewer")
+    intake = await create_open_intake(admin)
+    app = await submit_application(await login_as("applicant"), intake["id"])
+    await _close_and_start(admin, intake["id"])
+    url = f"/api/v1/staff/applications/{app['id']}/review"
+    for value in ("maybe", "x" * 40):
+        res = await reviewer.put(url, json={"scores": {}, "recommendation": value, "submit": False})
+        assert res.status_code == 422, res.text
+    draft = await reviewer.put(url, json={"scores": {}, "recommendation": "waitlist", "submit": False})
+    assert draft.status_code == 200, draft.text
+
+
 async def test_reviewer_disagreement_blocks_advance_and_other_reviews_hidden_until_submit(login_as) -> None:  # type: ignore[no-untyped-def]
     admin = await login_as("admin")
     applicant = await login_as("applicant")
