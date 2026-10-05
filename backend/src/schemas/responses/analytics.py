@@ -116,3 +116,89 @@ class LabIntakeOut(Out):
     admitted: int
     with_outcome: int
     criteria: list[LabIntakeCriterion]
+
+
+class QualityCohort(Out):
+    id: uuid.UUID
+    code: str
+    name: str
+    status: str
+    classes: int
+
+
+class QualitySummary(Out):
+    learners: int
+    active: int
+    qualified: int
+    not_qualified: int
+    withdrawn: int
+    qualified_rate: float | None
+    coverage: float | None
+    attainment: float | None
+
+
+class QualityTrackCell(Out):
+    track_id: uuid.UUID
+    track: str
+    targeted: int
+    assessed: int
+    met: int
+    attainment: float | None
+
+
+class QualityCompetency(Out):
+    id: uuid.UUID
+    code: str
+    name: str
+    targeted: int
+    assessed: int
+    met: int
+    attainment: float | None
+    coverage: float | None
+    avg_gap: float | None
+    previous: float | None
+    by_track: list[QualityTrackCell]
+
+
+class QualityTrack(Out):
+    track_id: uuid.UUID
+    track: str
+    learners: int
+    qualified: int
+    not_qualified: int
+    active: int
+    qualified_rate: float | None
+
+
+class QualityAlertItem(Out):
+    label: str
+    ref_type: str
+    ref_id: str
+
+
+class QualityAlert(Out):
+    code: str
+    severity: str
+    title: str
+    detail: str
+    count: int
+    items: list[QualityAlertItem]
+
+
+class QualityRecommendation(Out):
+    priority: str
+    area: str
+    title: str
+    rationale: str
+    actions: list[str]
+
+
+class QualityOut(Out):
+    cohort: QualityCohort
+    previous_cohort: str | None
+    summary: QualitySummary
+    competencies: list[QualityCompetency]
+    tracks: list[QualityTrack]
+    alerts: list[QualityAlert]
+    recommendations: list[QualityRecommendation]
+    thresholds: dict[str, float]

@@ -163,6 +163,38 @@ def _composite(scores: dict[str, float], criteria: list[dict[str, Any]]) -> floa
     return float(sum(scores[c["id"]] / c["max"] * c["weight"] for c in criteria if c["id"] in scores) / total_w * 100)
 
 
+# Khả năng một năng lực là chỗ học viên chưa đạt bị hụt (năng lực khó hơn thì hay hụt hơn).
+FAIL_WEIGHTS = {
+    "programming": 1.0,
+    "machine_learning": 1.4,
+    "data_engineering": 1.6,
+    "product_thinking": 1.2,
+    "collaboration": 0.8,
+}
+
+
+def _competency_levels(
+    rng: random.Random, targets: dict[str, int], qualified: bool, *, last_cohort: bool
+) -> dict[str, int]:
+    """Mức năng lực minh hoạ khớp với kết quả xét đạt: đạt thì mọi năng lực đủ mức, chưa đạt thì hụt 1-2 năng lực.
+
+    Khoá cuối được dựng yếu hẳn ở tư duy sản phẩm (kể cả vài người vẫn được xét đạt) để màn Chất lượng chương trình có
+    ví dụ về năng lực tụt so với khoá trước và quyết định không khớp dữ liệu.
+    """
+    weights = {**FAIL_WEIGHTS, **({"product_thinking": 4.0} if last_cohort else {})}
+    levels = {code: min(7, target + rng.choice((0, 0, 1, 1, 2))) for code, target in targets.items()}
+    codes = list(targets)
+    if not qualified:
+        failing: set[str] = set()
+        while len(failing) < min(1 if rng.random() < 0.6 else 2, len(codes)):
+            failing.add(rng.choices(codes, weights=[weights.get(c, 1.0) for c in codes])[0])
+        for code in failing:
+            levels[code] = max(1, targets[code] - rng.choice((1, 1, 2)))
+    elif last_cohort and "product_thinking" in targets and rng.random() < 0.3:
+        levels["product_thinking"] = targets["product_thinking"] - 1
+    return levels
+
+
 async def _ensure_roles(session: AsyncSession) -> dict[str, uuid.UUID]:
     return {code: rid for code, rid in (await session.execute(select(Role.code, Role.id))).all()}
 
@@ -380,6 +412,8 @@ async def seed_demo(
         reviews: list[dict[str, Any]] = []
         enrollments: list[dict[str, Any]] = []
         assess_rows: list[dict[str, Any]] = []
+        # RNG riêng cho đánh giá năng lực: không làm xáo dãy ngẫu nhiên của hồ sơ/điểm tuyển sinh (Rubric Lab dựa vào đó).
+        arng = random.Random(f"{seed}-assess-{k}")  # noqa: S311 - dữ liệu giả
         track_list = list(tracks.values())
         qualified_n = 0
         for rank, (_, person, _uid, mid, s1) in enumerate(scored):
@@ -463,8 +497,32 @@ async def seed_demo(
                         "enrolled_at": starts,
                     }
                 )
-                for code_c, target in TRACK_TARGETS[track.key].items():
-                    lvl = int(max(1, min(7, round(target + (0.4 if qualified else -1.3) + rng.gauss(0, 0.6)))))
+                levels = _competency_levels(
+                    arng, TRACK_TARGETS[track.key], qualified, last_cohort=k == len(history_sizes)
+                )
+                # Mentor thứ hai chấm rộng tay hơn (khoá 2 trở đi) để màn Chất lượng chương trình có ví dụ hiệu chuẩn.
+                lenient = k >= 2 and len(reviewers) > 1 and arng.random() < 0.4
+                assessor = reviewers[1] if lenient else reviewers[0]
+                skip = k == len(history_sizes) and arng.random() < 0.02  # vài bản ghi còn thiếu
+                jump = k == 2 and arng.random() < 0.03  # vài lần nhập nhầm rồi sửa
+                for idx, (code_c, lvl) in enumerate(levels.items()):
+                    if skip and idx == 0:
+                        continue
+                    if lenient and lvl >= TRACK_TARGETS[track.key][code_c]:
+                        lvl = min(7, lvl + 1)
+                    if jump and idx == 0:
+                        assess_rows.append(
+                            {
+                                "id": uuid7(),
+                                "organization_id": org.id,
+                                "enrollment_id": enrollment_id,
+                                "competency_id": comps[code_c].id,
+                                "level": lvl - 3 if lvl >= 4 else lvl + 3,
+                                "evidence": "Đánh giá minh hoạ (nhập nhầm, đã được đánh giá lại).",
+                                "assessor_membership_id": assessor,
+                                "assessed_at": now - timedelta(days=60),
+                            }
+                        )
                     assess_rows.append(
                         {
                             "id": uuid7(),
@@ -473,7 +531,7 @@ async def seed_demo(
                             "competency_id": comps[code_c].id,
                             "level": lvl,
                             "evidence": "Đánh giá minh hoạ của mentor dựa trên dự án thực chiến.",
-                            "assessor_membership_id": reviewers[0],
+                            "assessor_membership_id": assessor,
                             "assessed_at": now - timedelta(days=30),
                         }
                     )

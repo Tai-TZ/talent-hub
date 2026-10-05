@@ -70,6 +70,36 @@ async def test_rubric_lab_finds_predictive_criteria_and_simulates_new_weights(lo
     assert (await applicant.post("/api/v1/analytics/lab", json={"intake_ids": ids})).status_code == 403
 
 
+async def test_programme_quality_reports_outcomes_alerts_and_improvements(login_as, demo_env) -> None:  # type: ignore[no-untyped-def]
+    manager = await login_as("training_manager", GAMMA)
+    cohorts = (await _programs(manager))["cohorts"]
+    k3, k1 = cohorts["K3"], cohorts["K1"]
+
+    res = await manager.get(f"/api/v1/analytics/quality?cohort_id={k3['id']}")
+    assert res.status_code == 200, res.text
+    data = res.json()
+    assert data["cohort"]["code"] == "K3" and data["previous_cohort"] == "K2"
+    assert data["summary"]["learners"] > 50 and 0 < data["summary"]["coverage"] <= 1
+    assert {c["code"] for c in data["competencies"]} >= {"programming", "product_thinking"}
+    assert all(c["by_track"] for c in data["competencies"]) and data["tracks"]
+    assert data["recommendations"] and all(r["actions"] for r in data["recommendations"])
+    # Dữ liệu minh hoạ khoá cuối có vài bản ghi thiếu và vài quyết định đạt dù tư duy sản phẩm chưa đủ mức.
+    codes = {a["code"] for a in data["alerts"]}
+    assert {"missing_assessment", "decision_mismatch"} <= codes
+    assert (await manager.get(f"/api/v1/analytics/quality?cohort_id={k1['id']}")).json()["previous_cohort"] is None
+
+    report = await manager.get(f"/api/v1/analytics/quality/report?cohort_id={k3['id']}")
+    assert report.status_code == 200 and report.headers["content-type"].startswith("text/markdown")
+    assert 'filename="quality-K3.md"' in report.headers["content-disposition"]
+    assert report.text.startswith("# Báo cáo chất lượng chương trình — K3")
+    english = await manager.get(f"/api/v1/analytics/quality?cohort_id={k3['id']}", headers={"Accept-Language": "en"})
+    assert english.json()["recommendations"][0]["actions"][0][0].isascii()
+
+    assert (await manager.get(f"/api/v1/analytics/quality?cohort_id={uuid.uuid4()}")).status_code == 404
+    applicant = await login_as("applicant", GAMMA)
+    assert (await applicant.get(f"/api/v1/analytics/quality?cohort_id={k3['id']}")).status_code == 403
+
+
 async def test_rubric_lab_lists_comparable_intakes_with_their_criteria(login_as, demo_env) -> None:  # type: ignore[no-untyped-def]
     reviewer = await login_as("reviewer", GAMMA)
     res = await reviewer.get("/api/v1/analytics/lab/intakes")

@@ -9,7 +9,7 @@ import { MAX_BODY_BYTES, MAX_UPLOAD_BODY_BYTES } from "@/lib/config";
 export const dynamic = "force-dynamic";
 
 // location: chuyển hướng OIDC do chính backend tạo (đường dẫn nội bộ hoặc URL xác thực của nhà cung cấp).
-const PASS_THROUGH_RESPONSE_HEADERS = ["content-type", "retry-after", "x-request-id", "location"];
+const PASS_THROUGH_RESPONSE_HEADERS = ["content-type", "content-disposition", "retry-after", "x-request-id", "location"];
 
 function problem(status: number, title: string): Response {
   return Response.json({ type: "about:blank", title, status, detail: title }, {
