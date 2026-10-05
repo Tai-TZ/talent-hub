@@ -18,7 +18,8 @@ export function TextField({ label, error, help, showLabel, hideLabel, type = "te
   const errorId = `${id}-error`;
   const [revealed, setRevealed] = useState(false);
   const isPassword = type === "password";
-  const describedBy = [help ? helpId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
+  // Khi có lỗi, phần trợ giúp bị ẩn: chỉ tham chiếu tới phần tử thực sự hiển thị.
+  const describedBy = [help && !error ? helpId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
 
   return (
     <div className="th-field">
