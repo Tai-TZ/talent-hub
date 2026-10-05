@@ -40,6 +40,12 @@ async def pending_decision(db: OrgDb, application_id: uuid.UUID) -> Decision | N
     ).scalar_one_or_none()
 
 
+def _forbid_own_application(app: Application, actor: Actor) -> None:
+    """Xung đột lợi ích: người vừa là ứng viên vừa là nhân sự không được quyết định hồ sơ của chính mình."""
+    if app.applicant_membership_id == actor.membership_id:
+        raise PermissionDeniedError("Không được quyết định hồ sơ của chính mình (xung đột lợi ích)")
+
+
 async def occupied_seats(db: OrgDb, intake_id: uuid.UUID) -> int:
     return (
         await db.session.execute(
@@ -67,8 +73,7 @@ async def propose(
         )
     if len(reason.strip()) < MIN_REASON:
         raise ValidationFailedError("Lý do đề xuất cần cụ thể", {"reason": f"Tối thiểu {MIN_REASON} ký tự"})
-    if app.applicant_membership_id == actor.membership_id:
-        raise PermissionDeniedError("Không được đề xuất quyết định cho hồ sơ của chính mình")
+    _forbid_own_application(app, actor)
 
     intake = await get_intake(db, app.intake_id)
     if app.status == "IN_ROUND":
@@ -130,6 +135,7 @@ async def approve(
         raise ConflictError("Đề xuất đã được xử lý")
     if decision.proposed_by == actor.user_id:
         raise PermissionDeniedError("Người đề xuất không được tự phê duyệt (nguyên tắc bốn mắt)")
+    _forbid_own_application(app, actor)
     if outcome not in OUTCOME_TO_STATUS:
         raise ValidationFailedError("Kết quả không hợp lệ", {"outcome": "Chọn accepted, rejected hoặc waitlisted"})
     if len(reason.strip()) < MIN_REASON:
@@ -199,6 +205,7 @@ async def return_to_review(
     assert actor.user_id is not None
     if decision.status != "pending":
         raise ConflictError("Đề xuất đã được xử lý")
+    _forbid_own_application(app, actor)
     if len(note.strip()) < 10:
         raise ValidationFailedError("Hãy nêu yêu cầu xem xét lại", {"note": "Tối thiểu 10 ký tự"})
     decision.status = "returned"

@@ -221,6 +221,47 @@ async def test_reviewer_cannot_review_own_application(login_as) -> None:  # type
     assert proposal.status_code == 403
 
 
+async def test_dual_role_approver_cannot_decide_own_application(login_as) -> None:  # type: ignore[no-untyped-def]
+    """Người vừa là ứng viên vừa là approver: người khác đề xuất cho hồ sơ của họ, họ không được duyệt hay trả lại."""
+    admin = await login_as("admin")
+    dual = await login_as("dual")
+    reviewer = await login_as("reviewer")
+    intake = await create_open_intake(admin)
+    app = await submit_application(dual, intake["id"], name="Dual Role")
+    await _close_and_start(admin, intake["id"])
+    assert (await _review(reviewer, app["id"], FULL_SCORES)).status_code == 200
+    proposal = await reviewer.post(
+        f"/api/v1/staff/applications/{app['id']}/proposals",
+        json={"outcome": "accepted", "reason": "Đủ năng lực và kinh nghiệm cho chương trình theo rubric."},
+    )
+    assert proposal.status_code == 201, proposal.text
+    decision_id = proposal.json()["decision_id"]
+    own = await dual.post(
+        f"/api/v1/staff/decisions/{decision_id}/approve",
+        json={
+            "outcome": "accepted",
+            "reason": "Tự duyệt hồ sơ của chính mình, không hợp lệ.",
+            "applicant_message": "Chúc mừng bạn được nhận.",
+        },
+    )
+    assert own.status_code == 403
+    sent_back = await dual.post(
+        f"/api/v1/staff/decisions/{decision_id}/return", json={"note": "Tự trả hồ sơ của mình về vòng xét."}
+    )
+    assert sent_back.status_code == 403
+    # approver khác vẫn duyệt bình thường
+    approver = await login_as("approver")
+    ok = await approver.post(
+        f"/api/v1/staff/decisions/{decision_id}/approve",
+        json={
+            "outcome": "accepted",
+            "reason": "Đồng ý với đề xuất, hồ sơ đạt yêu cầu.",
+            "applicant_message": "Chúc mừng bạn được nhận.",
+        },
+    )
+    assert ok.status_code == 200, ok.text
+
+
 async def test_reviewer_disagreement_blocks_advance_and_other_reviews_hidden_until_submit(login_as) -> None:  # type: ignore[no-untyped-def]
     admin = await login_as("admin")
     applicant = await login_as("applicant")
