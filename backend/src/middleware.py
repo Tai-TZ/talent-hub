@@ -5,6 +5,7 @@ import logging
 import re
 import time
 import uuid
+from urllib.parse import urlsplit
 
 from starlette.datastructures import Headers, MutableHeaders
 from starlette.responses import JSONResponse
@@ -20,12 +21,20 @@ REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9-]{8,64}$")
 DOC_PATHS = ("/docs", "/redoc", "/openapi.json")
 # Chỉ endpoint tải tài liệu được nhận body lớn (JSON base64); mọi nơi khác giữ giới hạn nhỏ.
 UPLOAD_PATH = "/api/v1/admin/documents"
+TENANT_LABEL_RE = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$")
 
 
 class RequestContextMiddleware:
     def __init__(self, app: ASGIApp, settings: Settings) -> None:
         self.app = app
         self.allowed_origins = frozenset(settings.allowed_origins)
+        # Tên miền con của tổ chức (`<slug>.<base_domain>`) cùng scheme và cổng với một origin được phép, ví dụ
+        # http://scale.localhost:3000 khi chạy local hay https://northwind.<miền-chính> khi chạy thật.
+        self.tenant_origins = {
+            (u.scheme, u.port, u.hostname)
+            for u in (urlsplit(o) for o in settings.allowed_origins if o != "*")
+            if u.hostname == settings.base_domain
+        }
         self.max_body = settings.max_body_bytes
         self.max_upload = settings.max_upload_bytes
         self.hsts = settings.cookie_secure
@@ -83,12 +92,24 @@ class RequestContextMiddleware:
                 )
             request_id_var.reset(token)
 
+    def _origin_allowed(self, origin: str) -> bool:
+        if origin in self.allowed_origins:
+            return True
+        try:
+            u = urlsplit(origin)
+            port = u.port
+        except ValueError:
+            return False
+        host = u.hostname or ""
+        label, _, parent = host.partition(".")
+        return bool(TENANT_LABEL_RE.match(label)) and (u.scheme, port, parent) in self.tenant_origins
+
     def _reject(self, method: str, headers: Headers, path: str) -> JSONResponse | None:
         if method not in UNSAFE_METHODS:
             return None
         # Chặn CSRF: yêu cầu ghi từ trình duyệt phải đến từ nguồn được phép.
         origin = headers.get("origin")
-        if origin is not None and origin not in self.allowed_origins:
+        if origin is not None and not self._origin_allowed(origin):
             return JSONResponse(status_code=403, content={"detail": "Nguồn yêu cầu không được phép"})
         length = headers.get("content-length")
         limit = self.max_upload if method == "POST" and path == UPLOAD_PATH else self.max_body

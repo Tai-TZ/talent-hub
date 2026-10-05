@@ -96,8 +96,7 @@ async def revoke_key(
 @router.get("/exports/{dataset}.csv", response_class=Response)
 async def export_csv(dataset: str, request: Request, db: OrgDb = Depends(org_db)) -> Response:
     """CSV đã khử định danh. Xác thực bằng khoá có `export.read` (Power BI) hoặc phiên đăng nhập có quyền export.read."""
-    if dataset not in integrations.EXPORTS:
-        raise HTTPException(status_code=404, detail="Không có bộ dữ liệu này")
+    # Xác thực trước khi kiểm tra tên bộ dữ liệu: người chưa xác thực không dò được bộ nào tồn tại.
     if _bearer(request):
         key = await _key(request, db)
         if "export.read" not in key.scopes:
@@ -106,6 +105,8 @@ async def export_csv(dataset: str, request: Request, db: OrgDb = Depends(org_db)
         principal = await current_principal(request, db)
         if "export.read" not in principal.permissions:
             raise HTTPException(status_code=403, detail="Không đủ quyền thực hiện thao tác này")
+    if dataset not in integrations.EXPORTS:
+        raise HTTPException(status_code=404, detail="Không có bộ dữ liệu này")
     body = await integrations.EXPORTS[dataset](db)
     await db.commit()  # lưu thời điểm dùng khoá
     return Response(

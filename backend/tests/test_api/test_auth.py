@@ -167,6 +167,30 @@ async def test_cross_origin_write_is_rejected(client: AsyncClient, password: str
     assert ok.status_code == 200
 
 
+async def test_tenant_subdomain_origins_are_allowed_but_lookalikes_are_not(client: AsyncClient, password: str) -> None:
+    """Mỗi tổ chức có tên miền con riêng (`<slug>.<base_domain>`): cùng scheme/cổng với origin được phép thì qua."""
+
+    async def login_from(origin: str) -> int:
+        res = await client.post(
+            "/api/v1/auth/login",
+            json={"email": "admin@alpha.test", "password": password},
+            headers={**ALPHA, "Origin": origin},
+        )
+        return res.status_code
+
+    assert await login_from("http://alpha.localhost:3000") == 200
+    for origin in (
+        "http://a.b.localhost:3000",  # nhiều cấp
+        "https://alpha.localhost:3000",  # sai scheme
+        "http://alpha.localhost:4000",  # sai cổng
+        "http://alpha.localhost.evil.example:3000",  # giả mạo đuôi
+        "http://-alpha.localhost:3000",  # nhãn không hợp lệ
+        "http://localhost:3000.evil.example",
+        "null",
+    ):
+        assert await login_from(origin) == 403, origin
+
+
 async def test_health(client: AsyncClient) -> None:
     assert (await client.get("/healthz")).json() == {"status": "ok"}
     assert (await client.get("/readyz")).json() == {"status": "ready"}
