@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import multiprocessing
 import time
 import uuid
 from collections import Counter, deque
@@ -168,7 +169,11 @@ async def run_triage(
 
     workers = get_settings().triage_workers
     use_pool = isinstance(engine, HeuristicEngine) and workers > 0 and len(pending) >= POOL_MIN
-    pool = ProcessPoolExecutor(max_workers=workers) if use_pool else None
+    # Luôn dùng `spawn` (mặc định trên Linux là `fork`): sao chép một tiến trình API đang có nhiều luồng có thể treo
+    # do khoá bị giữ dở; tiến trình con chỉ cần nạp `src.ai.heuristic`.
+    pool = (
+        ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn")) if use_pool else None
+    )
     tiers: Counter[str] = Counter()
     failed = 0
     scores: list[float] = []

@@ -194,19 +194,19 @@ async def test_large_batch_scored_in_worker_processes_matches_in_process(login_a
     assert in_process["status"] == "done"
     before = (await admin.get(f"/api/v1/intakes/{intake['id']}/triage")).json()["items"]
 
-    pools: list[ProcessPoolExecutor] = []
+    start_methods: list[str] = []
 
     class CountingPool(ProcessPoolExecutor):
         def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
             super().__init__(*args, **kwargs)
-            pools.append(self)
+            start_methods.append(kwargs["mp_context"].get_start_method())
 
     monkeypatch.setattr(triage, "ProcessPoolExecutor", CountingPool)
     monkeypatch.setattr(triage, "POOL_MIN", 1)
     monkeypatch.setattr(triage, "POOL_BATCH", 1)  # mỗi hồ sơ một lô để thử cả hàng đợi nhiều lô
     monkeypatch.setattr(get_settings(), "triage_workers", 2)
     _, pooled = await _run(admin, intake["id"], force=True)
-    assert len(pools) == 1
+    assert start_methods == ["spawn"]  # không fork tiến trình API nhiều luồng (mặc định của Linux)
     assert pooled["status"] == "done" and pooled["done"] == 3
     assert pooled["result"]["processed"] == 3 and pooled["result"]["tiers"] == in_process["result"]["tiers"]
     after = (await admin.get(f"/api/v1/intakes/{intake['id']}/triage")).json()["items"]
