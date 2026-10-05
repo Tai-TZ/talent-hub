@@ -259,6 +259,7 @@ async def test_responses_never_include_secrets_or_internal_fields(login_as: Any)
         "jwt_secret",
         "token_hash",
         "anthropic_api_key",
+        "llm_api_key",
         "client_secret",
     ):
         assert needle not in blob, needle

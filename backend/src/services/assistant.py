@@ -17,8 +17,8 @@ from src.ai.assistant import (
     fold,
     rerank,
 )
+from src.ai.factory import make_provider
 from src.ai.pricing import estimate_cost_usd
-from src.ai.providers import AnthropicProvider
 from src.config import Settings
 from src.db import set_org_context
 from src.errors import ConflictError, ValidationFailedError
@@ -63,9 +63,9 @@ async def retrieve(db: OrgDb, question: str, *, internal: bool, limit: int = RET
 
 
 def build_answerer(settings: Settings, engine_setting: str) -> Answerer:
-    """`llm` thiếu khoá API thì dùng động cơ trích xuất."""
-    if engine_setting == "llm" and settings.anthropic_api_key:
-        provider = AnthropicProvider(api_key=settings.anthropic_api_key, model=settings.assistant_model, timeout=20.0)
+    """`llm` thiếu khoá API thì dùng động cơ trích xuất. Nhà cung cấp chọn chung với chấm hồ sơ (`make_provider`)."""
+    provider = make_provider(settings, "assistant") if engine_setting == "llm" else None
+    if provider is not None:
         return FallbackAnswerer(LLMAnswerer(provider), ExtractiveAnswerer())
     return ExtractiveAnswerer()
 

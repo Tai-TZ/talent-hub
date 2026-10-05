@@ -5,6 +5,7 @@ from typing import Any
 
 from sqlalchemy import func, select
 
+from src.ai.factory import provider_model, resolve_provider_kind
 from src.config import get_settings
 from src.models import AuditLog, Decision, EmailOutbox, Intake, Job, KbDocument, OrgMembership, Role, User, UserRole
 from src.services import costs, org_settings
@@ -78,8 +79,8 @@ async def overview(db: OrgDb) -> dict[str, Any]:
         "documents": docs,
         "ai": {
             "engine": cfg["ai_engine"],
-            "llm_configured": bool(settings.anthropic_api_key),
-            "model": settings.ai_scoring_model,
+            "llm_configured": resolve_provider_kind(settings) is not None,
+            "model": provider_model(settings, "scoring") or settings.ai_scoring_model,
             "month_to_date_usd": round(mtd, 4),
             "monthly_budget_usd": cfg["ai_monthly_budget_usd"],
         },

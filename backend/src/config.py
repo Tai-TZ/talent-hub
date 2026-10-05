@@ -1,9 +1,11 @@
 from functools import lru_cache
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEV_JWT_SECRET = "dev-only-change-me-dev-only-change-me"  # noqa: S105
+# Tên quen thuộc được chấp nhận cho LLM_PROVIDER, đều đi qua lớp tương thích OpenAI.
+LLM_PROVIDER_ALIASES = frozenset({"openai", "openrouter", "gemini", "openai-compatible"})
 
 
 class Settings(BaseSettings):
@@ -69,7 +71,7 @@ class Settings(BaseSettings):
     # Mặc định đi qua giao diện (BFF) để cookie cùng origin: <public_base_url>/api/v1/auth/microsoft/callback
     microsoft_redirect_uri: str | None = None
 
-    # AI: "heuristic" chạy offline không cần khoá; "llm" dùng Claude và tự lùi về luật khi dịch vụ lỗi.
+    # AI: "heuristic" chạy offline không cần khoá; "llm" dùng LLM đã cấu hình và tự lùi về luật khi dịch vụ lỗi.
     ai_engine: str = "heuristic"
     anthropic_api_key: str | None = None
     ai_scoring_model: str = "claude-opus-5-5"
@@ -79,6 +81,43 @@ class Settings(BaseSettings):
     triage_workers: int = 4
     # Trợ lý hỏi đáp được gọi nhiều hơn chấm hồ sơ: dùng mô hình nhỏ, rẻ.
     assistant_model: str = "claude-haiku-4-5-20251001"
+
+    # Nhà cung cấp LLM: "auto" (mặc định) chọn openai_compatible khi có LLM_API_KEY, rồi anthropic khi có
+    # ANTHROPIC_API_KEY, không có khoá nào thì chạy offline. Cài đặt của tổ chức (ai_engine/assistant_engine) vẫn
+    # quyết định offline hay LLM; các biến dưới đây chỉ quyết định dùng LLM NÀO.
+    llm_provider: str = "auto"
+    # Dịch vụ tương thích OpenAI Chat Completions (OpenRouter, OpenAI, Gemini...). Mặc định là OpenRouter.
+    llm_api_key: str | None = None
+    llm_base_url: str = "https://openrouter.ai/api/v1"
+    # Tên mô hình theo cách gọi của nhà cung cấp (OpenRouter có tiền tố "hãng/"). Đổi được qua biến môi trường;
+    # mô hình phải hỗ trợ đầu ra JSON theo schema (structured output).
+    llm_scoring_model: str = "google/gemini-2.5-flash"
+    llm_assistant_model: str = "google/gemini-2.5-flash-lite"
+    # "json_schema": ép đầu ra theo schema (strict). "json_object": cho mô hình không hỗ trợ schema; schema được đưa
+    # vào prompt và đầu ra vẫn được kiểm chứng bằng Pydantic.
+    llm_json_mode: str = "json_schema"
+    # Giá tuỳ chỉnh (USD mỗi triệu token) cho LLM_SCORING_MODEL/LLM_ASSISTANT_MODEL, ưu tiên hơn bảng giá có sẵn.
+    # Cần đặt cả hai để có hiệu lực; dùng khi mô hình chưa có trong src/ai/pricing.py.
+    llm_price_input_per_mtok: float | None = None
+    llm_price_output_per_mtok: float | None = None
+
+    @field_validator("llm_provider", mode="before")
+    @classmethod
+    def _normalize_llm_provider(cls, value: object) -> str:
+        name = str(value or "auto").strip().lower() or "auto"
+        if name in LLM_PROVIDER_ALIASES:
+            return "openai_compatible"
+        if name not in {"auto", "openai_compatible", "anthropic"}:
+            raise ValueError("LLM_PROVIDER phải là auto, openai_compatible hoặc anthropic")
+        return name
+
+    @field_validator("llm_json_mode", mode="before")
+    @classmethod
+    def _normalize_json_mode(cls, value: object) -> str:
+        mode = str(value or "json_schema").strip().lower() or "json_schema"
+        if mode not in {"json_schema", "json_object"}:
+            raise ValueError("LLM_JSON_MODE phải là json_schema hoặc json_object")
+        return mode
 
     @property
     def is_local(self) -> bool:
