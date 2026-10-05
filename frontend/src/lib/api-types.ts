@@ -3065,10 +3065,7 @@ export interface components {
             quota: number;
             /** Rounds */
             rounds: components["schemas"]["RoundIn"][];
-            /** Triage Config */
-            triage_config?: {
-                [key: string]: unknown;
-            };
+            triage_config?: components["schemas"]["TriageConfig"];
         };
         /** IntakeOut */
         IntakeOut: {
@@ -3139,10 +3136,7 @@ export interface components {
             name?: string | null;
             /** Quota */
             quota?: number | null;
-            /** Triage Config */
-            triage_config?: {
-                [key: string]: unknown;
-            } | null;
+            triage_config?: components["schemas"]["TriageConfig"] | null;
         };
         /** IntakeRef */
         IntakeRef: {
@@ -4440,6 +4434,10 @@ export interface components {
                 [key: string]: components["schemas"]["TierCountOut"];
             };
         };
+        /** TriageConfig */
+        TriageConfig: {
+            thresholds?: components["schemas"]["TriageThresholds"];
+        };
         /** TriageIn */
         TriageIn: {
             /**
@@ -4489,6 +4487,20 @@ export interface components {
             round: string;
             /** Total */
             total: number;
+        };
+        /**
+         * TriageThresholds
+         * @description Ngưỡng sàng lọc AI (điểm 0–100, độ tin cậy 0–1). Thiếu khoá nào thì dùng mặc định của động cơ chấm.
+         */
+        TriageThresholds: {
+            /** Decline */
+            decline?: number | null;
+            /** Invite */
+            invite?: number | null;
+            /** Margin */
+            margin?: number | null;
+            /** Min Confidence */
+            min_confidence?: number | null;
         };
         /** UnansweredOut */
         UnansweredOut: {

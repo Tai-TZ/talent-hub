@@ -61,6 +61,33 @@ class EligibilityRule(BaseModel):
     value: int | None = Field(default=None, ge=0, le=100000)
 
 
+class TriageThresholds(BaseModel):
+    """Ngưỡng sàng lọc AI (điểm 0–100, độ tin cậy 0–1). Thiếu khoá nào thì dùng mặc định của động cơ chấm."""
+
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+
+    invite: float | None = Field(default=None, ge=0, le=100)
+    decline: float | None = Field(default=None, ge=0, le=100)
+    min_confidence: float | None = Field(default=None, ge=0, le=1)
+    margin: float | None = Field(default=None, ge=0, le=50)
+
+    @model_validator(mode="after")
+    def _ordered(self) -> "TriageThresholds":
+        if self.invite is not None and self.decline is not None and self.decline >= self.invite:
+            raise ValueError("Ngưỡng 'khả năng loại' phải thấp hơn ngưỡng 'nên mời'")
+        return self
+
+
+class TriageConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    thresholds: TriageThresholds = Field(default_factory=TriageThresholds)
+
+    def stored(self) -> dict[str, Any]:
+        """Dạng lưu JSONB: bỏ các ngưỡng không đặt để động cơ dùng mặc định."""
+        return self.model_dump(exclude_none=True)
+
+
 class IntakeIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -78,7 +105,7 @@ class IntakeIn(BaseModel):
     blind_review: bool = True
     min_reviews: int = Field(default=1, ge=1, le=5)
     eligibility_rules: list[EligibilityRule] = Field(default_factory=list, max_length=20)
-    triage_config: dict[str, Any] = Field(default_factory=dict)
+    triage_config: TriageConfig = Field(default_factory=TriageConfig)
 
     @model_validator(mode="after")
     def _check(self) -> "IntakeIn":
@@ -101,7 +128,7 @@ class IntakePatch(BaseModel):
     blind_review: bool | None = None
     min_reviews: int | None = Field(default=None, ge=1, le=5)
     eligibility_rules: list[EligibilityRule] | None = None
-    triage_config: dict[str, Any] | None = None
+    triage_config: TriageConfig | None = None
 
 
 class RubricIn(BaseModel):
