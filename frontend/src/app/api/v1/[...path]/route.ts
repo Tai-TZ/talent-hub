@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { backendFetch, buildBackendHeaders } from "@/lib/backend";
-import { MAX_BODY_BYTES, MAX_UPLOAD_BODY_BYTES } from "@/lib/config";
+import { clientIpFrom } from "@/lib/client-ip";
+import { MAX_BODY_BYTES, MAX_UPLOAD_BODY_BYTES, TRUSTED_PROXY_HOPS } from "@/lib/config";
 
 /**
  * BFF: trình duyệt chỉ nói chuyện với Next.js (cùng origin, không cần CORS), Next chuyển tiếp sang backend.
@@ -68,7 +69,7 @@ async function forward(request: NextRequest, { params }: { params: Promise<{ pat
     }
   }
 
-  const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+  const forwardedFor = clientIpFrom(request.headers.get("x-forwarded-for"), TRUSTED_PROXY_HOPS);
   const headers = buildBackendHeaders({
     host: request.headers.get("host"),
     cookie: request.headers.get("cookie"),

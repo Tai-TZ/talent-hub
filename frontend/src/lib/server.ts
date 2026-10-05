@@ -1,6 +1,8 @@
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
 import { backendFetch, buildBackendHeaders } from "./backend";
+import { clientIpFrom } from "./client-ip";
+import { TRUSTED_PROXY_HOPS } from "./config";
 import { DEFAULT_LOCALE, getMessages, isLocale, LOCALE_COOKIE, type Locale, type Messages } from "./i18n";
 import type { Dict } from "./i18n/define";
 import type { Me, OrgInfo } from "./types";
@@ -11,7 +13,7 @@ async function requestContext() {
   return {
     host: h.get("host"),
     cookie: c.toString(),
-    clientIp: h.get("x-forwarded-for"),
+    clientIp: clientIpFrom(h.get("x-forwarded-for"), TRUSTED_PROXY_HOPS),
     requestId: h.get("x-request-id"),
   };
 }
