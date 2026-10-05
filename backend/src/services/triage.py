@@ -253,7 +253,9 @@ async def board_items(
         clauses.append("t.needs_attention = :attention")
         params["attention"] = attention
     where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-    rows = (await db.session.execute(text(_ITEMS_SQL.replace("__WHERE__", where)), params)).all()
+    # Khung SQL và các mệnh đề lọc đều là hằng số trong file này; giá trị người dùng chỉ đi qua tham số ràng buộc.
+    statement = text(_ITEMS_SQL.replace("__WHERE__", where))  # nosemgrep: avoid-sqlalchemy-text
+    rows = (await db.session.execute(statement, params)).all()
     show_name = can_see_pii or not blind
     return [
         {

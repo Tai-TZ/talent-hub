@@ -12,11 +12,11 @@ alembic>=1.14.0
 # Cache / rate limit
 redis>=5.2.0
 
-# Tài liệu (trích văn bản)
+# Tai lieu (trich van ban)
 pypdf>=5.0.0
 python-docx>=1.1.0
 
-# Tối ưu xếp lớp và phân tích
+# Toi uu xep lop va phan tich
 numpy>=2.0.0
 scipy>=1.14.0
 
@@ -25,5 +25,5 @@ anthropic>=0.80.0
 
 # Auth
 argon2-cffi>=23.1.0
-pyjwt[crypto]>=2.9.0  # RS256 để xác minh ID token của nhà cung cấp danh tính
-httpx>=0.28.0  # gọi token endpoint và JWKS của OIDC
+pyjwt[crypto]>=2.9.0  # RS256 de xac minh ID token cua nha cung cap danh tinh
+httpx>=0.28.0  # goi token endpoint va JWKS cua OIDC

@@ -29,7 +29,9 @@ class OrgDb:
 def _is_trusted_proxy(request: Request) -> bool:
     secret = get_settings().internal_proxy_secret
     provided = request.headers.get("x-internal-auth")
-    return bool(secret and provided and hmac.compare_digest(secret, provided))
+    if not secret or not provided:
+        return False
+    return hmac.compare_digest(secret, provided)
 
 
 def resolve_org_slug(request: Request) -> str | None:
