@@ -240,3 +240,22 @@ class Job(IdMixin, TimestampMixin, OrgScopedMixin, Base):
     created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AiUsage(IdMixin, OrgScopedMixin, Base):
+    """Mỗi lần gọi LLM: token và chi phí ước tính (USD) để kiểm soát chi phí AI theo tính năng."""
+
+    __tablename__ = "ai_usage"
+    __table_args__ = (Index("ix_ai_usage_org_created", "organization_id", "created_at"),)
+
+    feature: Mapped[str] = mapped_column(String(40), nullable=False)
+    provider: Mapped[str] = mapped_column(String(40), nullable=False)
+    model: Mapped[str] = mapped_column(String(100), nullable=False)
+    input_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    cache_read_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    cache_write_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    cost_usd: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    application_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("applications.id", ondelete="SET NULL"))
+    job_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("jobs.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

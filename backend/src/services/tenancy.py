@@ -1,7 +1,9 @@
 """Xác định tổ chức của request và mở session có ngữ cảnh RLS (docs/09-multi-tenancy.md)."""
 
 import hmac
+import uuid
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
 from fastapi import HTTPException, Request
@@ -62,3 +64,18 @@ async def org_db(request: Request) -> AsyncIterator[OrgDb]:
             yield OrgDb(session=session, org=org)
         finally:
             await session.rollback()
+
+
+@asynccontextmanager
+async def background_org_db(org_id: uuid.UUID) -> AsyncIterator[OrgDb]:
+    """Session cho tác vụ nền (không có request): đặt ngữ cảnh tổ chức, commit khi xong, rollback khi lỗi."""
+    async with get_sessionmaker()() as session:
+        org = (await session.execute(select(Organization).where(Organization.id == org_id))).scalar_one()
+        await set_org_context(session, org.id)
+        db = OrgDb(session=session, org=org)
+        try:
+            yield db
+            await session.commit()
+        except BaseException:
+            await session.rollback()
+            raise

@@ -16,6 +16,7 @@ from src.api.intakes import router as intakes_router
 from src.api.notifications import router as notifications_router
 from src.api.org import router as org_router
 from src.api.staff import router as staff_router
+from src.api.triage import router as triage_router
 from src.config import get_settings
 from src.db import dispose_engine, get_engine
 from src.logging_config import configure_logging
@@ -87,7 +88,7 @@ def create_app() -> FastAPI:
     app.include_router(me_router, prefix="/api/v1")
     app.include_router(audit_router, prefix="/api/v1")
     app.include_router(org_router, prefix="/api/v1")
-    for router in (intakes_router, applications_router, staff_router, notifications_router):
+    for router in (intakes_router, applications_router, staff_router, notifications_router, triage_router):
         app.include_router(router, prefix="/api/v1")
     return app
 

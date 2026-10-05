@@ -63,7 +63,9 @@ def good_profile(name: str = "Nguyễn Văn A") -> dict[str, Any]:
     return {"full_name": name, "phone": "0901234567", "gender": "undisclosed", "city": "Hà Nội"}
 
 
-async def create_open_intake(admin: AsyncClient, *, quota: int = 5, name: str | None = None) -> dict[str, Any]:
+async def create_open_intake(
+    admin: AsyncClient, *, quota: int = 5, name: str | None = None, ai: bool = False
+) -> dict[str, Any]:
     """Tạo chương trình, khoá, đợt tuyển, rubric cho cả hai vòng rồi mở đợt."""
     code = f"p{uuid.uuid4().hex[:8]}"
     program = (await admin.post("/api/v1/programs", json={"code": code, "name_vi": "Chương trình thử"})).json()
@@ -82,6 +84,7 @@ async def create_open_intake(admin: AsyncClient, *, quota: int = 5, name: str | 
             "opens_at": (now - timedelta(hours=1)).isoformat(),
             "closes_at": (now + timedelta(days=7)).isoformat(),
             "quota": quota,
+            "ai_screening_enabled": ai,
             "rounds": ROUNDS,
             "eligibility_rules": [
                 {

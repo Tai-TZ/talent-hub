@@ -364,3 +364,33 @@ async def test_withdraw_and_return_flow(login_as) -> None:  # type: ignore[no-un
     withdrawn = await applicant.post(f"/api/v1/applications/{app['id']}/withdraw", json={"reason": "Đổi kế hoạch"})
     assert withdrawn.status_code == 200 and withdrawn.json()["status"] == "WITHDRAWN"
     assert (await applicant.post(f"/api/v1/applications/{app['id']}/withdraw", json={})).status_code == 422
+
+
+async def test_many_concurrent_approvals_and_proposals_stay_consistent(login_as) -> None:  # type: ignore[no-untyped-def]
+    admin = await login_as("admin")
+    applicant = await login_as("applicant")
+    r1, r2 = await login_as("reviewer"), await login_as("reviewer2")
+    approvers = [await login_as("approver"), await login_as("approver2"), await login_as("dual")]
+    intake = await create_open_intake(admin)
+    app = await submit_application(applicant, intake["id"])
+    await _close_and_start(admin, intake["id"])
+    await _review(r1, app["id"], FULL_SCORES)
+    await _review(r2, app["id"], FULL_SCORES)
+
+    body = {"outcome": "rejected", "reason": "Hai reviewer cùng đề xuất một lúc để thử đồng thời."}
+    proposals = await asyncio.gather(
+        r1.post(f"/api/v1/staff/applications/{app['id']}/proposals", json=body),
+        r2.post(f"/api/v1/staff/applications/{app['id']}/proposals", json=body),
+    )
+    assert sorted(p.status_code for p in proposals) == [201, 409]
+    decision_id = next(p.json()["decision_id"] for p in proposals if p.status_code == 201)
+
+    approve = {
+        "outcome": "rejected",
+        "reason": "Đồng ý với đề xuất sau khi xem xét hồ sơ.",
+        "applicant_message": "Rất tiếc về kết quả.",
+    }
+    results = await asyncio.gather(
+        *(a.post(f"/api/v1/staff/decisions/{decision_id}/approve", json=approve) for a in approvers)
+    )
+    assert sorted(r.status_code for r in results) == [200, 409, 409]

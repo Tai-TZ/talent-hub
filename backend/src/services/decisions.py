@@ -4,6 +4,7 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 
 from src.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationFailedError
 from src.models import Application, Decision
@@ -18,8 +19,11 @@ OUTCOME_TO_STATUS = {"accepted": "ACCEPTED", "rejected": "REJECTED", "waitlisted
 MIN_REASON = 20
 
 
-async def get_decision(db: OrgDb, decision_id: uuid.UUID) -> Decision:
-    decision = (await db.session.execute(select(Decision).where(Decision.id == decision_id))).scalar_one_or_none()
+async def get_decision(db: OrgDb, decision_id: uuid.UUID, *, for_update: bool = False) -> Decision:
+    stmt = select(Decision).where(Decision.id == decision_id)
+    if for_update:
+        stmt = stmt.with_for_update()  # hai người cùng duyệt: người sau chờ rồi thấy đề xuất đã xử lý
+    decision = (await db.session.execute(stmt)).scalar_one_or_none()
     if decision is None:
         raise NotFoundError("Không tìm thấy đề xuất")
     return decision
@@ -83,6 +87,10 @@ async def propose(
         status="pending",
     )
     db.session.add(decision)
+    try:
+        await db.session.flush()
+    except IntegrityError:
+        raise ConflictError("Hồ sơ đã có đề xuất đang chờ duyệt") from None
     await apply_transition(
         db,
         app,

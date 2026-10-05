@@ -9,7 +9,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from sqlalchemy import update
+from sqlalchemy import select, update
 
 from src.errors import ConflictError, InvalidTransitionError, PermissionDeniedError
 from src.models import Application, ApplicationEvent
@@ -87,6 +87,15 @@ async def apply_transition(
     allow_system: bool = False,
 ) -> Application:
     """Chuyển trạng thái có kiểm tra. `expected_version=None` dùng version đang đọc (thao tác nội bộ)."""
+    # Khoá hàng để các thao tác đồng thời trên một hồ sơ chạy tuần tự; dữ liệu đã cũ thì báo xung đột (409)
+    # thay vì rơi vào lỗi "chuyển không hợp lệ" gây hiểu nhầm.
+    current = (
+        await db.session.execute(
+            select(Application.status, Application.version).where(Application.id == application.id).with_for_update()
+        )
+    ).one()
+    if current.status != application.status or (expected_version is not None and current.version != expected_version):
+        raise ConflictError("Hồ sơ vừa được người khác cập nhật. Hãy tải lại và thử lại.")
     rule = check_transition(application, to, actor, allow_system=allow_system)
     version = application.version if expected_version is None else expected_version
     from_status = application.status

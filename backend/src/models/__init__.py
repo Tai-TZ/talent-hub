@@ -1,5 +1,6 @@
 from src.models.admissions import (
     AiAssessment,
+    AiUsage,
     Application,
     ApplicationEvent,
     Cohort,
@@ -24,6 +25,7 @@ from src.models.identity import (
 
 __all__ = [
     "AiAssessment",
+    "AiUsage",
     "Application",
     "ApplicationEvent",
     "AuditLog",

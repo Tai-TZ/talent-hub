@@ -345,7 +345,7 @@ async def approve(
     principal: Principal = Depends(require("decision.approve")),
     db: OrgDb = Depends(org_db),
 ) -> dict[str, Any]:
-    decision = await decision_svc.get_decision(db, decision_id)
+    decision = await decision_svc.get_decision(db, decision_id, for_update=True)
     app = await app_svc.get_application(db, decision.application_id)
     await decision_svc.approve(
         db,
@@ -371,7 +371,7 @@ async def return_decision(
     principal: Principal = Depends(require("decision.approve")),
     db: OrgDb = Depends(org_db),
 ) -> dict[str, Any]:
-    decision = await decision_svc.get_decision(db, decision_id)
+    decision = await decision_svc.get_decision(db, decision_id, for_update=True)
     app = await app_svc.get_application(db, decision.application_id)
     await decision_svc.return_to_review(
         db,
