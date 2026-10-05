@@ -48,8 +48,8 @@ jobs:
 
       - name: Lint
         run: |
-          ruff check src tests migrations
-          ruff format --check src tests migrations
+          ruff check src tests migrations tools
+          ruff format --check src tests migrations tools
 
       - name: Type check
         run: mypy src
