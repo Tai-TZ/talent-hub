@@ -1,0 +1,30 @@
+# Cập nhật phụ thuộc hằng tuần; gom các bản vá nhỏ thành một PR mỗi hệ sinh thái để đỡ ồn.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /backend
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      python-minor:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule: { interval: weekly, day: monday }
+
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule: { interval: weekly, day: monday }
