@@ -19,7 +19,7 @@ Sản phẩm chạy được đầu-cuối trên máy local (Docker chỉ cho Po
 | Hồ sơ năng lực có chữ ký (Skill Passport) | **Chưa làm** |
 | Trang giới thiệu công khai (`/`) | Chưa làm |
 
-Chất lượng hiện tại: backend 188 test, độ phủ 94%, ruff/mypy sạch; frontend 23 test đơn vị + 58 kịch bản e2e (desktop và mobile, gồm quét trợ năng WCAG A/AA); semgrep, pip-audit, npm audit đều sạch.
+Chất lượng hiện tại: backend 190 test, độ phủ 94%, ruff/mypy sạch; frontend 23 test đơn vị + 58 kịch bản e2e (desktop và mobile, gồm quét trợ năng WCAG A/AA); semgrep, pip-audit, npm audit đều sạch.
 
 ## Đã đo (số thật, tái lập được)
 
@@ -30,7 +30,9 @@ Chất lượng hiện tại: backend 188 test, độ phủ 94%, ruff/mypy sạc
   - Đợt từ 1.000 hồ sơ chấm bằng động cơ luật trong `ProcessPoolExecutor` (`TRIAGE_WORKERS`, mặc định 4; 0 = tắt), dò trùng chạy song song.
   - Một truy vấn duy nhất, nội dung lấy dạng chuỗi JSON (giải mã ở tiến trình con): giảm khựng do GC từ 230–340 ms xuống ~50 ms.
   - Ghi chú đo: CPU laptop hạ xung sau vài giây chạy nặng nên số tuyệt đối dao động; so sánh trước/sau luôn đo cùng điều kiện.
-- **Độ trễ API trên đợt 20.000 hồ sơ** (`bench_api.py --org scale`, p50): phần lớn màn dưới 100 ms; chậm: lọc hàng đợi "ưu tiên xem kỹ" ~965 ms, Rubric Lab ~740 ms (p95 1,6 s), bảng triage ~590 ms, báo cáo xét đạt ~350 ms. (Đo trên DB có ~8 lượt chấm mỗi hồ sơ do chạy lại nhiều lần; `_LATEST` dùng `DISTINCT ON` nên lượt chấm lại càng nhiều càng chậm.) Composer trả 409 ở tổ chức `scale` vì không có học viên đang học (dữ liệu, không phải lỗi).
+- **Độ trễ API trên đợt 20.000 hồ sơ** (`bench_api.py --org scale`, DB nhân bản từ DB dev, mỗi hồ sơ một lượt chấm): mọi màn p95 dưới 300 ms. Chậm nhất: báo cáo xét đạt p95 ~276 ms, lọc hàng đợi "ưu tiên xem kỹ" ~163 ms, bảng triage ~111 ms. Composer trả 409 ở tổ chức `scale` vì không có học viên đang học (dữ liệu, không phải lỗi).
+- **Rubric Lab** (12.500 hồ sơ, 6.000 học viên có kết quả): p95 1.839 ms → **49 ms**; lần đầu (chưa có bộ nhớ đệm) ~500 ms. Đã làm: bootstrap 200 mẫu giải đồng thời bằng trọng số đếm + khởi động ấm (`bootstrap_coefs`); chỉ lấy trường cần và tính trung bình điểm trong SQL; bộ nhớ đệm trong tiến trình theo dấu vân tay dữ liệu (số dòng + tổng `updated_at` của hồ sơ, bài chấm, ghi danh), nên chỉnh trọng số không phân tích lại. Đầu ra đối chiếu giống hệt bản cũ (dữ liệu thật hai tổ chức + 40 bộ ngẫu nhiên). **Sửa lỗi có sẵn**: truy vấn thiếu `ORDER BY` làm khoảng tin cậy đổi giữa các lần xem.
+- Lưu ý: bảng triage và bộ lọc hàng đợi chọn "lượt chấm mới nhất" bằng `DISTINCT ON`/truy vấn con trên mọi lượt chấm; mỗi lần sàng lọc lại có `force` thêm 20.000 dòng nên chậm dần (đo được ~590 ms và ~965 ms khi mỗi hồ sơ có ~8 lượt chấm).
 - **Trợ lý hỏi đáp** (`eval/README.md`): bộ phát triển 100% (đã tinh chỉnh theo bộ này nên không có ý nghĩa thước đo); **bộ giữ riêng 71% câu có đáp án đúng, 88% câu không có đáp án được từ chối đúng, 91% chính xác khi đã trả lời**. Các câu trượt đều là từ chối an toàn do khác từ đồng nghĩa.
 
 ## Lỗi thật tìm được qua các vòng QA (đã sửa)
@@ -41,12 +43,12 @@ Chất lượng hiện tại: backend 188 test, độ phủ 94%, ruff/mypy sạc
 
 ## Việc tiếp theo (theo thứ tự nên làm)
 
-1. **Màn đọc chậm ở quy mô 20.000 hồ sơ** (sàng lọc đã xong, xem mục "Đã đo"): lọc hàng đợi theo "ưu tiên xem kỹ", bảng triage (`_LATEST` trong `src/services/triage.py` quét mọi lượt chấm bằng `DISTINCT ON`; cân nhắc cột/bảng "lượt chấm mới nhất" hoặc chỉ mục phù hợp), Rubric Lab. Mục tiêu p95 dưới 300 ms. Đo bằng `python tools/bench_api.py --org scale`.
+1. **Giữ hiệu năng khi sàng lọc lại nhiều lần** (tuỳ chọn, chưa gấp): đánh dấu lượt chấm mới nhất (ví dụ cột `is_latest` có chỉ mục một phần, hoặc xoá/lưu trữ lượt cũ khi chấm lại có `force`) để bảng triage và hàng đợi không chậm dần. Báo cáo xét đạt (p95 ~276 ms) sát ngưỡng 300 ms. Đo bằng `python tools/bench_api.py --org scale` trên DB nhân bản.
 2. **Vòng QA 6 (nghiệp vụ)**: viết kiểm thử bất biến (không vượt chỉ tiêu, bốn mắt, chấm mù, điểm AI chỉ cho người có `triage.read`) chạy với dữ liệu ngẫu nhiên; rà lại trải nghiệm bàn phím cho mọi hộp thoại.
 3. **Skill Passport**: chứng nhận hoàn thành ký Ed25519 (khoá theo tổ chức), trang xác minh công khai `/verify/[id]`, huỷ/thu hồi, hiển thị trong trang học viên. Đây là phần "khó sao chép" cho đối tác doanh nghiệp.
 4. **Trợ lý với Claude thật**: đặt `ANTHROPIC_API_KEY` trong `backend/.env`, chạy `eval-assistant --engine llm` trên bộ giữ riêng và so sánh; thêm bộ phân loại ý định (câu hỏi tra cứu so với yêu cầu thực hiện tác vụ hoặc dò dữ liệu cá nhân).
 5. **Đa tổ chức đúng nghĩa cho đăng nhập**: link lời mời dựng từ `PUBLIC_BASE_URL` toàn cục, cần theo tên miền con của từng tổ chức; cấu hình Microsoft đang là toàn cục (`MICROSOFT_CLIENT_ID/SECRET`), cần bảng kết nối IdP theo tổ chức (xem `docs/09-multi-tenancy.md`).
-6. **Hạ tầng thử nghiệm**: e2e đang ghi dữ liệu vào DB dev (đợt "E2E…", tài khoản thử). Cần DB riêng cho e2e (`talenthub_e2e`) với lệnh `make e2e-db` và `make run-be-e2e`.
+6. **Hạ tầng thử nghiệm**: e2e đang ghi dữ liệu vào DB dev (đợt "E2E…", tài khoản thử). Cần DB riêng cho e2e (`talenthub_e2e`) với lệnh `make e2e-db` và `make run-be-e2e`. Cách tạm đã dùng ngày 05/10 (52 qua, 14 bỏ qua có chủ đích gồm 10 kịch bản Microsoft): `docker exec talent-hub-postgres-1 psql -U postgres -c "CREATE DATABASE talenthub_e2e_tmp TEMPLATE talenthub"`, chạy backend cổng 8000 với `DATABASE_URL`/`MIGRATION_DATABASE_URL` trỏ vào DB đó, `npm --prefix frontend run e2e`, rồi `DROP DATABASE talenthub_e2e_tmp`.
 7. **Tài liệu và sản phẩm trình bày**: cập nhật `docs/05, 06, 08` theo thực tế (tên thư mục `backend/`, composer, lab, trợ lý, Microsoft); viết `JOURNAL.md`, `architecture_diagram`, bài trình bày; bảng tự chấm điểm 10 tiêu chí và trả lời 10 câu hỏi của đề bài; cập nhật bảng trạng thái trong README (đã sửa ở đợt này).
 8. **Giao diện**: trang `/` giới thiệu chương trình cho ứng viên (kèm trợ lý), chuông thông báo trên thanh đầu trang, bản tiếng Anh cho khu nhân sự và quản trị (hiện chỉ tiếng Việt).
 9. **CI**: thêm job e2e (dùng DB riêng + IdP giả), giữ semgrep và pip-audit; kiểm tra job frontend dùng `npm run api:types` để chặn lệch hợp đồng API.
