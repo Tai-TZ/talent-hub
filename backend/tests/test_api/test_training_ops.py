@@ -100,6 +100,8 @@ async def test_competency_assessment_rules_and_mentor_scope(login_as: Any, train
     )
     assert denied.status_code == 403
     assert (await mentor.get("/api/v1/mentor/learners")).json() == []  # chưa được giao ai
+    # và cũng không đọc được hồ sơ năng lực của học viên không phụ trách (404, không lộ sự tồn tại)
+    assert (await mentor.get(f"/api/v1/enrollments/{learner_id}/competencies")).status_code == 404
 
 
 async def test_mentor_sees_and_assesses_only_assigned_learners(login_as: Any, training_env: dict[str, str]) -> None:

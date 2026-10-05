@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from src.api.deps import Principal, actor_of, request_meta, require
+from src.errors import NotFoundError
 from src.models import Competency, ComposerRun, Enrollment, OrgMembership, Partner, Placement, Track, TrackTarget, User
 from src.schemas.responses.cohorts import (
     AssignedOut,
@@ -291,6 +292,9 @@ async def competencies(
     enrollment_id: uuid.UUID, principal: Principal = Depends(require("mentor.assess")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
     e = await ops.get_enrollment(db, enrollment_id)
+    # Cùng phạm vi với việc ghi đánh giá; trả 404 thay vì 403 để không lộ học viên có tồn tại hay không.
+    if not await ops.can_assess(db, actor_of(principal), e.id):
+        raise NotFoundError("Không tìm thấy học viên")
     matrix = await ops.competency_matrix(db, e)
     learner = (
         await db.session.execute(
