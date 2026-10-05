@@ -1168,3 +1168,51 @@ a.th-button {
     right: var(--th-space-3);
   }
 }
+
+
+/* ---------- Tinh chỉnh cho điện thoại (vòng QA UX) ---------- */
+@media (max-width: 639px) {
+  /* "Đăng xuất" không được xuống dòng làm vỡ thanh đầu trang. */
+  .shell__actions .th-button {
+    padding-inline: var(--th-space-2);
+    white-space: nowrap;
+  }
+
+  /* 6 bước nộp hồ sơ: một hàng cuộn ngang thay vì chiếm sáu dòng. */
+  .wizard-steps {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: var(--th-space-2);
+    scroll-snap-type: x proximity;
+  }
+
+  .wizard-steps > li {
+    flex: none;
+    scroll-snap-align: center;
+  }
+
+  /* Bộ lọc: hai ô mỗi hàng để đỡ dài; ô đầu (chọn đợt) chiếm cả hàng. */
+  .toolbar .th-field {
+    flex: 1 1 140px;
+  }
+
+  .toolbar .th-field:first-child {
+    flex-basis: 100%;
+    max-width: none;
+  }
+}
+
+/* Nút nổi không được che thanh thao tác chính (Quay lại / Tiếp tục / Nộp hồ sơ). */
+body:has(.sticky-actions) .assistant-fab {
+  bottom: 88px;
+}
+
+.stacked-only {
+  display: inline-block;
+}
+
+@media (min-width: 1100px) {
+  .stacked-only {
+    display: none;
+  }
+}

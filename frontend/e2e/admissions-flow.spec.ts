@@ -119,7 +119,8 @@ test("tuyển sinh từ tạo đợt đến công bố kết quả", async ({ br
   await p.goto(`/apply/${applicationId}`);
   await expect(p.getByText(/Chúc mừng! Hồ sơ của bạn đã được nhận/)).toBeVisible();
   await p.goto("/dashboard");
-  await expect(p.getByText("Chúc mừng, hồ sơ của bạn được nhận")).toBeVisible();
+  // Tài khoản ứng viên dùng chung giữa các lần chạy: chọn đúng thông báo trỏ tới hồ sơ của lần chạy này.
+  await expect(p.locator(`a[href="/apply/${applicationId}"]`, { hasText: "Chúc mừng, hồ sơ của bạn được nhận" })).toBeVisible();
 
   await Promise.all([admin.context.close(), applicant.context.close(), reviewer.context.close(), approver.context.close()]);
 });

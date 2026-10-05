@@ -109,7 +109,7 @@ export function ReviewPanel({ app, onChanged }: { app: StaffApplication; onChang
   }
 
   return (
-    <section className="th-card panel stack" aria-labelledby="review-title">
+    <section id="review" className="th-card panel stack" aria-labelledby="review-title">
       <div className="row-actions">
         <h2 id="review-title" className="th-type-h4">
           Chấm điểm

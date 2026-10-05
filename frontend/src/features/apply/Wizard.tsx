@@ -95,6 +95,11 @@ export function Wizard({
   }, []);
 
   const stepIndex = STEPS.findIndex((s) => s.key === step);
+
+  // Trên điện thoại hàng bước cuộn ngang: đưa bước hiện tại vào vùng nhìn thấy.
+  useEffect(() => {
+    document.querySelector('.wizard-step[aria-current="step"]')?.scrollIntoView({ inline: "center", block: "nearest" });
+  }, [step]);
   const err = (path: string) => fieldErrors[path];
   const essayLength = draft.essays.motivation.trim().length;
 

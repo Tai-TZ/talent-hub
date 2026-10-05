@@ -115,6 +115,11 @@ function Body({ app, refresh }: { app: StaffApplication; refresh: () => void }) 
         }
       />
       {actionError ? <Alert tone="danger">{actionError}</Alert> : null}
+      {inRound && can("application.review") ? (
+        <a className="stacked-only" href="#review">
+          Đến phần chấm điểm ↓
+        </a>
+      ) : null}
 
       <div className="split split--sidebar">
         <div className="stack">
