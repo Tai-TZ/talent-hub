@@ -53,6 +53,7 @@ async def _prepare_database() -> None:
     try:
         # Giống infra/postgres/init/01-roles.sql cho database test.
         await conn.execute("CREATE EXTENSION IF NOT EXISTS citext")
+        await conn.execute("CREATE EXTENSION IF NOT EXISTS unaccent")
         await conn.execute("GRANT ALL ON SCHEMA public TO talenthub_owner")
         await conn.execute("GRANT USAGE ON SCHEMA public TO talenthub_app")
         await conn.execute(
