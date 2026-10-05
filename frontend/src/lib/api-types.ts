@@ -385,6 +385,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/analytics/quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Quality
+         * @description Chất lượng chương trình theo chuẩn đầu ra của một khoá: mức đạt, cảnh báo dữ liệu, đề xuất cải tiến.
+         */
+        get: operations["quality_api_v1_analytics_quality_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/quality/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Quality Report
+         * @description Báo cáo cải tiến dạng Markdown để tải về.
+         */
+        get: operations["quality_report_api_v1_analytics_quality_report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/applications": {
         parameters: {
             query?: never;
@@ -3580,6 +3620,163 @@ export interface components {
             /** Track Name */
             track_name: string | null;
         };
+        /** QualityAlert */
+        QualityAlert: {
+            /** Code */
+            code: string;
+            /** Count */
+            count: number;
+            /** Detail */
+            detail: string;
+            /** Items */
+            items: components["schemas"]["QualityAlertItem"][];
+            /** Severity */
+            severity: string;
+            /** Title */
+            title: string;
+        };
+        /** QualityAlertItem */
+        QualityAlertItem: {
+            /** Label */
+            label: string;
+            /** Ref Id */
+            ref_id: string;
+            /** Ref Type */
+            ref_type: string;
+        };
+        /** QualityCohort */
+        QualityCohort: {
+            /** Classes */
+            classes: number;
+            /** Code */
+            code: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
+        };
+        /** QualityCompetency */
+        QualityCompetency: {
+            /** Assessed */
+            assessed: number;
+            /** Attainment */
+            attainment: number | null;
+            /** Avg Gap */
+            avg_gap: number | null;
+            /** By Track */
+            by_track: components["schemas"]["QualityTrackCell"][];
+            /** Code */
+            code: string;
+            /** Coverage */
+            coverage: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Met */
+            met: number;
+            /** Name */
+            name: string;
+            /** Previous */
+            previous: number | null;
+            /** Targeted */
+            targeted: number;
+        };
+        /** QualityOut */
+        QualityOut: {
+            /** Alerts */
+            alerts: components["schemas"]["QualityAlert"][];
+            cohort: components["schemas"]["QualityCohort"];
+            /** Competencies */
+            competencies: components["schemas"]["QualityCompetency"][];
+            /** Previous Cohort */
+            previous_cohort: string | null;
+            /** Recommendations */
+            recommendations: components["schemas"]["QualityRecommendation"][];
+            summary: components["schemas"]["QualitySummary"];
+            /** Thresholds */
+            thresholds: {
+                [key: string]: number;
+            };
+            /** Tracks */
+            tracks: components["schemas"]["QualityTrack"][];
+        };
+        /** QualityRecommendation */
+        QualityRecommendation: {
+            /** Actions */
+            actions: string[];
+            /** Area */
+            area: string;
+            /** Priority */
+            priority: string;
+            /** Rationale */
+            rationale: string;
+            /** Title */
+            title: string;
+        };
+        /** QualitySummary */
+        QualitySummary: {
+            /** Active */
+            active: number;
+            /** Attainment */
+            attainment: number | null;
+            /** Coverage */
+            coverage: number | null;
+            /** Learners */
+            learners: number;
+            /** Not Qualified */
+            not_qualified: number;
+            /** Qualified */
+            qualified: number;
+            /** Qualified Rate */
+            qualified_rate: number | null;
+            /** Withdrawn */
+            withdrawn: number;
+        };
+        /** QualityTrack */
+        QualityTrack: {
+            /** Active */
+            active: number;
+            /** Learners */
+            learners: number;
+            /** Not Qualified */
+            not_qualified: number;
+            /** Qualified */
+            qualified: number;
+            /** Qualified Rate */
+            qualified_rate: number | null;
+            /** Track */
+            track: string;
+            /**
+             * Track Id
+             * Format: uuid
+             */
+            track_id: string;
+        };
+        /** QualityTrackCell */
+        QualityTrackCell: {
+            /** Assessed */
+            assessed: number;
+            /** Attainment */
+            attainment: number | null;
+            /** Met */
+            met: number;
+            /** Targeted */
+            targeted: number;
+            /** Track */
+            track: string;
+            /**
+             * Track Id
+             * Format: uuid
+             */
+            track_id: string;
+        };
         /** QueueItemOut */
         QueueItemOut: {
             /** Ai Attention */
@@ -4908,6 +5105,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LabIntakeOut"][];
+                };
+            };
+        };
+    };
+    quality_api_v1_analytics_quality_get: {
+        parameters: {
+            query: {
+                cohort_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QualityOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quality_report_api_v1_analytics_quality_report_get: {
+        parameters: {
+            query: {
+                cohort_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

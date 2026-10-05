@@ -9,6 +9,7 @@ const PAGES: { role: string; path: string; heading: RegExp }[] = [
   { role: "reviewer", path: "/staff/queue", heading: /Hàng đợi hồ sơ/ },
   { role: "reviewer", path: "/analytics", heading: /Phễu và công bằng/ },
   { role: "reviewer", path: "/analytics/lab", heading: /Rubric Lab/ },
+  { role: "training_manager", path: "/analytics/quality", heading: /Chất lượng chương trình/ },
   { role: "approver", path: "/staff/approvals", heading: /Phê duyệt quyết định/ },
   { role: "cohort_manager", path: "/cohorts", heading: /Khoá học/ },
   { role: "training_manager", path: "/mentor", heading: /Học viên của tôi/ },

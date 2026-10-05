@@ -5499,6 +5499,469 @@
         "title": "QualificationRowOut",
         "type": "object"
       },
+      "QualityAlert": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/QualityAlertItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "severity": {
+            "title": "Severity",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "title",
+          "detail",
+          "count",
+          "items"
+        ],
+        "title": "QualityAlert",
+        "type": "object"
+      },
+      "QualityAlertItem": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ref_id": {
+            "title": "Ref Id",
+            "type": "string"
+          },
+          "ref_type": {
+            "title": "Ref Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "ref_type",
+          "ref_id"
+        ],
+        "title": "QualityAlertItem",
+        "type": "object"
+      },
+      "QualityCohort": {
+        "properties": {
+          "classes": {
+            "title": "Classes",
+            "type": "integer"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "status",
+          "classes"
+        ],
+        "title": "QualityCohort",
+        "type": "object"
+      },
+      "QualityCompetency": {
+        "properties": {
+          "assessed": {
+            "title": "Assessed",
+            "type": "integer"
+          },
+          "attainment": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attainment"
+          },
+          "avg_gap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Gap"
+          },
+          "by_track": {
+            "items": {
+              "$ref": "#/components/schemas/QualityTrackCell"
+            },
+            "title": "By Track",
+            "type": "array"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "met": {
+            "title": "Met",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "targeted": {
+            "title": "Targeted",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "targeted",
+          "assessed",
+          "met",
+          "attainment",
+          "coverage",
+          "avg_gap",
+          "previous",
+          "by_track"
+        ],
+        "title": "QualityCompetency",
+        "type": "object"
+      },
+      "QualityOut": {
+        "properties": {
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/QualityAlert"
+            },
+            "title": "Alerts",
+            "type": "array"
+          },
+          "cohort": {
+            "$ref": "#/components/schemas/QualityCohort"
+          },
+          "competencies": {
+            "items": {
+              "$ref": "#/components/schemas/QualityCompetency"
+            },
+            "title": "Competencies",
+            "type": "array"
+          },
+          "previous_cohort": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Cohort"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/QualityRecommendation"
+            },
+            "title": "Recommendations",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/QualitySummary"
+          },
+          "thresholds": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Thresholds",
+            "type": "object"
+          },
+          "tracks": {
+            "items": {
+              "$ref": "#/components/schemas/QualityTrack"
+            },
+            "title": "Tracks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cohort",
+          "previous_cohort",
+          "summary",
+          "competencies",
+          "tracks",
+          "alerts",
+          "recommendations",
+          "thresholds"
+        ],
+        "title": "QualityOut",
+        "type": "object"
+      },
+      "QualityRecommendation": {
+        "properties": {
+          "actions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "area": {
+            "title": "Area",
+            "type": "string"
+          },
+          "priority": {
+            "title": "Priority",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "priority",
+          "area",
+          "title",
+          "rationale",
+          "actions"
+        ],
+        "title": "QualityRecommendation",
+        "type": "object"
+      },
+      "QualitySummary": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "integer"
+          },
+          "attainment": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attainment"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "learners": {
+            "title": "Learners",
+            "type": "integer"
+          },
+          "not_qualified": {
+            "title": "Not Qualified",
+            "type": "integer"
+          },
+          "qualified": {
+            "title": "Qualified",
+            "type": "integer"
+          },
+          "qualified_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualified Rate"
+          },
+          "withdrawn": {
+            "title": "Withdrawn",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "learners",
+          "active",
+          "qualified",
+          "not_qualified",
+          "withdrawn",
+          "qualified_rate",
+          "coverage",
+          "attainment"
+        ],
+        "title": "QualitySummary",
+        "type": "object"
+      },
+      "QualityTrack": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "integer"
+          },
+          "learners": {
+            "title": "Learners",
+            "type": "integer"
+          },
+          "not_qualified": {
+            "title": "Not Qualified",
+            "type": "integer"
+          },
+          "qualified": {
+            "title": "Qualified",
+            "type": "integer"
+          },
+          "qualified_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualified Rate"
+          },
+          "track": {
+            "title": "Track",
+            "type": "string"
+          },
+          "track_id": {
+            "format": "uuid",
+            "title": "Track Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "track_id",
+          "track",
+          "learners",
+          "qualified",
+          "not_qualified",
+          "active",
+          "qualified_rate"
+        ],
+        "title": "QualityTrack",
+        "type": "object"
+      },
+      "QualityTrackCell": {
+        "properties": {
+          "assessed": {
+            "title": "Assessed",
+            "type": "integer"
+          },
+          "attainment": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attainment"
+          },
+          "met": {
+            "title": "Met",
+            "type": "integer"
+          },
+          "targeted": {
+            "title": "Targeted",
+            "type": "integer"
+          },
+          "track": {
+            "title": "Track",
+            "type": "string"
+          },
+          "track_id": {
+            "format": "uuid",
+            "title": "Track Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "track_id",
+          "track",
+          "targeted",
+          "assessed",
+          "met",
+          "attainment"
+        ],
+        "title": "QualityTrackCell",
+        "type": "object"
+      },
       "QueueItemOut": {
         "properties": {
           "ai_attention": {
@@ -8298,6 +8761,94 @@
           }
         },
         "summary": "Lab Intakes",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/quality": {
+      "get": {
+        "description": "Chất lượng chương trình theo chuẩn đầu ra của một khoá: mức đạt, cảnh báo dữ liệu, đề xuất cải tiến.",
+        "operationId": "quality_api_v1_analytics_quality_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cohort_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Cohort Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Quality",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/quality/report": {
+      "get": {
+        "description": "Báo cáo cải tiến dạng Markdown để tải về.",
+        "operationId": "quality_report_api_v1_analytics_quality_report_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cohort_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Cohort Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Quality Report",
         "tags": [
           "analytics"
         ]

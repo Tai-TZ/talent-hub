@@ -31,6 +31,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/mentor", label: (t) => t.nav.items.mentees, group: "training", permission: "mentor.assess" },
   { href: "/analytics", label: (t) => t.nav.items.funnel, group: "insight", permission: "analytics.read", exact: true },
   { href: "/analytics/lab", label: (t) => t.nav.items.lab, group: "insight", permission: "analytics.read" },
+  { href: "/analytics/quality", label: (t) => t.nav.items.quality, group: "insight", permission: "analytics.read" },
   { href: "/admin", label: (t) => t.nav.items.adminOverview, group: "admin", permission: "audit.read", exact: true },
   { href: "/admin/users", label: (t) => t.nav.items.accounts, group: "admin", permission: "user.manage" },
   { href: "/admin/documents", label: (t) => t.nav.items.documents, group: "admin", permission: "kb.manage" },

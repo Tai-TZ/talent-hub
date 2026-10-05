@@ -30,6 +30,7 @@ const vi = {
       mentees: "Học viên của tôi",
       funnel: "Phễu và công bằng",
       lab: "Rubric Lab",
+      quality: "Chất lượng chương trình",
       adminOverview: "Tổng quan hệ thống",
       accounts: "Tài khoản",
       documents: "Tài liệu",

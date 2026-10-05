@@ -32,6 +32,7 @@ const en: Messages = {
       mentees: "My learners",
       funnel: "Funnel & fairness",
       lab: "Rubric Lab",
+      quality: "Programme quality",
       adminOverview: "System overview",
       accounts: "Accounts",
       documents: "Documents",

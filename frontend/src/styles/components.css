@@ -1470,3 +1470,151 @@ body:has(.sticky-actions) .assistant-fab {
     width: 100%;
   }
 }
+
+/* ---------- Chất lượng chương trình ---------- */
+.quality-toolbar {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3) var(--th-space-4);
+  justify-content: space-between;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.quality-table th[scope="row"] {
+  font-weight: var(--th-font-semibold);
+  text-align: left;
+}
+
+.quality-rate {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2);
+}
+
+.quality-rate .muted {
+  font-size: var(--th-text-xs);
+}
+
+.meter {
+  background: var(--th-surface-subtle);
+  border-radius: var(--th-radius-pill);
+  display: inline-block;
+  height: 8px;
+  overflow: hidden;
+  width: 72px;
+}
+
+.meter__fill {
+  background: var(--th-brand-600);
+  display: block;
+  height: 100%;
+}
+
+.meter[data-tone="success"] .meter__fill {
+  background: var(--th-green-700);
+}
+
+.meter[data-tone="warning"] .meter__fill {
+  background: var(--th-amber-700);
+}
+
+.meter[data-tone="danger"] .meter__fill {
+  background: var(--th-red-700);
+}
+
+.quality-tracks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-1);
+}
+
+.quality-split {
+  align-items: start;
+}
+
+.quality-alerts,
+.quality-recs {
+  display: grid;
+  gap: var(--th-space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.quality-alert,
+.quality-rec {
+  border: 1px solid var(--th-border-subtle);
+  border-left: 4px solid var(--th-brand-400);
+  border-radius: var(--th-radius-md);
+  display: grid;
+  gap: var(--th-space-2);
+  padding: var(--th-space-3) var(--th-space-4);
+}
+
+.quality-alert[data-severity="danger"] {
+  border-left-color: var(--th-red-700);
+}
+
+.quality-alert[data-severity="warning"] {
+  border-left-color: var(--th-amber-700);
+}
+
+.quality-alert p,
+.quality-rec p {
+  margin: 0;
+}
+
+.quality-alert__head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2);
+}
+
+.quality-alert details summary {
+  color: var(--th-text-link);
+  cursor: pointer;
+  font-size: var(--th-text-sm);
+}
+
+.quality-alert__items {
+  font-size: var(--th-text-sm);
+  margin: var(--th-space-2) 0 0;
+  padding-left: var(--th-space-5);
+}
+
+.quality-rec {
+  border-left-color: var(--th-brand-700);
+}
+
+.quality-rec ul {
+  margin: 0;
+  padding-left: var(--th-space-5);
+}
+
+.quality-rec__label {
+  color: var(--th-text-secondary);
+  font-size: var(--th-text-xs);
+  font-weight: var(--th-font-bold);
+  letter-spacing: var(--th-tracking-wide);
+  text-transform: uppercase;
+}
+
+.quality-footnote {
+  font-size: var(--th-text-xs);
+}
+
+/* Tiêu đề hàng (tên năng lực, nhánh) giữ chữ thường như nội dung, khác tiêu đề cột. */
+.th-table tbody th[scope="row"] {
+  color: var(--th-text-primary);
+  font-size: var(--th-text-sm);
+  font-weight: var(--th-font-semibold);
+  letter-spacing: normal;
+  text-transform: none;
+}
