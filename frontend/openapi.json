@@ -3669,9 +3669,7 @@
             "type": "array"
           },
           "triage_config": {
-            "additionalProperties": true,
-            "title": "Triage Config",
-            "type": "object"
+            "$ref": "#/components/schemas/TriageConfig"
           }
         },
         "required": [
@@ -3900,14 +3898,12 @@
           "triage_config": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/TriageConfig"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Triage Config"
+            ]
           }
         },
         "title": "IntakePatch",
@@ -7634,6 +7630,16 @@
         "title": "TriageBoardOut",
         "type": "object"
       },
+      "TriageConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "thresholds": {
+            "$ref": "#/components/schemas/TriageThresholds"
+          }
+        },
+        "title": "TriageConfig",
+        "type": "object"
+      },
       "TriageIn": {
         "properties": {
           "force": {
@@ -7749,6 +7755,66 @@
           "engine"
         ],
         "title": "TriageStartOut",
+        "type": "object"
+      },
+      "TriageThresholds": {
+        "additionalProperties": false,
+        "description": "Ngưỡng sàng lọc AI (điểm 0–100, độ tin cậy 0–1). Thiếu khoá nào thì dùng mặc định của động cơ chấm.",
+        "properties": {
+          "decline": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decline"
+          },
+          "invite": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invite"
+          },
+          "margin": {
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin"
+          },
+          "min_confidence": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Confidence"
+          }
+        },
+        "title": "TriageThresholds",
         "type": "object"
       },
       "UnansweredOut": {

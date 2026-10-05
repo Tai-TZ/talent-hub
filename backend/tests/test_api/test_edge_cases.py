@@ -188,6 +188,35 @@ async def test_intake_dates_without_timezone_are_client_errors_not_500(login_as:
     assert mixed.status_code == 422, mixed.text
 
 
+@pytest.mark.parametrize(
+    "config",
+    [
+        {"thresholds": {"invite": "high"}},
+        {"thresholds": [1]},
+        {"thresholds": {"invite": 150}},
+        {"thresholds": {"min_confidence": 2}},
+        {"thresholds": {"invite": 40, "decline": 60}},
+        {"thresholds": {"unknown": 1}},
+        {"other": True},
+    ],
+)
+async def test_bad_triage_config_is_rejected_before_it_can_break_triage(login_as: Any, config: dict[str, Any]) -> None:
+    admin = await login_as("admin")
+    intake = await create_open_intake(admin)
+    res = await admin.patch(f"/api/v1/intakes/{intake['id']}", json={"triage_config": config})
+    assert res.status_code == 422, res.text
+    assert (await admin.get(f"/api/v1/intakes/{intake['id']}/triage")).status_code == 200
+
+
+async def test_partial_triage_thresholds_keep_engine_defaults(login_as: Any) -> None:
+    admin = await login_as("admin")
+    intake = await create_open_intake(admin)
+    res = await admin.patch(f"/api/v1/intakes/{intake['id']}", json={"triage_config": {"thresholds": {"invite": 75}}})
+    assert res.status_code == 200, res.text
+    triage = (await admin.get(f"/api/v1/intakes/{intake['id']}/triage")).json()
+    assert triage["thresholds"]["invite"] == 75 and triage["thresholds"]["decline"] == 42
+
+
 async def test_costs_and_settings_reject_non_finite_and_absurd_numbers(login_as: Any) -> None:
     admin = await login_as("admin")
     today = datetime.now(UTC).date().isoformat()

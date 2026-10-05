@@ -50,7 +50,7 @@ async def create_intake(db: OrgDb, data: IntakeIn, *, actor_user_id: uuid.UUID, 
         blind_review=data.blind_review,
         min_reviews=data.min_reviews,
         eligibility_rules=[r.model_dump() for r in data.eligibility_rules],
-        triage_config=data.triage_config,
+        triage_config=data.triage_config.stored(),
         status="draft",
     )
     db.session.add(intake)
@@ -74,6 +74,8 @@ async def update_intake(
         changes["eligibility_rules"] = [
             r.model_dump() if hasattr(r, "model_dump") else r for r in patch.eligibility_rules or []
         ]
+    if patch.triage_config is not None:
+        changes["triage_config"] = patch.triage_config.stored()
     before = {k: str(getattr(intake, k)) for k in changes}
     for key, value in changes.items():
         if value is not None:
