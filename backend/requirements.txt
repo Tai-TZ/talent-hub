@@ -12,6 +12,9 @@ alembic>=1.14.0
 # Cache / rate limit
 redis>=5.2.0
 
+# AI
+anthropic>=0.80.0
+
 # Auth
 argon2-cffi>=23.1.0
 pyjwt>=2.9.0

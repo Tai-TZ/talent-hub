@@ -48,6 +48,12 @@ class Settings(BaseSettings):
 
     max_body_bytes: int = 1_048_576
 
+    # AI: "heuristic" chạy offline không cần khoá; "llm" dùng Claude và tự lùi về luật khi dịch vụ lỗi.
+    ai_engine: str = "heuristic"
+    anthropic_api_key: str | None = None
+    ai_scoring_model: str = "claude-opus-5-5"
+    ai_concurrency: int = 6
+
     @property
     def is_local(self) -> bool:
         return self.environment == "local"
