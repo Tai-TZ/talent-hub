@@ -4,6 +4,8 @@ export const BASE_DOMAIN = process.env.BASE_DOMAIN ?? "localhost";
 // Tổ chức dùng khi chạy local mà host không có tên miền con (localhost:3000).
 export const DEFAULT_ORG = process.env.DEFAULT_ORG ?? "northwind";
 export const INTERNAL_PROXY_SECRET = process.env.INTERNAL_PROXY_SECRET;
+// Số proxy tin cậy đứng trước Next (load balancer, CDN). Dùng để lấy đúng IP người dùng từ X-Forwarded-For.
+export const TRUSTED_PROXY_HOPS = Number(process.env.TRUSTED_PROXY_HOPS ?? "1");
 export const BACKEND_TIMEOUT_MS = 15_000;
 export const MAX_BODY_BYTES = 1_048_576;
 // Tải tài liệu lên kho tri thức (tệp tối đa 15 MB, mã hoá base64 trong JSON). Khớp với giới hạn của backend.
