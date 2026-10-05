@@ -176,6 +176,31 @@ async def demo_env(owner_maker: async_sessionmaker[AsyncSession], orgs: dict[str
     }
 
 
+@pytest_asyncio.fixture(scope="session")
+async def training_env(owner_maker: async_sessionmaker[AsyncSession], orgs: dict[str, Organization]) -> dict[str, str]:
+    """Tổ chức riêng `delta` cho các test GHI vào khoá học (ghi danh, đánh giá, phụ cấp): không dùng chung với `gamma`
+    để test phân tích đọc dữ liệu minh hoạ không phụ thuộc thứ tự chạy."""
+    from src.cli import add_member, create_org
+    from src.db import set_org_context
+    from src.demo.seed import seed_demo
+
+    async with owner_maker() as session, session.begin():
+        org = await create_org(session, slug="delta", name="Delta University")
+        for role in ("admin", "cohort_manager", "training_manager", "mentor", "reviewer", "approver", "applicant"):
+            await add_member(
+                session,
+                org,
+                email=f"{role}@delta.test",
+                full_name=f"{role} delta",
+                role_codes=[role],
+                password=PASSWORD,
+                must_change_password=False,
+            )
+        await set_org_context(session, org.id)
+        summary = await seed_demo(session, org, current_applications=10, history_sizes=(40,), ready_size=50)
+    return {k: str(v) for k, v in summary["ready_to_enroll"].items()}
+
+
 @pytest_asyncio.fixture
 async def app_instance(orgs: dict[str, Organization]) -> AsyncIterator[FastAPI]:
     app = create_app()

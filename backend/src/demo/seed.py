@@ -235,7 +235,7 @@ async def _make_people(
     users = [
         {
             "id": uuid7(),
-            "email": f"{tag}.{i:04d}@{DEMO_DOMAIN}",
+            "email": f"{tag}.{i:04d}@{org.slug}.{DEMO_DOMAIN}",
             "full_name": p.full_name,
             "password_hash": None,
             "is_active": True,
@@ -258,7 +258,7 @@ async def _make_people(
 async def _ensure_reviewers(session: AsyncSession, org: Organization, roles: dict[str, uuid.UUID]) -> list[uuid.UUID]:
     out = []
     for i in range(3):
-        email = f"reviewer.{i}@{DEMO_DOMAIN}"
+        email = f"reviewer.{i}@{org.slug}.{DEMO_DOMAIN}"  # theo tổ chức: users.email là duy nhất toàn cục
         user = (await session.execute(select(User).where(User.email == email))).scalar_one_or_none()
         if user is None:
             user = User(email=email, full_name=f"Reviewer minh hoạ {i + 1}", password_hash=None)
