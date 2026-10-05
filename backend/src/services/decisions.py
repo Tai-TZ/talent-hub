@@ -143,7 +143,9 @@ async def approve(
     if len(applicant_message.strip()) < 10:
         raise ValidationFailedError("Cần có lời nhắn gửi ứng viên", {"applicant_message": "Tối thiểu 10 ký tự"})
 
-    intake = await get_intake(db, app.intake_id)
+    # Khoá dòng đợt tuyển trước khi đếm chỗ: hai approver duyệt nhận hai hồ sơ khác nhau cùng lúc không được
+    # cùng thấy còn một chỗ trống rồi cùng nhận (vượt chỉ tiêu).
+    intake = await get_intake(db, app.intake_id, for_update=outcome == "accepted")
     if outcome == "accepted" and await occupied_seats(db, intake.id) >= intake.quota:
         raise ConflictError("Đã đủ chỉ tiêu của đợt tuyển. Hãy đưa hồ sơ vào danh sách chờ.")
 

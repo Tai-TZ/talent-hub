@@ -262,6 +262,47 @@ async def test_dual_role_approver_cannot_decide_own_application(login_as) -> Non
     assert ok.status_code == 200, ok.text
 
 
+async def test_concurrent_approvals_cannot_exceed_quota(login_as, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """Còn một chỗ, hai approver cùng lúc duyệt nhận hai hồ sơ khác nhau: đúng một người thành công."""
+    from src.services import decisions as decisions_svc
+
+    count_seats = decisions_svc.occupied_seats
+
+    async def slow_count(db, intake_id):  # type: ignore[no-untyped-def]
+        # Ép hai giao dịch xen kẽ: cả hai đếm chỗ trước khi giao dịch nào kịp commit.
+        seats = await count_seats(db, intake_id)
+        await asyncio.sleep(0.3)
+        return seats
+
+    monkeypatch.setattr(decisions_svc, "occupied_seats", slow_count)
+    admin = await login_as("admin")
+    reviewer = await login_as("reviewer")
+    intake = await create_open_intake(admin, quota=1)
+    apps = [
+        await submit_application(await login_as(who), intake["id"], name=who) for who in ("applicant", "applicant2")
+    ]
+    await _close_and_start(admin, intake["id"])
+    decisions = []
+    for app in apps:
+        assert (await _review(reviewer, app["id"], FULL_SCORES)).status_code == 200
+        proposed = await reviewer.post(
+            f"/api/v1/staff/applications/{app['id']}/proposals",
+            json={"outcome": "accepted", "reason": "Đủ năng lực và kinh nghiệm cho chương trình theo rubric."},
+        )
+        assert proposed.status_code == 201, proposed.text
+        decisions.append(proposed.json()["decision_id"])
+    body = {
+        "outcome": "accepted",
+        "reason": "Đồng ý với đề xuất, hồ sơ đạt yêu cầu.",
+        "applicant_message": "Chúc mừng bạn được nhận.",
+    }
+    approvers = [await login_as("approver"), await login_as("approver2")]
+    results = await asyncio.gather(
+        *(a.post(f"/api/v1/staff/decisions/{d}/approve", json=body) for a, d in zip(approvers, decisions, strict=True))
+    )
+    assert sorted(r.status_code for r in results) == [200, 409], [r.text for r in results]
+
+
 async def test_reviewer_disagreement_blocks_advance_and_other_reviews_hidden_until_submit(login_as) -> None:  # type: ignore[no-untyped-def]
     admin = await login_as("admin")
     applicant = await login_as("applicant")

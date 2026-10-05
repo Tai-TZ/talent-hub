@@ -12,8 +12,11 @@ from src.services.audit import RequestMeta, write_audit
 from src.services.tenancy import OrgDb
 
 
-async def get_intake(db: OrgDb, intake_id: uuid.UUID) -> Intake:
-    intake = (await db.session.execute(select(Intake).where(Intake.id == intake_id))).scalar_one_or_none()
+async def get_intake(db: OrgDb, intake_id: uuid.UUID, *, for_update: bool = False) -> Intake:
+    stmt = select(Intake).where(Intake.id == intake_id)
+    if for_update:
+        stmt = stmt.with_for_update()
+    intake = (await db.session.execute(stmt)).scalar_one_or_none()
     if intake is None:
         raise NotFoundError("Không tìm thấy đợt tuyển")
     return intake
