@@ -51,7 +51,7 @@ test("tuyển sinh từ tạo đợt đến công bố kết quả", async ({ br
   await p.getByLabel("Số điện thoại").fill("0901234567");
   await p.getByRole("button", { name: "Tiếp tục" }).click();
   await p.getByRole("button", { name: "Thêm học vấn" }).click();
-  await p.getByLabel("Trường").fill("Đại học Northwind University");
+  await p.getByLabel("Trường").fill("Đại học Northwind");
   await p.getByLabel("Ngành học").fill("Khoa học máy tính");
   await p.getByRole("button", { name: "Tiếp tục" }).click();
   await p.getByRole("button", { name: "Thêm dự án" }).click();

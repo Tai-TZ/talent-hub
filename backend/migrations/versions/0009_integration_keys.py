@@ -27,7 +27,9 @@ def upgrade() -> None:
         sa.Column("prefix", sa.String(16), nullable=False),
         sa.Column("key_hash", sa.String(64), nullable=False),
         sa.Column("scopes", sa.dialects.postgresql.JSONB(), nullable=False, server_default="[]"),
-        sa.Column("service_membership_id", sa.Uuid(), sa.ForeignKey("org_memberships.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "service_membership_id", sa.Uuid(), sa.ForeignKey("org_memberships.id", ondelete="RESTRICT"), nullable=False
+        ),
         sa.Column("created_by", sa.Uuid(), sa.ForeignKey("users.id", ondelete="SET NULL")),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         sa.Column("last_used_at", sa.DateTime(timezone=True)),

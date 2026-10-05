@@ -1,4 +1,4 @@
-"""Nạp dữ liệu minh hoạ cho một tổ chức: chương trình mẫu, ba khoá lịch sử có kết quả và một đợt đang tuyển.
+"""Nạp dữ liệu minh hoạ cho một tổ chức: chương trình nhân tài AI, ba khoá lịch sử có kết quả và một đợt đang tuyển.
 
 Tất cả là dữ liệu tổng hợp (xem synthetic.py). Đợt tuyển tên bắt đầu bằng "[Minh hoạ]" để giao diện hiện nhãn cảnh báo.
 """
@@ -207,7 +207,7 @@ async def _ensure_catalog(
         program = Program(
             organization_id=org.id,
             code="ai-talent",
-            name={"vi": "20.000 nhân tài AI thực chiến", "en": "20,000 Applied AI Talent"},
+            name={"vi": "Chương trình nhân tài AI thực chiến", "en": "Applied AI Talent Program"},
             kind="cohort",
         )
         session.add(program)

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { computeTotal, fieldTexts, markSegments, snippetOf } from "@/features/staff/evidence";
 
 const content = {
-  education: [{ school: "Northwind University", degree: "Cử nhân", major: "Khoa học máy tính", status: "final_year", year: 2026, gpa: 8.7 }],
-  experience: [{ org: "FPT", role: "Thực tập", years: 0.5, description: "Xây dựng API" }],
+  education: [{ school: "Northwind", degree: "Cử nhân", major: "Khoa học máy tính", status: "final_year", year: 2026, gpa: 8.7 }],
+  experience: [{ org: "Contoso", role: "Thực tập", years: 0.5, description: "Xây dựng API" }],
   projects: [{ title: "Chatbot", description: "Trả lời câu hỏi tuyển sinh", link: null, tech: ["Python", "FastAPI"] }],
   skills: ["Python", "SQL"],
   essays: { motivation: "Tôi muốn học AI ứng dụng.", problem_solving: "" },
@@ -15,8 +15,8 @@ const content = {
 describe("fieldTexts", () => {
   it("khớp quy tắc dựng văn bản của backend", () => {
     const f = fieldTexts(content);
-    expect(f["education.0"]).toBe("Cử nhân Khoa học máy tính Northwind University (final_year, GPA 8.7)");
-    expect(f["experience.0"]).toBe("Thực tập — FPT — Xây dựng API");
+    expect(f["education.0"]).toBe("Cử nhân Khoa học máy tính Northwind (final_year, GPA 8.7)");
+    expect(f["experience.0"]).toBe("Thực tập — Contoso — Xây dựng API");
     expect(f["projects.0"]).toBe("Chatbot. Trả lời câu hỏi tuyển sinh Công nghệ: Python, FastAPI.");
     expect(f["skills"]).toBe("Python, SQL");
     expect(f["essays.motivation"]).toBe("Tôi muốn học AI ứng dụng.");

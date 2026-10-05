@@ -1,8 +1,8 @@
 /**
  * Icon dạng React để dùng được `currentColor`.
- * - CloseIcon, ChevronDownIcon, ArrowNextIcon: SVG của Northwind University (northwind-style/northwind/icons), hình dạng giữ nguyên.
- * - BarsIcon, CircleInfoIcon, TriangleExclamationIcon, CheckIcon: Font Awesome Free 6.7.2 (CC BY 4.0,
- *   https://fontawesome.com/license/free), dùng làm dự phòng cho hành động chung mà Northwind University không có icon riêng.
+ * - CloseIcon, ChevronDownIcon, ArrowNextIcon, cờ: vẽ riêng cho Talent Hub (nét tròn, lưới 24px).
+ * - BarsIcon, CircleInfoIcon, TriangleExclamationIcon, CheckIcon, KeyIcon, SignOutIcon: Font Awesome Free 6.7.2
+ *   (CC BY 4.0, https://fontawesome.com/license/free).
  */
 import type { ReactNode, SVGProps } from "react";
 
@@ -19,24 +19,23 @@ function Svg({ size = 20, children, ...rest }: IconProps & { children: ReactNode
 export function CloseIcon(props: IconProps) {
   return (
     <Svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M6 18L18 6" />
-      <path d="M18 18L6 6" />
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
     </Svg>
   );
 }
 
 export function ChevronDownIcon(props: IconProps) {
   return (
-    <Svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M17.9202 8.17969H11.6902H6.08024C5.12024 8.17969 4.64024 9.33969 5.32024 10.0197L10.5002 15.1997C11.3302 16.0297 12.6802 16.0297 13.5102 15.1997L15.4802 13.2297L18.6902 10.0197C19.3602 9.33969 18.8802 8.17969 17.9202 8.17969Z" />
+    <Svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M6 9.5l6 6 6-6" />
     </Svg>
   );
 }
 
 export function ArrowNextIcon(props: IconProps) {
   return (
-    <Svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M15.5122 11.1559L13.5422 9.18594L10.3322 5.97594C9.65219 5.30594 8.49219 5.78594 8.49219 6.74594V12.9759V18.5859C8.49219 19.5459 9.65219 20.0259 10.3322 19.3459L15.5122 14.1659C16.3422 13.3459 16.3422 11.9859 15.5122 11.1559Z" />
+    <Svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" />
     </Svg>
   );
 }

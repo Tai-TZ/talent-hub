@@ -100,7 +100,7 @@ function InviteForm({ roles, onClose }: { roles: string[]; onClose: () => void }
   );
 }
 
-const IMPORT_HINT = "email,họ tên,vai trò\nan.nguyen@northwind.edu.vn,Nguyễn Văn An,reviewer\nbinh.tran@northwind.edu.vn,Trần Thị Bình,mentor;reviewer";
+const IMPORT_HINT = "email,họ tên,vai trò\nan.nguyen@northwind.example.edu,Nguyễn Văn An,reviewer\nbinh.tran@northwind.example.edu,Trần Thị Bình,mentor;reviewer";
 
 function ImportForm({ onClose }: { onClose: () => void }) {
   const [text, setText] = useState("");

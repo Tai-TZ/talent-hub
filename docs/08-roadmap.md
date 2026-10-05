@@ -1,6 +1,6 @@
 # Lộ trình và tiêu chí nghiệm thu
 
-Khách hàng đầu tiên: Northwind University (chương trình 20.000 nhân tài AI thực chiến, xem [10-sample-tenant.md](10-sample-tenant.md)); nền tảng đa tổ chức ([09-multi-tenancy.md](09-multi-tenancy.md)) từ đầu để thêm trường khác bằng cấu hình. Phạm vi: chạy local bằng Docker Compose, chưa deploy. Mỗi mốc kết thúc bằng một bản chạy được và test xanh.
+Kịch bản mẫu: chương trình nhân tài AI theo đợt của tổ chức hư cấu Northwind University (xem [10-sample-tenant.md](10-sample-tenant.md)); nền tảng đa tổ chức ([09-multi-tenancy.md](09-multi-tenancy.md)) từ đầu để thêm trường khác bằng cấu hình. Phạm vi: chạy local bằng Docker Compose, chưa deploy. Mỗi mốc kết thúc bằng một bản chạy được và test xanh.
 
 ## M0 — Nền móng
 - Monorepo `apps/api`, `apps/web`, `infra`; `docker-compose.yml` (Postgres + pgvector, Redis, MinIO, Mailpit để xem email local).
@@ -16,7 +16,7 @@ Khách hàng đầu tiên: Northwind University (chương trình 20.000 nhân t�
 **Nghiệm thu:** `docker compose up` rồi đăng nhập được bằng tài khoản seed của từng vai trò, mỗi vai trò chỉ thấy menu của mình; gọi API trái quyền trả `403`; mọi thay đổi vai trò có audit; người dùng của `northwind` không đọc/ghi được dữ liệu của `demo-uni` qua API lẫn SQL trực tiếp bằng vai trò ứng dụng.
 
 ## M1 — Tuyển sinh MVP
-- Đợt tuyển với **dãy vòng cấu hình** (Northwind University: xét hồ sơ → đánh giá năng lực), form hồ sơ động theo `form_schema`, luật đủ điều kiện (chỉ gợi ý loại), upload tài liệu qua presigned URL, kiểm tra loại và kích thước, quét virus (ClamAV tuỳ chọn).
+- Đợt tuyển với **dãy vòng cấu hình** (chương trình mẫu: xét hồ sơ → đánh giá năng lực), form hồ sơ động theo `form_schema`, luật đủ điều kiện (chỉ gợi ý loại), upload tài liệu qua presigned URL, kiểm tra loại và kích thước, quét virus (ClamAV tuỳ chọn).
 - State machine hồ sơ (bảng chuyển hợp lệ + quyền theo bước + khoá lạc quan), timeline.
 - Rubric, màn hình reviewer, đề xuất, phê duyệt hai cấp (người duyệt khác người đề xuất, ràng buộc ở DB).
 - Email thông báo qua outbox + worker.
@@ -59,7 +59,7 @@ Khách hàng đầu tiên: Northwind University (chương trình 20.000 nhân t�
 **Nghiệm thu:** từng rule có test với dữ liệu gây lỗi; alert không bị tạo trùng khi chạy lại; số liệu trong báo cáo khớp snapshot.
 
 ## Ngoài phạm vi hiện tại
-Deploy lên cloud, database riêng cho từng tổ chức, chi trả phụ cấp thực tế, engine làm bài trắc nghiệm tích hợp (trừ khi Northwind University yêu cầu), connector CRM/LMS thật, SSO cấp tổ chức ngoài Microsoft, ứng dụng di động, thanh toán lệ phí.
+Deploy lên cloud, database riêng cho từng tổ chức, chi trả phụ cấp thực tế, engine làm bài trắc nghiệm tích hợp (trừ khi tổ chức triển khai yêu cầu), connector CRM/LMS thật, SSO cấp tổ chức ngoài Microsoft, ứng dụng di động, thanh toán lệ phí.
 
 ## Rủi ro chính
 | Rủi ro | Giảm thiểu |
@@ -69,5 +69,5 @@ Deploy lên cloud, database riêng cho từng tổ chức, chi trả phụ cấp
 | Chiếm tài khoản qua Microsoft | Định danh `iss+sub`, không gộp theo email, giới hạn tenant cho nhân sự |
 | Trợ lý trả lời sai | Grounding gate, từ chối khi thiếu ngữ cảnh, eval trước khi bật |
 | Rò rỉ dữ liệu giữa các tổ chức | RLS bắt buộc, vai trò DB không BYPASSRLS, test cô lập chạy trong CI, ngữ cảnh đặt bằng `SET LOCAL` |
-| Đặc thù Northwind University chưa công khai (rubric, tiêu chí xét đạt, bài test) | Mọi thứ nằm trong cấu hình; danh sách cần cung cấp ở [10-sample-tenant.md](10-sample-tenant.md) mục 6; bàn giao dữ liệu đó là điều kiện để chạy khoá thật |
+| Đặc thù của tổ chức triển khai chưa có (rubric, tiêu chí xét đạt, bài test) | Mọi thứ nằm trong cấu hình; danh sách cần cung cấp ở [10-sample-tenant.md](10-sample-tenant.md) mục 6; bàn giao dữ liệu đó là điều kiện để chạy khoá thật |
 | Chưa có CRM/LMS thật | Adapter và mock; contract test để connector thật cắm vào sau |

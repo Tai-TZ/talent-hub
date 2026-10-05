@@ -1,4 +1,4 @@
-/* Giao diện ứng dụng, dựng trên token Northwind University (tokens.css). Mobile-first: mặc định cho màn nhỏ,
+/* Giao diện ứng dụng, dựng trên token Talent Hub (tokens.css). Mobile-first: mặc định cho màn nhỏ,
  * media query min-width mở rộng dần. Chỉ dùng biến ngữ nghĩa (--th-text-*, --th-surface-*...), không dùng màu thô. */
 
 :root {
@@ -73,6 +73,7 @@ button {
 /* ---------- Khung ứng dụng ---------- */
 .shell {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* cột không nở theo chữ không xuống dòng (tên tổ chức dài) */
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 100dvh;
 }
@@ -130,6 +131,9 @@ button {
   font-size: var(--th-text-xl);
   font-weight: var(--th-font-bold);
   letter-spacing: var(--th-tracking-tight);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis; /* tên tổ chức dài không đẩy tràn thanh đầu trang trên điện thoại */
   white-space: nowrap;
 }
 
@@ -376,7 +380,7 @@ a:focus-visible {
 
 .nav-link[aria-current="page"] {
   background: var(--th-brand-50);
-  box-shadow: inset 3px 0 0 var(--th-red-700);
+  box-shadow: inset 3px 0 0 var(--th-brand-600);
   color: var(--th-brand-800);
   font-weight: var(--th-font-bold);
 }
@@ -417,7 +421,7 @@ a:focus-visible {
 }
 
 .page-head__title::before {
-  background: var(--th-red-700);
+  background: var(--th-brand-600);
   content: "";
   display: block;
   height: 6px;
@@ -602,7 +606,7 @@ a:focus-visible {
 }
 
 .auth__hero::before {
-  background: var(--th-red-700);
+  background: var(--th-brand-600);
   content: "";
   height: 6px;
   width: 56px;

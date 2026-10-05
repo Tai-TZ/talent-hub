@@ -1,7 +1,7 @@
 # Talent Hub — Yêu cầu đề bài
 
 ## Bối cảnh
-Nền tảng hỗ trợ tuyển sinh và quản lý chất lượng đào tạo cho chương trình **kỹ sư AI quy mô lớn**.
+Nền tảng hỗ trợ tuyển sinh và quản lý chất lượng đào tạo cho một chương trình đào tạo **kỹ sư AI quy mô lớn** (hàng chục nghìn học viên, chia nhiều khoá).
 
 ## Mô tả
 - Tiếp nhận hồ sơ ứng viên, theo dõi hành trình ứng viên.

@@ -1,6 +1,6 @@
 # Kiến trúc Talent Hub
 
-> Khách hàng đầu tiên là Northwind University (chương trình nhân tài AI thực chiến); nền tảng **đa tổ chức** để các trường khác dùng lại bằng cấu hình. Xem [09-multi-tenancy.md](09-multi-tenancy.md) và [10-sample-tenant.md](10-sample-tenant.md).
+> Thiết kế quanh một chương trình nhân tài AI theo đợt làm mẫu (tổ chức hư cấu Northwind University); nền tảng **đa tổ chức** để các trường khác dùng lại bằng cấu hình. Xem [09-multi-tenancy.md](09-multi-tenancy.md) và [10-sample-tenant.md](10-sample-tenant.md).
 
 ## 1. Tổng quan hệ thống
 
@@ -87,7 +87,7 @@ flowchart TD
 
 ## 3. Luồng xét tuyển (state machine)
 
-Trạng thái hồ sơ là tập cố định; **dãy vòng** (`current_round`) do cấu hình đợt tuyển quyết định (Northwind University: `portfolio` → `aptitude`; trường khác có thể thêm phỏng vấn…).
+Trạng thái hồ sơ là tập cố định; **dãy vòng** (`current_round`) do cấu hình đợt tuyển quyết định (chương trình mẫu: `portfolio` → `aptitude`; trường khác có thể thêm phỏng vấn…).
 
 ```mermaid
 stateDiagram-v2
@@ -121,7 +121,7 @@ stateDiagram-v2
 
 ## 4. Luồng đào tạo và chuẩn đầu ra
 
-Mô hình: **Program → Cohort (khoá) → Phase (giai đoạn) → Track (nhánh)**. Chương trình mẫu của Northwind University là 12 tuần theo 3+3+6 và 3 nhánh; chương trình theo môn/tín chỉ của trường khác dùng cùng mô hình qua mẫu cấu hình. Chi tiết: [10-sample-tenant.md](10-sample-tenant.md).
+Mô hình: **Program → Cohort (khoá) → Phase (giai đoạn) → Track (nhánh)**. Chương trình mẫu là 12 tuần theo 3+3+6 và 3 nhánh; chương trình theo môn/tín chỉ của trường khác dùng cùng mô hình qua mẫu cấu hình. Chi tiết: [10-sample-tenant.md](10-sample-tenant.md).
 
 ```mermaid
 flowchart LR

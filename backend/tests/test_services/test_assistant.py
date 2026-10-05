@@ -33,7 +33,7 @@ def test_content_terms_drop_question_words_and_diacritics() -> None:
     ]  # không dấu: so khớp bỏ dấu
     assert "ai" in ai.content_terms("Đ có AI không")  # AI là từ khoá, không phải đại từ nghi vấn
     assert ai.content_terms("là gì?") == []
-    assert ai.fold("Đại học Bách Khoa") == "dai hoc bach khoa"
+    assert ai.fold("Đại học Kỹ thuật Minh hoạ") == "dai hoc ky thuat minh hoa"
 
 
 async def test_extractive_answers_with_verbatim_sentence_and_citation() -> None:

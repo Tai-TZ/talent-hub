@@ -165,9 +165,7 @@ async def test_openrouter_structured_completion_flows_through_llm_engine_with_ve
     request = rec.requests[0]
     assert str(request.url) == "https://openrouter.ai/api/v1/chat/completions"
     assert request.headers["authorization"] == f"Bearer {FAKE_KEY}"
-    assert (
-        request.headers["x-title"] == "Talent Hub" and request.headers["http-referer"] == "http://localhost:3000"
-    )
+    assert request.headers["x-title"] == "Talent Hub" and request.headers["http-referer"] == "http://localhost:3000"
     body = rec.bodies[0]
     assert body["model"] == "google/gemini-2.5-flash" and body["max_tokens"] == 4000
     assert [m["role"] for m in body["messages"]] == ["system", "user"]

@@ -12,13 +12,13 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: { default: "Talent Hub", template: "%s · Talent Hub" },
-  description: "Tuyển sinh và quản lý chất lượng đào tạo cho chương trình nhân tài AI.",
+  description: "Hệ thống quản lý tuyển sinh và chất lượng đào tạo theo đợt.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#134D8B",
+  themeColor: "#4338CA",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

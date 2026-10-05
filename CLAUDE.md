@@ -1,13 +1,13 @@
 # Talent Hub — hướng dẫn cho agent
 
-Nền tảng tuyển sinh và quản lý chất lượng đào tạo, đa tổ chức. Khách hàng đầu tiên là Northwind University (chương trình 20.000 nhân tài AI). Tài liệu thiết kế ở `docs/` (bắt đầu từ `docs/02-architecture.md`, `docs/09-multi-tenancy.md`, `docs/10-sample-tenant.md`).
+Hệ thống quản lý tuyển sinh và chất lượng đào tạo theo đợt, đa tổ chức. Tổ chức mẫu cho dev/demo là Northwind University (`northwind`, tên hư cấu). Tài liệu thiết kế ở `docs/` (bắt đầu từ `docs/02-architecture.md`, `docs/09-multi-tenancy.md`, `docs/10-sample-tenant.md`).
 
 ## Cấu trúc
 
 | Thư mục | Vai trò |
 |---|---|
 | `backend/` | **BE**: FastAPI + SQLAlchemy async + PostgreSQL. Mã nguồn trong `backend/src` |
-| `frontend/` | **FE**: Next.js 16 (App Router) + TypeScript, style Northwind University. Mã nguồn trong `frontend/src` |
+| `frontend/` | **FE**: Next.js 16 (App Router) + TypeScript, token thiết kế riêng (`src/styles/tokens.css`). Mã nguồn trong `frontend/src` |
 | `db/init/` | SQL khởi tạo vai trò DB cho Postgres local |
 | `docs/` | Thiết kế, research, quyết định kiến trúc |
 

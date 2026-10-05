@@ -16,10 +16,10 @@ from pathlib import Path
 OUT = Path(__file__).parent / "readme"
 COS, SIN = math.cos(math.radians(30)), math.sin(math.radians(30))
 
-# Bảng màu: lấy từ token thương hiệu (xanh Northwind University) + các sắc phụ có độ sáng cân bằng; mỗi khối có mặt trên/trái/phải.
+# Bảng màu: lấy từ token thương hiệu (indigo) + các sắc phụ có độ sáng cân bằng; mỗi khối có mặt trên/trái/phải.
 FACES = {
-    "blue": ("#5d9bc8", "#1d6199", "#134d8b"),
-    "navy": ("#387aad", "#134d8b", "#0b2a4d"),
+    "blue": ("#818cf8", "#4f46e5", "#4338ca"),
+    "navy": ("#6366f1", "#4338ca", "#312e81"),
     "teal": ("#4fc7b6", "#0e9a8a", "#0a7569"),
     "amber": ("#f2c46d", "#d39a2c", "#a87418"),
     "violet": ("#a99be6", "#7b68c9", "#5b49a6"),
@@ -249,9 +249,9 @@ def tenancy() -> str:
     tx, ty = iso(2.5, 2.5, 6.6, ox, oy, s)
     _, by = iso(2.5, 2.5, 4.15, ox, oy, s)
     beam = f"M{tx:.1f},{ty:.1f} L{tx:.1f},{by:.1f}"
-    parts.append(f'<path class="wire dash" d="{beam}" stroke="#387aad" stroke-width="2.4"/>')
+    parts.append(f'<path class="wire dash" d="{beam}" stroke="#6366f1" stroke-width="2.4"/>')
     for k in range(3):
-        parts.append(packet(beam, "#134d8b", 2.4, k * 0.8, r=5.5))
+        parts.append(packet(beam, "#4338ca", 2.4, k * 0.8, r=5.5))
     parts.append(f'<rect class="card" x="{tx - 120:.1f}" y="{ty - 46:.1f}" width="240" height="34" rx="8"/>')
     parts.append(f'<text class="t-small" text-anchor="middle" x="{tx:.1f}" y="{ty - 24:.1f}">SET LOCAL app.org_id = northwind</text>')
     return svg(860, 430, "Cô lập dữ liệu theo tổ chức", "Ba lớp dữ liệu của ba tổ chức trong một database; truy vấn với app.org_id = northwind chỉ đọc được lớp northwind.", "".join(parts))
@@ -263,7 +263,7 @@ def tenancy() -> str:
 
 
 def performance() -> str:
-    before, after = "#93a3b5", "#1d6199"
+    before, after = "#93a3b5", "#4f46e5"
     panels = [
         ("Sàng lọc AI 20.000 hồ sơ", "hồ sơ/giây · cao hơn là tốt", [("Trước", 95, "95"), ("Sau", 2000, "~2.000")], 2000, "nhanh hơn ~20 lần"),
         ("Rubric Lab (12.500 hồ sơ)", "p95 mili giây · thấp hơn là tốt", [("Trước", 1839, "1.839 ms"), ("Sau", 49, "49 ms")], 1839, "nhanh hơn ~37 lần"),

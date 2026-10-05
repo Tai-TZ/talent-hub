@@ -1,6 +1,6 @@
-# Đa tổ chức (multi-tenancy): Northwind University trước, các trường khác sau
+# Đa tổ chức (multi-tenancy)
 
-**Mục tiêu:** Northwind University là tổ chức đầu tiên và quyết định các tính năng cụ thể; mọi thứ riêng của Northwind University phải nằm trong **cấu hình**, không nằm trong code, để thêm một trường mới (hoặc một chương trình khác của chính Northwind University) chỉ cần tạo tổ chức mới và nạp cấu hình.
+**Mục tiêu:** mọi thứ riêng của một tổ chức (ví dụ tổ chức mẫu `northwind`) phải nằm trong **cấu hình**, không nằm trong code, để thêm một trường mới (hoặc một chương trình khác của cùng trường) chỉ cần tạo tổ chức mới và nạp cấu hình.
 
 ## 1. Ranh giới: cái gì chung, cái gì riêng
 
@@ -81,7 +81,7 @@ Thêm một trường mới nghĩa là viết một mẫu mới (ví dụ chươ
 
 ## 7. Chuẩn bị cho quy mô
 
-Giả định thiết kế (cần xác nhận với Northwind University): 10.000–20.000 học viên trong 2 năm, khoảng 500 học viên mỗi khoá, và mỗi khoá nhận hàng nghìn hồ sơ. Do đó:
+Giả định thiết kế (cần xác nhận với tổ chức triển khai): 10.000–20.000 học viên trong 2 năm, khoảng 500 học viên mỗi khoá, và mỗi khoá nhận hàng nghìn hồ sơ. Do đó:
 - Hàng đợi hồ sơ phân trang bằng cursor, có chỉ mục `(organization_id, intake_id, status, current_round)`.
 - Hành động hàng loạt (phân công, chuyển vòng, đề xuất, duyệt theo lô) chạy nền với tiến độ, mỗi hồ sơ vẫn tạo sự kiện và audit riêng.
 - Luật sàng lọc tự động theo điều kiện đủ tư cách (ví dụ thiếu giấy tờ bắt buộc) giảm tải reviewer, nhưng chỉ **gợi ý loại** để người xác nhận hàng loạt, không tự loại.

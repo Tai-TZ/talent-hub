@@ -12,11 +12,11 @@ AI đọc hồ sơ có dẫn chứng kiểm chứng được · con người quy
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_RLS-4169E1?logo=postgresql&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-252_backend_·_76_e2e-2f9a62)
-![i18n](https://img.shields.io/badge/UI-Ti%E1%BA%BFng_Vi%E1%BB%87t_·_English-134d8b)
-[![License](https://img.shields.io/badge/license-Proprietary-c72127)](LICENSE)
+![i18n](https://img.shields.io/badge/UI-Ti%E1%BA%BFng_Vi%E1%BB%87t_·_English-4338ca)
+[![License](https://img.shields.io/badge/license-Proprietary-6b7280)](LICENSE)
 
-[![AI](https://img.shields.io/badge/AI-c72127?style=flat-square)](https://github.com/topics/artificial-intelligence)
-[![EdTech](https://img.shields.io/badge/EdTech-134d8b?style=flat-square)](https://github.com/topics/edtech)
+[![AI](https://img.shields.io/badge/AI-4f46e5?style=flat-square)](https://github.com/topics/artificial-intelligence)
+[![EdTech](https://img.shields.io/badge/EdTech-4338ca?style=flat-square)](https://github.com/topics/edtech)
 [![RAG](https://img.shields.io/badge/RAG-5b49a6?style=flat-square)](https://github.com/topics/rag)
 [![LLM](https://img.shields.io/badge/LLM-5b49a6?style=flat-square)](https://github.com/topics/llm)
 [![Human-in-the-loop](https://img.shields.io/badge/Human--in--the--loop-0e623a?style=flat-square)](https://github.com/topics/human-in-the-loop)
@@ -35,7 +35,7 @@ AI đọc hồ sơ có dẫn chứng kiểm chứng được · con người quy
 
 ## Tổng quan
 
-Khách hàng đầu tiên là **Northwind University** với chương trình *nhân tài AI thực chiến* (khoá 12 tuần theo mô hình 3+3+6, ba nhánh chuyên sâu, thực chiến tại doanh nghiệp đối tác). Nền tảng được thiết kế **đa tổ chức** để các trường khác dùng lại bằng cấu hình, không cần sửa mã.
+Talent Hub là hệ thống quản lý tuyển sinh và chất lượng đào tạo cho các chương trình đào tạo nhân tài theo đợt, ví dụ một chương trình AI thực chiến 12 tuần theo mô hình 3+3+6 (nền tảng, mô phỏng, thực chiến tại doanh nghiệp đối tác) với ba nhánh chuyên sâu. Nền tảng được thiết kế **đa tổ chức** để mỗi trường dùng lại bằng cấu hình, không cần sửa mã. Tổ chức mẫu trong dữ liệu dev là *Northwind University*, một tên hư cấu.
 
 ### Vấn đề
 
@@ -271,7 +271,7 @@ cd frontend && npm run e2e                   # cần backend chạy; desktop và
 | [04 Luồng người dùng](docs/04-user-flows.md) · [05 Dữ liệu](docs/05-data-model.md) · [06 API](docs/06-api-spec.md) | Màn hình, mô hình dữ liệu, đặc tả API |
 | [07 AI/RAG](docs/07-ai-rag.md) | Thiết kế sàng lọc, trợ lý, cảnh báo chất lượng |
 | [08 Lộ trình](docs/08-roadmap.md) | Các mốc và tiêu chí nghiệm thu |
-| [09 Đa tổ chức](docs/09-multi-tenancy.md) · [10 Northwind University](docs/10-sample-tenant.md) | Cô lập dữ liệu, cấu hình cho Northwind University |
+| [09 Đa tổ chức](docs/09-multi-tenancy.md) · [10 Tổ chức mẫu](docs/10-sample-tenant.md) | Cô lập dữ liệu, cấu hình chương trình mẫu |
 | [11 Chiến lược sản phẩm](docs/11-product-strategy.md) | Vấn đề, đối thủ, USP, các khoảnh khắc WOW |
 | [12 Tích hợp](docs/12-integrations.md) | Khoá API, Power BI, LMS, CRM |
 
@@ -292,7 +292,7 @@ cd frontend && npm run e2e                   # cần backend chạy; desktop và
 
 Chi tiết số liệu đã đo, lỗi đã tìm và sửa, việc tiếp theo: xem [WORKLOG.md](WORKLOG.md).
 
-> **Về dữ liệu minh hoạ:** bộ sinh dữ liệu trong `backend/src/demo` tạo người, hồ sơ, điểm và kết quả **giả**. Số liệu thu được từ đó không phải kết quả của Northwind University và không dùng làm bằng chứng hiệu quả.
+> **Về dữ liệu minh hoạ:** bộ sinh dữ liệu trong `backend/src/demo` tạo người, hồ sơ, điểm và kết quả **giả**. Số liệu thu được từ đó không phải kết quả của một tổ chức thật và không dùng làm bằng chứng hiệu quả.
 
 ## Đóng góp
 

@@ -60,7 +60,7 @@ export function RubricEditor({ intakeId, round, rubric, locked }: { intakeId: st
           {!locked ? (
             <div style={{ marginTop: "var(--th-space-3)" }}>
               <Button size="sm" variant="secondary" onClick={() => setCriteria(DEFAULT_RUBRIC.map((c) => ({ ...c })))}>
-                Dùng mẫu 7 tiêu chí Talent Hub
+                Dùng mẫu 7 tiêu chí
               </Button>
             </div>
           ) : null}

@@ -54,15 +54,15 @@ Theo các phân tích về [EU AI Act](https://www.ehu.eus/en/web/adimen-artifiz
 - Báo cáo công bằng định kỳ: so sánh tỉ lệ đạt theo nhóm (khi có dữ liệu được phép thu thập hợp pháp).
 - Dữ liệu cá nhân: tuân thủ Nghị định 13/2023/NĐ-CP (consent, mục đích, quyền truy cập và xoá); cần pháp chế xác nhận thời hạn lưu trữ.
 
-## 6. Chương trình của Northwind University và bài học cho miền nghiệp vụ
+## 6. Chương trình nhân tài AI theo đợt và bài học cho miền nghiệp vụ
 
-Chi tiết và nguồn ở [10-sample-tenant.md](10-sample-tenant.md). Điểm quan trọng nhất: đây là **khoá 12 tuần theo mô hình 3+3+6 chia 3 nhánh**, tuyển bằng xét hồ sơ rồi đánh giá năng lực online, **xếp lớp theo trình độ**, thực chiến tại doanh nghiệp đối tác, đánh giá theo khung **SFIA**, có phụ cấp 8 triệu đồng/tháng và theo dõi kết quả việc làm (khoá 1: 373/500 học viên đạt yêu cầu). Vì vậy mô hình chương trình phải là Program → Cohort → Phase → Track với năng lực theo mức, không phải môn/tín chỉ.
+Chương trình mẫu mô tả ở [10-sample-tenant.md](10-sample-tenant.md). Điểm quan trọng nhất: đây là **khoá 12 tuần theo mô hình 3+3+6 chia 3 nhánh**, tuyển bằng xét hồ sơ rồi đánh giá năng lực online, **xếp lớp theo trình độ**, thực chiến tại doanh nghiệp đối tác, đánh giá theo khung **SFIA**, có phụ cấp hằng tháng và theo dõi kết quả việc làm. Vì vậy mô hình chương trình phải là Program → Cohort → Phase → Track với năng lực theo mức, không phải môn/tín chỉ.
 
-Northwind University cũng có quy trình tuyển sinh đại học riêng ([admissions.northwind.edu.vn](https://admissions.northwind.edu.vn/undergraduate/apply-to-northwind/first-year-applicants/application-process/)): sàng lọc đầu vào, vòng 1 xét hồ sơ bởi giảng viên và chuyên viên, vòng 2 phỏng vấn/tình huống. Điều này xác nhận dãy vòng phải **cấu hình được** (có/không phỏng vấn).
+Tuyển sinh đại học thông thường thì khác: sàng lọc đầu vào, vòng 1 xét hồ sơ bởi giảng viên và chuyên viên, vòng 2 phỏng vấn/tình huống. Điều này xác nhận dãy vòng phải **cấu hình được** (có/không phỏng vấn).
 
 Khung SFIA ([SFIA 9](https://sfia-online.org/en/sfia-9/responsibilities)) gồm 7 mức trách nhiệm xác định bởi 5 thuộc tính (tự chủ, ảnh hưởng, độ phức tạp, kỹ năng kinh doanh, kiến thức) → khung năng lực cần thang **mức** bên cạnh thang phần trăm.
 
-Về chuẩn đầu ra ở Việt Nam: [Thông tư 04/2025/TT-BGDĐT](https://www.sggp.org.vn/nhieu-quy-dinh-moi-ve-kiem-dinh-chuong-trinh-dao-tao-dai-hoc-post782808.html) yêu cầu chuẩn đầu ra phải cụ thể, quan sát, đánh giá và đo lường được, và với bậc đại học phải có yêu cầu về năng lực số, nội dung AI, ngoại ngữ. Northwind University có ba chương trình được [ABET công nhận](https://northwind.edu.vn/three-programs-at-northwind-university-college-of-engineering-computer-science-earn-abet-accreditation/). Hệ quả: khung năng lực là thực thể cấu hình (SFIA, PLO, ABET student outcomes), mỗi trường tự nạp.
+Về chuẩn đầu ra ở Việt Nam: [Thông tư 04/2025/TT-BGDĐT](https://www.sggp.org.vn/nhieu-quy-dinh-moi-ve-kiem-dinh-chuong-trinh-dao-tao-dai-hoc-post782808.html) yêu cầu chuẩn đầu ra phải cụ thể, quan sát, đánh giá và đo lường được, và với bậc đại học phải có yêu cầu về năng lực số, nội dung AI, ngoại ngữ. Nhiều trường kỹ thuật còn theo chuẩn ABET. Hệ quả: khung năng lực là thực thể cấu hình (SFIA, PLO, ABET student outcomes), mỗi trường tự nạp.
 
 ## 7. Nền tảng quản lý chương trình theo khoá (cohort/bootcamp)
 

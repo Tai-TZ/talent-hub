@@ -27,7 +27,7 @@ def good_content() -> dict[str, Any]:
     return {
         "education": [
             {
-                "school": "Đại học Bách Khoa",
+                "school": "Đại học Kỹ thuật Minh hoạ",
                 "major": "Khoa học máy tính",
                 "status": "final_year",
                 "year": 2026,

@@ -1,4 +1,4 @@
-/* Thành phần dùng chung cho các màn hình nghiệp vụ. Chỉ dùng token ngữ nghĩa của bộ style Northwind University. */
+/* Thành phần dùng chung cho các màn hình nghiệp vụ. Chỉ dùng token ngữ nghĩa của Talent Hub (tokens.css). */
 
 /* ---------- Tiêu đề trang có hành động ---------- */
 .page-head--row {
@@ -668,7 +668,7 @@
 .round-progress__item--current .round-progress__dot {
   background: var(--th-brand-700);
   border-color: var(--th-brand-700);
-  box-shadow: 0 0 0 4px rgba(19, 77, 139, 0.2);
+  box-shadow: 0 0 0 4px rgba(67, 56, 202, 0.2);
 }
 
 @media (min-width: 900px) {

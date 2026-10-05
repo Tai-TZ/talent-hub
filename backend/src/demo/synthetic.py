@@ -35,18 +35,18 @@ GIVEN_F = ["Linh", "Trang", "Hà", "Lan", "Ngọc", "Mai", "Hương", "Thảo", 
 GIVEN_M = ["Nam", "Hùng", "Dũng", "Khoa", "Long", "Phúc", "Tuấn", "Việt", "Bách", "Đạt", "Huy", "Sơn", "Thái", "Kiên"]
 CITIES = ["Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ", "Huế", "Nghệ An", "Thái Nguyên"]
 SCHOOLS = [
-    "Đại học Bách Khoa Hà Nội",
-    "Đại học Công nghệ - ĐHQGHN",
-    "Đại học Bách Khoa TP.HCM",
-    "Đại học Khoa học Tự nhiên TP.HCM",
-    "Học viện Công nghệ Bưu chính Viễn thông",
-    "Đại học FPT",
-    "Đại học Kinh tế Quốc dân",
-    "Đại học Sư phạm Kỹ thuật TP.HCM",
-    "Đại học Đà Nẵng",
-    "Đại học Cần Thơ",
-    "Đại học Khoa học Huế",
-    "Đại học Thăng Long",
+    "Đại học Kỹ thuật Minh hoạ Hà Nội",
+    "Đại học Công nghệ Minh hoạ",
+    "Đại học Kỹ thuật Minh hoạ TP.HCM",
+    "Đại học Khoa học Tự nhiên Minh hoạ",
+    "Học viện Viễn thông Minh hoạ",
+    "Đại học Phần mềm Minh hoạ",
+    "Đại học Kinh tế Minh hoạ",
+    "Đại học Sư phạm Kỹ thuật Minh hoạ",
+    "Đại học Minh hoạ Đà Nẵng",
+    "Đại học Minh hoạ Cần Thơ",
+    "Đại học Khoa học Minh hoạ Huế",
+    "Đại học Tư thục Minh hoạ",
 ]
 TECH_MAJORS = ["Khoa học máy tính", "Công nghệ thông tin", "Kỹ thuật phần mềm", "Khoa học dữ liệu", "An toàn thông tin"]
 OTHER_MAJORS = ["Quản trị kinh doanh", "Kinh tế", "Toán ứng dụng", "Điện tử viễn thông", "Ngôn ngữ Anh", "Marketing"]

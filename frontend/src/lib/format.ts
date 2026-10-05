@@ -86,7 +86,7 @@ export const fmtPct = vi.pct;
 export const fmtScore = vi.score;
 export const fmtAgo = vi.ago;
 
-/** Số chữ cái đầu của họ tên, dùng cho avatar (chỉ lấy chữ cái: "reviewer (northwind)" → "RV"). */
+/** Số chữ cái đầu của họ tên, dùng cho avatar (chỉ lấy chữ cái: "reviewer (northwind)" → "RN"). */
 export function initials(name: string): string {
   const words = name.match(/\p{L}[\p{L}\p{M}]*/gu) ?? [];
   return ((words[0]?.[0] ?? "") + (words.length > 1 ? (words.at(-1)?.[0] ?? "") : "")).toUpperCase() || "?";

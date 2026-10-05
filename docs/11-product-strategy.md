@@ -4,7 +4,7 @@ Tài liệu này trả lời câu hỏi "tại sao sản phẩm này đáng đư
 
 ## 1. Vấn đề thật sự
 
-Chương trình 20.000 nhân tài AI của Northwind University và tập đoàn đối tác ([nguồn](10-sample-tenant.md)) chạy **nhiều khoá liên tiếp**, mỗi khoá khoảng 500 học viên chọn ra từ hàng nghìn hồ sơ, 12 tuần, thực chiến tại doanh nghiệp đối tác, theo dõi kết quả việc làm. Khoá 1 có 373 trên 500 học viên đạt yêu cầu. Điều này tạo ra bốn nỗi đau mà bảng tính và CRM tuyển sinh thông thường không giải quyết:
+Một chương trình đào tạo nhân tài AI quy mô lớn ([chương trình mẫu](10-sample-tenant.md)) chạy **nhiều khoá liên tiếp**, mỗi khoá khoảng 500 học viên chọn ra từ hàng nghìn hồ sơ, 12 tuần, thực chiến tại doanh nghiệp đối tác, theo dõi kết quả việc làm. Điều này tạo ra bốn nỗi đau mà bảng tính và CRM tuyển sinh thông thường không giải quyết:
 
 | # | Nỗi đau | Ai chịu | Hậu quả |
 |---|---|---|---|
@@ -85,7 +85,7 @@ Quy mô thị trường: **cần nghiên cứu thêm**, không đưa số chưa 
 
 ## 7. Trung thực về dữ liệu demo
 
-Chương trình thật chưa cung cấp hồ sơ ứng viên, rubric hay kết quả chi tiết. Để demo, hệ thống có bộ sinh dữ liệu **tổng hợp** (ứng viên giả, ba khoá lịch sử và một đợt đang tuyển), luôn hiển thị nhãn "Dữ liệu minh hoạ". Thuật toán chạy thật; con số kết quả trên dữ liệu minh hoạ **không** phải kết quả của Northwind University và không dùng làm bằng chứng hiệu quả khi pitching.
+Chương trình thật chưa cung cấp hồ sơ ứng viên, rubric hay kết quả chi tiết. Để demo, hệ thống có bộ sinh dữ liệu **tổng hợp** (ứng viên giả, ba khoá lịch sử và một đợt đang tuyển), luôn hiển thị nhãn "Dữ liệu minh hoạ". Thuật toán chạy thật; con số kết quả trên dữ liệu minh hoạ **không** phải kết quả của một tổ chức thật và không dùng làm bằng chứng hiệu quả khi pitching.
 
 ## 8. Đo thành công (giả thuyết cần đo)
 

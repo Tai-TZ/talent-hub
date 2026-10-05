@@ -31,7 +31,7 @@ CODES: dict[str, dict[str, Any]] = {}
 
 PERSONAS = [
     ("Nguyễn Minh Anh", "minhanh@outlook.com", DEFAULT_TENANT, "Ứng viên (tài khoản Microsoft)"),
-    ("Trần Giang Viên", "giangvien@northwind.edu.vn", DEFAULT_TENANT, "Giảng viên (tài khoản cơ quan)"),
+    ("Trần Giang Viên", "giangvien@northwind.example.edu", DEFAULT_TENANT, "Giảng viên (tài khoản cơ quan)"),
     (
         "Kẻ Mạo Danh",
         "applicant@northwind.test",

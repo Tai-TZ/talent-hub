@@ -45,7 +45,7 @@ describe("Rubric Lab: chọn đợt theo bộ tiêu chí", () => {
 
 describe("chữ viết tắt trên avatar", () => {
   it("chỉ lấy chữ cái của từ đầu và từ cuối", () => {
-    expect(initials("reviewer (northwind)")).toBe("RV");
+    expect(initials("reviewer (northwind)")).toBe("RN");
     expect(initials("Nguyễn Minh Anh")).toBe("NA");
     expect(initials("Đặng")).toBe("Đ");
     expect(initials("  (123) ")).toBe("?");
