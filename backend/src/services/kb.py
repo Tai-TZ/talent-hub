@@ -249,6 +249,14 @@ _AND_SQL = _SEARCH_SQL.replace("__QUERY__", "websearch_to_tsquery('simple', f_un
 _OR_SQL = _SEARCH_SQL.replace("__QUERY__", "to_tsquery('simple', f_unaccent(:q))")
 
 
+async def chunks_by_ids(db: OrgDb, chunk_ids: list[uuid.UUID]) -> dict[uuid.UUID, str]:
+    """Nội dung đầy đủ của các đoạn (kết quả tìm kiếm chỉ trả đoạn trích ngắn)."""
+    if not chunk_ids:
+        return {}
+    rows = (await db.session.execute(select(KbChunk.id, KbChunk.content).where(KbChunk.id.in_(chunk_ids)))).all()
+    return {cid: content for cid, content in rows}
+
+
 async def search(db: OrgDb, query: str, *, visibility: list[str], limit: int = 5) -> list[dict[str, Any]]:
     """Tìm toàn văn không dấu. Thử khớp mọi từ trước, nếu không có kết quả thì nới lỏng thành khớp bất kỳ từ nào."""
     query = query.strip()[:300]

@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/v1/admin/assistant/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Insights */
+        get: operations["insights_api_v1_admin_assistant_insights_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/costs/ai": {
         parameters: {
             query?: never;
@@ -465,6 +482,40 @@ export interface paths {
         put?: never;
         /** Withdraw Application */
         post: operations["withdraw_application_api_v1_applications__application_id__withdraw_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/ask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask */
+        post: operations["ask_api_v1_assistant_ask_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/queries/{query_id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Feedback */
+        post: operations["feedback_api_v1_assistant_queries__query_id__feedback_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1691,6 +1742,27 @@ export interface components {
             /** Version */
             version?: number | null;
         };
+        /** AskIn */
+        AskIn: {
+            /** Question */
+            question: string;
+        };
+        /** AskOut */
+        AskOut: {
+            /** Answer */
+            answer: string;
+            /** Answered */
+            answered: boolean;
+            /** Citations */
+            citations: components["schemas"]["CitationOut"][];
+            /** Engine */
+            engine: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
         /** AssessmentIn */
         AssessmentIn: {
             /**
@@ -1721,6 +1793,21 @@ export interface components {
             id: string;
             /** Track Id */
             track_id: string | null;
+        };
+        /** AssistantInsightsOut */
+        AssistantInsightsOut: {
+            /** Answer Rate */
+            answer_rate: number | null;
+            /** Answered */
+            answered: number;
+            /** Days */
+            days: number;
+            /** Helpful Rate */
+            helpful_rate: number | null;
+            /** Total */
+            total: number;
+            /** Unanswered */
+            unanswered: components["schemas"]["UnansweredOut"][];
         };
         /** AuditLogOut */
         AuditLogOut: {
@@ -1808,6 +1895,17 @@ export interface components {
             heading: string | null;
             /** Ordinal */
             ordinal: number;
+        };
+        /** CitationOut */
+        CitationOut: {
+            /** Heading */
+            heading: string;
+            /** N */
+            n: number;
+            /** Snippet */
+            snippet: string;
+            /** Title */
+            title: string;
         };
         /** ClassIn */
         ClassIn: {
@@ -2547,6 +2645,11 @@ export interface components {
             };
             /** Warnings */
             warnings: string[];
+        };
+        /** FeedbackIn */
+        FeedbackIn: {
+            /** Helpful */
+            helpful: boolean;
         };
         /** FlagOut */
         FlagOut: {
@@ -3909,6 +4012,18 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** UnansweredOut */
+        UnansweredOut: {
+            /** Count */
+            count: number;
+            /**
+             * Last At
+             * Format: date-time
+             */
+            last_at: string;
+            /** Question */
+            question: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -3946,6 +4061,37 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    insights_api_v1_admin_assistant_insights_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantInsightsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     costs_ai_api_v1_admin_costs_ai_get: {
         parameters: {
             query?: {
@@ -4947,6 +5093,72 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApplicationViewOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_api_v1_assistant_ask_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AskIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    feedback_api_v1_assistant_queries__query_id__feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                query_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

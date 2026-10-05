@@ -11,7 +11,9 @@ FALLBACK_PRICE = (10.0, 50.0, 1.0, 12.5)
 
 
 def estimate_cost_usd(model: str, usage: dict[str, int]) -> float:
-    inp, out, c_read, c_write = PRICES.get(model, FALLBACK_PRICE)
+    # Chấp nhận mã có hậu tố ngày (vd claude-haiku-4-5-20251001) khớp với khoá giá "claude-haiku-4-5".
+    key = next((k for k in PRICES if model == k or model.startswith(f"{k}-")), None)
+    inp, out, c_read, c_write = PRICES[key] if key else FALLBACK_PRICE
     total = (
         usage.get("input_tokens", 0) * inp
         + usage.get("output_tokens", 0) * out

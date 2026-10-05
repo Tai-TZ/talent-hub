@@ -6,6 +6,7 @@ from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Computed,
     Date,
@@ -140,3 +141,25 @@ class Budget(IdMixin, TimestampMixin, OrgScopedMixin, Base):
     category: Mapped[str | None] = mapped_column(String(20))  # null = tổng ngân sách của khoá
     amount_vnd: Mapped[Decimal] = mapped_column(Numeric(16, 2), nullable=False)
     updated_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+
+
+class AssistantQuery(IdMixin, OrgScopedMixin, Base):
+    """Câu hỏi gửi trợ lý: để đo chất lượng và phát hiện khoảng trống tài liệu (câu không trả lời được).
+
+    Chỉ lưu văn bản câu hỏi (đã cắt) và kết quả; không lưu danh tính ngoài mã thành viên.
+    """
+
+    __tablename__ = "assistant_queries"
+    __table_args__ = (Index("ix_assistant_queries_org_created", "organization_id", "created_at"),)
+
+    membership_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("org_memberships.id", ondelete="SET NULL"))
+    question: Mapped[str] = mapped_column(String(500), nullable=False)
+    question_key: Mapped[str] = mapped_column(
+        String(500), nullable=False
+    )  # đã bỏ dấu, chữ thường, để gộp câu giống nhau
+    answered: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    reason: Mapped[str] = mapped_column(String(80), nullable=False, default="")
+    engine: Mapped[str] = mapped_column(String(60), nullable=False)
+    citations: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    helpful: Mapped[bool | None] = mapped_column(Boolean)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

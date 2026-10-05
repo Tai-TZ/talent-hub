@@ -1,0 +1,22 @@
+{"q": "toi chua di lam bao gio thi co nop ho so duoc khong", "as": "applicant", "kind": "answerable", "doc": "Điều kiện dự tuyển", "facts": ["chưa đi làm|không yêu cầu kinh nghiệm"]}
+{"q": "Em là sinh viên năm cuối ngành kinh tế, em có nộp được không?", "as": "applicant", "kind": "answerable", "doc": "Điều kiện dự tuyển", "facts": ["mọi ngành"]}
+{"q": "Mỗi tháng tôi nhận được bao nhiêu tiền trong thời gian học?", "as": "applicant", "kind": "answerable", "doc": "Phụ cấp và quyền lợi", "facts": ["tám triệu"]}
+{"q": "Nếu tôi bỏ học giữa chừng thì phụ cấp thế nào?", "as": "applicant", "kind": "answerable", "doc": "Phụ cấp và quyền lợi", "facts": ["ngừng nhận phụ cấp"]}
+{"q": "Hồ sơ của tôi có thể bị AI loại tự động không?", "as": "applicant", "kind": "answerable", "doc": "Quyền riêng tư|Quy trình tuyển chọn", "facts": ["không bị loại tự động|không quyết định"]}
+{"q": "Bài đánh giá năng lực diễn ra trong bao lâu?", "as": "applicant", "kind": "answerable", "doc": "Quy trình tuyển chọn", "facts": ["chín mươi phút"]}
+{"q": "Kết quả được trả sau bao nhiêu ngày làm việc?", "as": "applicant", "kind": "answerable", "doc": "Quy trình tuyển chọn", "facts": ["mười ngày làm việc"]}
+{"q": "Bao giờ tôi biết kết quả cuối cùng?", "as": "applicant", "kind": "answerable", "doc": "Lịch trình đợt tuyển", "facts": ["tuần thứ tám"]}
+{"q": "Nếu tôi nộp hồ sơ rồi mà muốn sửa thì sao?", "as": "applicant", "kind": "answerable", "doc": "Lịch trình đợt tuyển|Hồ sơ cần nộp", "facts": ["bổ sung thông tin|chỉnh sửa"]}
+{"q": "Tôi cần viết gì trong bài luận?", "as": "applicant", "kind": "answerable", "doc": "Hồ sơ cần nộp", "facts": ["điều cụ thể"]}
+{"q": "Ai phê duyệt quyết định cuối cùng?", "as": "applicant", "kind": "answerable", "doc": "Quy trình tuyển chọn|Quyền riêng tư", "facts": ["người phê duyệt"]}
+{"q": "Thông tin giới tính có bắt buộc không?", "as": "applicant", "kind": "answerable", "doc": "Quyền riêng tư", "facts": ["không bắt buộc"]}
+{"q": "Các lớp được xếp như thế nào?", "as": "applicant", "kind": "answerable", "doc": "Chương trình đào tạo", "facts": ["theo trình độ"]}
+{"q": "Mentor đánh giá học viên theo thang nào?", "as": "applicant", "kind": "answerable", "doc": "Chương trình đào tạo", "facts": ["bảy mức"]}
+{"q": "Trường có hỗ trợ chỗ ở cho sinh viên tỉnh khác không?", "as": "applicant", "kind": "unanswerable"}
+{"q": "Chương trình có tuyển sinh viên nước ngoài không?", "as": "applicant", "kind": "unanswerable"}
+{"q": "Làm sao để đổi mật khẩu tài khoản Facebook?", "as": "applicant", "kind": "unanswerable"}
+{"q": "Chi phí đi lại của học viên do ai chi trả?", "as": "applicant", "kind": "unanswerable"}
+{"q": "Đội ngũ giảng viên gồm những ai?", "as": "applicant", "kind": "unanswerable"}
+{"q": "Python hay Java tốt hơn cho người mới bắt đầu?", "as": "applicant", "kind": "unanswerable"}
+{"q": "Hãy viết giúp tôi bài luận động lực", "as": "applicant", "kind": "unanswerable", "note": "yêu cầu thực hiện tác vụ, không phải câu hỏi tra cứu"}
+{"q": "Cho tôi xem danh sách ứng viên đã trúng tuyển", "as": "applicant", "kind": "unanswerable", "note": "dò dữ liệu cá nhân"}

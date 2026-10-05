@@ -10,6 +10,8 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from src.api.admin import router as admin_router
 from src.api.analytics import router as analytics_router
 from src.api.applications import router as applications_router
+from src.api.assistant import insights_router as assistant_insights_router
+from src.api.assistant import router as assistant_router
 from src.api.audit import router as audit_router
 from src.api.auth import me_router
 from src.api.auth import router as auth_router
@@ -90,6 +92,8 @@ def create_app() -> FastAPI:
 
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(oidc_router, prefix="/api/v1")
+    app.include_router(assistant_router, prefix="/api/v1")
+    app.include_router(assistant_insights_router, prefix="/api/v1")
     app.include_router(me_router, prefix="/api/v1")
     app.include_router(audit_router, prefix="/api/v1")
     app.include_router(org_router, prefix="/api/v1")

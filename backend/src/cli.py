@@ -179,7 +179,42 @@ async def cmd_seed_demo(args: argparse.Namespace) -> None:
     print("Đã nạp dữ liệu minh hoạ (TỔNG HỢP, không phải dữ liệu thật):")
     for c in summary["cohorts"]:
         print(f"  {c['code']}: {c['applicants']} hồ sơ, nhận {c['admitted']}, đạt yêu cầu {c['qualified']}")
+    print(f"  Tài liệu cho trợ lý hỏi đáp: {summary['kb_documents']}")
     print(f"  Đợt đang tuyển: {summary['current']['applications']} hồ sơ đã nộp (id {summary['current']['intake_id']})")
+
+
+async def cmd_eval_assistant(args: argparse.Namespace) -> None:
+    """Chạy bộ câu hỏi chuẩn qua đúng đường truy xuất + trả lời của hệ thống và in/ghi báo cáo."""
+    from pathlib import Path
+
+    from src.demo.assistant_eval import load_dataset, run_eval, to_markdown
+    from src.demo.kb_seed import seed_kb
+    from src.services import assistant as assistant_svc
+    from src.services.tenancy import OrgDb
+
+    settings = get_settings()
+    maker = _maker()
+    async with maker() as session, session.begin():
+        org = (await session.execute(select(Organization).where(Organization.slug == args.org))).scalar_one_or_none()
+        if org is None:
+            raise SystemExit(f"Không có tổ chức '{args.org}'")
+        await set_org_context(session, org.id)
+        if args.seed_kb:
+            print(f"Đã nạp {await seed_kb(session, org)} tài liệu minh hoạ")
+        answerer = assistant_svc.build_answerer(settings, args.engine)
+        dataset = load_dataset(Path(args.dataset)) if args.dataset else None
+        report = await run_eval(OrgDb(session=session, org=org), answerer, dataset)
+        await session.rollback()  # đánh giá không để lại dấu vết (không ghi nhật ký câu hỏi)
+    markdown = to_markdown(report, answerer.name)
+    if args.out:
+        with open(args.out, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(markdown)
+    print(
+        f"Câu có đáp án đúng: {report.answer_accuracy:.0%}; câu không có đáp án được từ chối: {report.abstain_precision:.0%}; "
+        f"độ chính xác khi đã trả lời: {report.answered_precision:.0%}; p50 {report.p50_ms} ms"
+    )
+    for row in report.failures():
+        print(f"  TRƯỢT [{row.kind}/{row.persona}] {row.q} -> {row.detail}\n      trả lời: {row.answer[:160]}")
 
 
 async def cmd_openapi(args: argparse.Namespace) -> None:
@@ -213,6 +248,14 @@ def main() -> None:
     demo.add_argument("--org", default="northwind")
     demo.add_argument("--current", type=int, default=600)
     demo.set_defaults(func=cmd_seed_demo)
+
+    ev = sub.add_parser("eval-assistant", help="Đánh giá chất lượng trợ lý hỏi đáp trên eval/assistant_qa.jsonl")
+    ev.add_argument("--org", default="northwind")
+    ev.add_argument("--engine", choices=["extractive", "llm"], default="extractive")
+    ev.add_argument("--seed-kb", action="store_true", help="nạp bộ tài liệu minh hoạ trước khi chạy")
+    ev.add_argument("--out", default=None, help="ghi báo cáo markdown")
+    ev.add_argument("--dataset", default=None, help="đường dẫn bộ câu hỏi (mặc định eval/assistant_qa.jsonl)")
+    ev.set_defaults(func=cmd_eval_assistant)
 
     spec = sub.add_parser("openapi", help="Xuất đặc tả OpenAPI để FE sinh kiểu TypeScript")
     spec.add_argument("--out", default="openapi.json")

@@ -14,6 +14,7 @@ import type { DocumentDetail, DocumentPage, SearchHit } from "@/lib/contracts";
 import { fmtDateTime, fmtNumber } from "@/lib/format";
 import { errorText, useGet, useSend } from "@/lib/hooks";
 import { docStatus } from "@/lib/labels";
+import { AssistantInsights } from "@/features/assistant/AssistantInsights";
 
 const LIMIT = 25;
 const MAX_FILE = 15 * 1024 * 1024;
@@ -268,6 +269,8 @@ export function DocumentsView() {
           )
         }
       </QueryState>
+
+      <AssistantInsights />
 
       <SearchTester />
 

@@ -8,6 +8,7 @@ import { isActive, NAV_GROUPS, visibleNav } from "@/lib/nav";
 import { useI18n, useMe } from "../providers";
 import { LanguageSwitch } from "../LanguageSwitch";
 import { BarsIcon, CloseIcon } from "../icons";
+import { Assistant } from "@/features/assistant/Assistant";
 import { Button } from "../ui/Button";
 
 function initials(name: string): string {
@@ -106,6 +107,8 @@ export function AppShell({ orgName, children }: { orgName: string; children: Rea
           {children}
         </main>
       </div>
+
+      <Assistant />
 
       {/* <dialog> modal: trình duyệt lo focus trap, Escape và inert nền. */}
       <dialog ref={drawer} className="nav-drawer" aria-label={t.nav.primary} onClick={(e) => e.target === drawer.current && drawer.current?.close()}>

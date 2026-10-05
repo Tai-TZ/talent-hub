@@ -63,6 +63,11 @@ SPEC: dict[str, tuple[Any, _Number | _Choice | _GuidList, str]] = {
     "ai_engine": ("heuristic", _Choice("heuristic", "llm"), "Động cơ sàng lọc: heuristic (offline) hoặc llm (Claude)"),
     "stipend_vnd_per_month": (8_000_000.0, _Number(0, 100_000_000), "Phụ cấp mỗi học viên mỗi tháng (VND)"),
     "invite_ttl_hours": (72.0, _Number(1, 720), "Thời hạn link lời mời (giờ)"),
+    "assistant_engine": (
+        "extractive",
+        _Choice("extractive", "llm"),
+        "Trợ lý hỏi đáp: extractive (offline, trả nguyên văn tài liệu) hoặc llm (Claude diễn đạt, vẫn kiểm chứng nguồn)",
+    ),
     "microsoft_signup": (
         "on",
         _Choice("on", "off"),

@@ -11,6 +11,7 @@ from typing import Any
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.demo.kb_seed import seed_kb
 from src.demo.synthetic import Person, make_content, make_person, outcome_probability, review_scores
 from src.models import (
     Application,
@@ -305,6 +306,7 @@ async def seed_demo(
     await session.flush()
 
     summary: dict[str, Any] = {"cohorts": [], "current": None}
+    summary["kb_documents"] = await seed_kb(session, org)
     # ----- Ba khoá lịch sử -----
     for k, size in enumerate(history_sizes, start=1):
         code = f"K{k}"

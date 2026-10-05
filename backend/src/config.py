@@ -74,6 +74,8 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None
     ai_scoring_model: str = "claude-opus-5-5"
     ai_concurrency: int = 6
+    # Trợ lý hỏi đáp được gọi nhiều hơn chấm hồ sơ: dùng mô hình nhỏ, rẻ.
+    assistant_model: str = "claude-haiku-4-5-20251001"
 
     @property
     def is_local(self) -> bool:

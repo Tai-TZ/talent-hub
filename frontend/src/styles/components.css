@@ -1047,3 +1047,124 @@ a.th-button {
   justify-content: center;
   text-decoration: none;
 }
+
+/* ---------- Trợ lý hỏi đáp ---------- */
+.assistant-fab {
+  background: var(--th-brand-700);
+  border: 0;
+  border-radius: var(--th-radius-pill);
+  bottom: var(--th-space-5);
+  box-shadow: var(--th-shadow-lg);
+  color: var(--th-neutral-0);
+  cursor: pointer;
+  font: var(--th-font-bold) var(--th-text-sm) / 1 var(--th-font-brand);
+  min-height: var(--th-control-md, 44px);
+  padding: 0 var(--th-space-5);
+  position: fixed;
+  right: var(--th-space-5);
+  z-index: 40;
+}
+
+.assistant-fab:hover {
+  background: var(--th-brand-800);
+}
+
+.assistant-fab:focus-visible {
+  box-shadow: var(--th-shadow-focus);
+  outline: 0;
+}
+
+.chat {
+  display: grid;
+  gap: var(--th-space-3);
+  grid-template-rows: minmax(220px, 1fr) auto auto;
+  min-height: 60dvh;
+}
+
+.chat__log {
+  max-height: 55dvh;
+  overflow: auto;
+}
+
+.chat__list {
+  display: grid;
+  gap: var(--th-space-5);
+}
+
+.chat__q {
+  background: var(--th-brand-50);
+  border-radius: var(--th-radius-md);
+  color: var(--th-brand-800);
+  justify-self: end;
+  margin: 0 0 var(--th-space-2) auto;
+  max-width: 85%;
+  padding: var(--th-space-2) var(--th-space-3);
+  width: fit-content;
+}
+
+.chat__a {
+  background: var(--th-surface-card);
+  border: 1px solid var(--th-border-subtle);
+  border-radius: var(--th-radius-md);
+  display: grid;
+  gap: var(--th-space-3);
+  padding: var(--th-space-3) var(--th-space-4);
+}
+
+.chat__a p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.chat__a--declined {
+  background: var(--th-amber-50);
+  border-color: var(--th-amber-700);
+}
+
+.chat__a--error {
+  border-color: var(--th-red-700);
+  color: var(--th-red-700);
+}
+
+.chat__form {
+  align-items: end;
+  display: grid;
+  gap: var(--th-space-3);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.chat__note {
+  font-size: var(--th-text-xs);
+  margin: 0;
+}
+
+.chat__rate {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2);
+}
+
+.cite {
+  background: var(--th-brand-50);
+  border: 1px solid var(--th-brand-600);
+  border-radius: var(--th-radius-sm);
+  color: var(--th-brand-800);
+  cursor: pointer;
+  font: var(--th-font-bold) var(--th-text-xs) / 1 var(--th-font-brand);
+  margin: 0 1px;
+  min-width: 18px;
+  padding: 2px 4px;
+}
+
+.cite:focus-visible {
+  box-shadow: var(--th-shadow-focus);
+  outline: 0;
+}
+
+@media (max-width: 639px) {
+  .assistant-fab {
+    bottom: var(--th-space-3);
+    right: var(--th-space-3);
+  }
+}
