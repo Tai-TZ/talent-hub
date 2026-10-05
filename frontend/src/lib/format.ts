@@ -10,6 +10,16 @@ export const fmtDateTime = (iso?: string | null) => (iso ? dateTime.format(new D
 export const fmtDate = (iso?: string | null) => (iso ? dateOnly.format(new Date(iso)) : "—");
 export const fmtNumber = (n?: number | null) => (n == null ? "—" : number.format(n));
 export const fmtVnd = (n?: number | null) => (n == null ? "—" : vnd.format(n));
+/** Số tiền rút gọn cho ô thống kê hẹp: 11,7 tỷ ₫ / 19,6 triệu ₫. */
+export function fmtVndCompact(n?: number | null): string {
+  if (n == null) return "—";
+  const abs = Math.abs(n);
+  const trim = (x: number) => x.toLocaleString("vi-VN", { maximumFractionDigits: 1 });
+  if (abs >= 1e9) return `${trim(n / 1e9)} tỷ ₫`;
+  if (abs >= 1e6) return `${trim(n / 1e6)} triệu ₫`;
+  return vnd.format(n);
+}
+
 export const fmtUsd = (n?: number | null) => (n == null ? "—" : usd.format(n));
 
 export function fmtPct(ratio?: number | null, digits = 0): string {

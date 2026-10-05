@@ -273,9 +273,22 @@ async def request_password_reset(
 
 
 async def list_accounts(
-    db: OrgDb, *, q: str | None, role: str | None, status: str | None, limit: int, cursor: uuid.UUID | None
+    db: OrgDb,
+    *,
+    q: str | None,
+    role: str | None,
+    status: str | None,
+    limit: int,
+    cursor: uuid.UUID | None,
+    audience: str | None = None,
 ) -> tuple[list[dict[str, Any]], uuid.UUID | None, int]:
+    """`audience`: "staff" = có ít nhất một vai trò ngoài ứng viên; "applicant" = chỉ là ứng viên (số lượng rất lớn)."""
     conditions: list[ColumnElement[bool]] = []
+    if audience in ("staff", "applicant"):
+        has_staff_role = OrgMembership.id.in_(
+            select(UserRole.membership_id).join(Role, Role.id == UserRole.role_id).where(Role.code != "applicant")
+        )
+        conditions.append(has_staff_role if audience == "staff" else ~has_staff_role)
     if q:
         like = f"%{q.strip()}%"
         conditions.append(User.email.ilike(like) | User.full_name.ilike(like))

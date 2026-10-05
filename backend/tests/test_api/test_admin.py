@@ -521,3 +521,15 @@ async def test_overview_reports_operational_state(login_as) -> None:  # type: ig
     assert data["users"]["by_status"]["active"] >= 5 and "admin" in data["users"]["active_by_role"]
     assert data["intakes"]["open"] >= 1 and data["security_24h"]["logins"] >= 1
     assert data["ai"]["engine"] == "heuristic" and data["email"]["backend"] == get_settings().email_backend
+
+
+async def test_user_list_can_separate_staff_from_applicants(login_as) -> None:  # type: ignore[no-untyped-def]
+    admin = await login_as("admin")
+    staff = (await admin.get("/api/v1/admin/users?audience=staff&limit=100")).json()
+    applicants = (await admin.get("/api/v1/admin/users?audience=applicant&limit=100")).json()
+    assert staff["total"] >= 1 and applicants["total"] >= 1
+    assert all(set(u["roles"]) - {"applicant"} for u in staff["items"])  # ai cũng có vai trò nhân sự
+    assert all(set(u["roles"]) <= {"applicant"} for u in applicants["items"])
+    everyone = (await admin.get("/api/v1/admin/users?limit=1")).json()["total"]
+    assert staff["total"] + applicants["total"] == everyone  # hai nhóm không chồng lấn và không sót
+    assert (await admin.get("/api/v1/admin/users?audience=khac")).status_code == 422

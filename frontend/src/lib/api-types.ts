@@ -4368,6 +4368,7 @@ export interface operations {
                 q?: string | null;
                 role?: string | null;
                 status?: string | null;
+                audience?: string | null;
                 limit?: number;
                 cursor?: string | null;
             };

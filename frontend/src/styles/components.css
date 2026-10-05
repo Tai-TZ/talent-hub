@@ -778,6 +778,7 @@
 
 /* Khối nội dung rộng hết cột; biểu mẫu giới hạn chiều rộng cho dễ đọc. */
 .panel {
+  align-content: start;
   max-width: none;
 }
 
@@ -964,4 +965,13 @@
   .forest__value {
     text-align: left;
   }
+}
+
+.row-voided td {
+  color: var(--th-text-muted);
+  text-decoration: line-through;
+}
+
+.row-voided td .muted {
+  text-decoration: none;
 }

@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { backendFetch, buildBackendHeaders } from "@/lib/backend";
-import { MAX_BODY_BYTES } from "@/lib/config";
+import { MAX_BODY_BYTES, MAX_UPLOAD_BODY_BYTES } from "@/lib/config";
 
 /**
  * BFF: trình duyệt chỉ nói chuyện với Next.js (cùng origin, không cần CORS), Next chuyển tiếp sang backend.
@@ -17,12 +17,55 @@ function problem(status: number, title: string): Response {
   });
 }
 
+/** Chỉ endpoint tải tài liệu được phép nhận thân yêu cầu lớn. */
+function bodyLimit(request: NextRequest, path: string[]): number {
+  return request.method === "POST" && path.join("/") === "admin/documents" ? MAX_UPLOAD_BODY_BYTES : MAX_BODY_BYTES;
+}
+
+class BodyTooLargeError extends Error {}
+
+/** Đọc thân yêu cầu và dừng ngay khi vượt giới hạn, không phụ thuộc header content-length (có thể thiếu hoặc bị giả). */
+async function readBounded(request: NextRequest, limit: number): Promise<ArrayBuffer> {
+  if (!request.body) return new ArrayBuffer(0);
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > limit) {
+      await reader.cancel();
+      throw new BodyTooLargeError();
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out.buffer;
+}
+
 async function forward(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }): Promise<Response> {
   const { path } = await params;
   const hasBody = !["GET", "HEAD"].includes(request.method);
 
+  const limit = bodyLimit(request, path);
   const length = Number(request.headers.get("content-length") ?? "0");
-  if (hasBody && length > MAX_BODY_BYTES) return problem(413, "Nội dung yêu cầu quá lớn");
+  if (hasBody && length > limit) return problem(413, "Nội dung yêu cầu quá lớn");
+
+  let body: ArrayBuffer | undefined;
+  if (hasBody) {
+    try {
+      body = await readBounded(request, limit);
+    } catch (error) {
+      if (error instanceof BodyTooLargeError) return problem(413, "Nội dung yêu cầu quá lớn");
+      return problem(400, "Không đọc được nội dung yêu cầu");
+    }
+  }
 
   const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
   const headers = buildBackendHeaders({
@@ -40,7 +83,7 @@ async function forward(request: NextRequest, { params }: { params: Promise<{ pat
     upstream = await backendFetch(`/api/v1/${path.map(encodeURIComponent).join("/")}${request.nextUrl.search}`, {
       method: request.method,
       headers,
-      body: hasBody ? await request.arrayBuffer() : undefined,
+      body,
     });
   } catch {
     return problem(502, "Không kết nối được máy chủ");

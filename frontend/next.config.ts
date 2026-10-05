@@ -4,6 +4,8 @@ const config: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
+  // Tải tệp tài liệu đi qua BFF dưới dạng base64 (tối đa ~20 MB); mặc định 10 MB sẽ cắt thân yêu cầu.
+  experimental: { proxyClientMaxBodySize: "22mb" },
   async headers() {
     return [
       {

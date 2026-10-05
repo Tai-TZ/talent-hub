@@ -105,13 +105,14 @@ async def list_users(
     q: str | None = Query(None, max_length=100),
     role: str | None = None,
     status: str | None = Query(None, pattern="^(invited|active|suspended)$"),
+    audience: str | None = Query(None, pattern="^(staff|applicant)$"),
     limit: int = Query(25, ge=1, le=100),
     cursor: uuid.UUID | None = None,
     _: Principal = Depends(require("user.manage")),
     db: OrgDb = Depends(org_db),
 ) -> dict[str, Any]:
     items, next_cursor, total = await accounts.list_accounts(
-        db, q=q, role=role, status=status, limit=limit, cursor=cursor
+        db, q=q, role=role, status=status, limit=limit, cursor=cursor, audience=audience
     )
     return {
         "items": items,
