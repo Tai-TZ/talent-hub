@@ -13,7 +13,13 @@ import { TextField } from "./ui/TextField";
 export function LoginForm({ next, microsoft = false, errorCode }: { next: string; microsoft?: boolean; errorCode?: string }) {
   const { t } = useI18n();
   const router = useRouter();
-  const [error, setError] = useState<string | null>(errorCode ? (t.login.errors[errorCode] ?? t.login.errors["failed"] ?? null) : null);
+  // `?error=` đến từ URL: chỉ nhận mã có thật trong bảng thông điệp. Tra thẳng `errors[code]` sẽ ra cả khoá của
+  // prototype ("constructor" → hàm Object, React gọi nó như initializer rồi sập khi render một object).
+  const [error, setError] = useState<string | null>(() => {
+    if (!errorCode) return null;
+    const known = Object.hasOwn(t.login.errors, errorCode) ? t.login.errors[errorCode] : undefined;
+    return typeof known === "string" ? known : (t.login.errors["failed"] ?? null);
+  });
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
