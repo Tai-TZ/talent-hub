@@ -4,6 +4,7 @@ Dùng shingle 5 từ và chỉ mục đảo: chỉ so các cặp thật sự có
 Chỉ tạo cờ cảnh báo để người xem xét; không kết luận và không tự loại.
 """
 
+import json
 import uuid
 from collections import defaultdict
 from typing import Any
@@ -62,3 +63,10 @@ def find_duplicates(
                     }
                 )
     return flags
+
+
+def find_duplicates_json(
+    contents: dict[uuid.UUID, str], threshold: float = THRESHOLD
+) -> dict[uuid.UUID, list[dict[str, Any]]]:
+    """Như `find_duplicates` nhưng nhận nội dung dạng chuỗi JSON, để giải mã ở nơi chạy (tiến trình con hoặc luồng riêng)."""
+    return find_duplicates({app_id: json.loads(raw) for app_id, raw in contents.items()}, threshold)

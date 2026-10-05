@@ -1,4 +1,5 @@
 import copy
+from concurrent.futures import ProcessPoolExecutor
 
 from httpx import AsyncClient
 from sqlalchemy import text
@@ -6,7 +7,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from src.ai.llm_engine import FallbackEngine, LLMEngine
 from src.ai.providers import FakeProvider
-from src.services import jobs
+from src.config import get_settings
+from src.services import jobs, triage
 from tests.conftest import OWNER_URL
 from tests.helpers import FULL_SCORES, create_open_intake, good_content, submit_application
 from tests.test_services.test_screening import strong_content
@@ -183,3 +185,29 @@ async def test_llm_engine_usage_is_logged_with_cost(login_as, app_instance, orgs
         ).all()
     await eng.dispose()
     assert len(rows) == 3 and all(r[0] == "claude-opus-5-5" and r[1] == "screening" and r[2] > 0 for r in rows)
+
+
+async def test_large_batch_scored_in_worker_processes_matches_in_process(login_as, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """Đợt lớn chấm bằng động cơ luật ở tiến trình con: kết quả phải giống hệt chấm ngay trong tiến trình API."""
+    admin, intake, _ = await _prepare(login_as)
+    _, in_process = await _run(admin, intake["id"])
+    assert in_process["status"] == "done"
+    before = (await admin.get(f"/api/v1/intakes/{intake['id']}/triage")).json()["items"]
+
+    pools: list[ProcessPoolExecutor] = []
+
+    class CountingPool(ProcessPoolExecutor):
+        def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+            super().__init__(*args, **kwargs)
+            pools.append(self)
+
+    monkeypatch.setattr(triage, "ProcessPoolExecutor", CountingPool)
+    monkeypatch.setattr(triage, "POOL_MIN", 1)
+    monkeypatch.setattr(triage, "POOL_BATCH", 1)  # mỗi hồ sơ một lô để thử cả hàng đợi nhiều lô
+    monkeypatch.setattr(get_settings(), "triage_workers", 2)
+    _, pooled = await _run(admin, intake["id"], force=True)
+    assert len(pools) == 1
+    assert pooled["status"] == "done" and pooled["done"] == 3
+    assert pooled["result"]["processed"] == 3 and pooled["result"]["tiers"] == in_process["result"]["tiers"]
+    after = (await admin.get(f"/api/v1/intakes/{intake['id']}/triage")).json()["items"]
+    assert after == before

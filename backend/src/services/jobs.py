@@ -87,12 +87,17 @@ def background(coro: Awaitable[Any]) -> None:
     task.add_done_callback(_tasks.discard)
 
 
-async def set_progress(org_id: uuid.UUID, job_id: uuid.UUID, *, done: int, total: int | None = None) -> None:
+async def update_progress(db: OrgDb, job_id: uuid.UUID, *, done: int, total: int | None = None) -> None:
+    """Cập nhật tiến độ trong session đang có (để đi chung giao dịch với phần ghi kết quả)."""
     values: dict[str, Any] = {"done": done}
     if total is not None:
         values["total"] = total
+    await db.session.execute(update(Job).where(Job.id == job_id).values(**values))
+
+
+async def set_progress(org_id: uuid.UUID, job_id: uuid.UUID, *, done: int, total: int | None = None) -> None:
     async with background_org_db(org_id) as db:
-        await db.session.execute(update(Job).where(Job.id == job_id).values(**values))
+        await update_progress(db, job_id, done=done, total=total)
 
 
 async def wait_for_all() -> None:

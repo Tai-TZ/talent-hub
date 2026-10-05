@@ -1,4 +1,6 @@
 import copy
+import random
+import re
 import uuid
 
 import pytest
@@ -8,7 +10,7 @@ from src.ai.llm_engine import FallbackEngine, LLMEngine, build_user_prompt
 from src.ai.providers import AnthropicProvider, FakeProvider, ProviderError, ProviderRefusalError
 from src.ai.screening import DEFAULT_THRESHOLDS, ScreeningError, decide_tier
 from src.ai.similarity import find_duplicates
-from src.ai.text import build_fields
+from src.ai.text import build_fields, find_span
 from tests.helpers import CRITERIA, ESSAY, good_content
 
 FULL_CRITERIA = CRITERIA + [
@@ -297,3 +299,25 @@ async def test_complete_but_signal_free_application_is_confidently_low() -> None
     result = await HeuristicEngine().screen(content, FULL_CRITERIA, {})
     assert result.total_score < DEFAULT_THRESHOLDS["decline"]
     assert result.tier == "decline_likely"
+
+
+def test_find_span_fast_path_matches_reference_regex() -> None:
+    """Đường nhanh của find_span phải cho đúng vị trí như regex gốc (khoảng trắng tuỳ ý, không phân biệt hoa/thường)."""
+
+    def reference(text: str, quote: str) -> tuple[int, int] | None:
+        pieces = [re.escape(p) for p in quote.split()]
+        match = re.search(r"\s+".join(pieces), text, flags=re.IGNORECASE) if pieces else None
+        return (match.start(), match.end()) if match else None
+
+    rng = random.Random(7)
+    alphabet = ["a", "B", "ệ", "Ư", "x", ".", " ", "  ", "\n", "\t ", " "]
+    for _ in range(3000):
+        text = "".join(rng.choice(alphabet) for _ in range(rng.randint(0, 40)))
+        if text and rng.random() < 0.7:
+            i = rng.randrange(len(text))
+            raw = text[i : i + rng.randint(1, 15)]
+            quote = "".join(ch.swapcase() if rng.random() < 0.3 else ch for ch in raw)
+            quote = re.sub(r"\s+", lambda _: rng.choice([" ", "  ", "\n"]), quote)
+        else:
+            quote = "".join(rng.choice(alphabet) for _ in range(rng.randint(0, 8)))
+        assert find_span(text, quote) == reference(text, quote), (text, quote)

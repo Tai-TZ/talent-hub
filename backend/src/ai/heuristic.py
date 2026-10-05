@@ -5,6 +5,8 @@ lỗi. Cho kết quả có bằng chứng trích nguyên văn nên người xét
 dạng nào (chỉ nhận `content`).
 """
 
+import functools
+import json
 import re
 from collections.abc import Callable
 from typing import Any
@@ -148,15 +150,22 @@ def _clamp(x: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return max(lo, min(hi, x))
 
 
-def _contains(text: str, term: str) -> bool:
-    if term in ("c++", "c#", "ci/cd"):
-        return term in text
-    return re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text) is not None
+@functools.lru_cache(maxsize=4096)
+def _term_pattern(term: str) -> re.Pattern[str]:
+    return re.compile(rf"(?<!\w){re.escape(term)}(?!\w)")
+
+
+PLAIN_TERMS = frozenset(("c++", "c#", "ci/cd"))  # có ký tự không phải chữ ở cuối nên chỉ so chuỗi con
 
 
 def _hits(text: str, terms: tuple[str, ...]) -> set[str]:
+    """Các từ khoá xuất hiện trọn từ trong `text` (không phân biệt hoa/thường).
+
+    Lọc bằng phép tìm chuỗi con trước: là điều kiện cần, rẻ hơn regex nhiều và loại được phần lớn từ khoá.
+    Hàm nóng nhất khi chấm hàng loạt nên viết gọn trong một biểu thức.
+    """
     lowered = text.lower()
-    return {t for t in terms if _contains(lowered, t)}
+    return {t for t in terms if t in lowered and (t in PLAIN_TERMS or _term_pattern(t).search(lowered) is not None)}
 
 
 def _sentence_evidence(
@@ -367,10 +376,26 @@ SCORERS: dict[str, Scorer] = {
 }
 
 
+def screen_batch(
+    contents: list[str], criteria: list[dict[str, Any]], thresholds: dict[str, float]
+) -> list[ScreeningResult]:
+    """Chấm một lô hồ sơ (nội dung dạng chuỗi JSON); hàm cấp module để chạy trong tiến trình con (ProcessPoolExecutor).
+
+    Nhận JSON thay vì dict để việc giải mã cũng diễn ra ở tiến trình con, không dồn lên tiến trình API.
+    """
+    engine = HeuristicEngine()
+    return [engine.screen_sync(json.loads(c), criteria, thresholds) for c in contents]
+
+
 class HeuristicEngine:
     name = "heuristic"
 
     async def screen(
+        self, content: dict[str, Any], criteria: list[dict[str, Any]], thresholds: dict[str, float]
+    ) -> ScreeningResult:
+        return self.screen_sync(content, criteria, thresholds)
+
+    def screen_sync(
         self, content: dict[str, Any], criteria: list[dict[str, Any]], thresholds: dict[str, float]
     ) -> ScreeningResult:
         fields = build_fields(content)

@@ -1,11 +1,13 @@
 """Tiện ích văn bản dùng chung cho các động cơ sàng lọc: dựng trường văn bản, tách câu, tìm trích dẫn."""
 
+import bisect
 import re
 import unicodedata
 from typing import Any
 
 SENTENCE_SPLIT = re.compile(r"(?<=[.!?…])\s+|\n+")
 WORD = re.compile(r"\w+", re.UNICODE)
+NON_SPACE = re.compile(r"\S+")
 
 
 def build_fields(content: dict[str, Any]) -> dict[str, str]:
@@ -49,10 +51,46 @@ def words(text: str) -> list[str]:
     return WORD.findall(norm(text).lower())
 
 
+def _find_collapsed(text: str, pieces: list[str]) -> tuple[int, int] | None:
+    """Đường nhanh của `find_span`: gộp mỗi cụm khoảng trắng thành một dấu cách, hạ chữ thường rồi tìm chuỗi con.
+
+    Tương đương regex `p1\\s+p2...` với IGNORECASE (vị trí khớp đầu tiên) khi `lower()` giữ nguyên độ dài; nếu không
+    thì trả None để dùng regex. Tránh biên dịch một regex mới cho mỗi trích dẫn (tốn kém khi chấm hàng chục nghìn hồ sơ).
+    """
+    lowered = text.lower()
+    needle = " ".join(pieces)
+    lowered_needle = needle.lower()
+    if len(lowered) != len(text) or len(lowered_needle) != len(needle):
+        return None
+    collapsed = " ".join(lowered.split())
+    at = collapsed.find(lowered_needle)
+    if at < 0:
+        return None
+    if collapsed == lowered:  # văn bản vốn không có khoảng trắng thừa: vị trí giữ nguyên, khỏi dựng bảng ánh xạ
+        return at, at + len(needle)
+    # `collapsed` là các token (\S+, cùng định nghĩa khoảng trắng với str.split) nối bằng một dấu cách.
+    tokens = [(m.start(), m.group()) for m in NON_SPACE.finditer(lowered)]
+    starts: list[int] = []
+    pos = 0
+    for _, token in tokens:
+        starts.append(pos)
+        pos += len(token) + 1
+
+    def original(i: int) -> int:
+        k = bisect.bisect_right(starts, i) - 1
+        return tokens[k][0] + i - starts[k]
+
+    return original(at), original(at + len(needle) - 1) + 1
+
+
 def find_span(text: str, quote: str) -> tuple[int, int] | None:
     """Tìm `quote` trong `text` bỏ qua khác biệt khoảng trắng và hoa/thường; trả (bắt đầu, kết thúc) hoặc None."""
-    pieces = [re.escape(p) for p in norm(quote).split()]
+    pieces = norm(quote).split()
     if not pieces:
         return None
-    match = re.search(r"\s+".join(pieces), norm(text), flags=re.IGNORECASE)
+    text = norm(text)
+    fast = _find_collapsed(text, pieces)
+    if fast is not None:
+        return fast
+    match = re.search(r"\s+".join(re.escape(p) for p in pieces), text, flags=re.IGNORECASE)
     return (match.start(), match.end()) if match else None

@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None
     ai_scoring_model: str = "claude-opus-5-5"
     ai_concurrency: int = 6
+    # Số tiến trình con chấm song song bằng động cơ luật khi đợt lớn (chạy CPU, không chặn API). 0 = chấm ngay trong
+    # tiến trình API.
+    triage_workers: int = 4
     # Trợ lý hỏi đáp được gọi nhiều hơn chấm hồ sơ: dùng mô hình nhỏ, rẻ.
     assistant_model: str = "claude-haiku-4-5-20251001"
 
