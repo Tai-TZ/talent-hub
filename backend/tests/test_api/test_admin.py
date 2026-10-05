@@ -109,8 +109,22 @@ async def test_expired_invitation_is_rejected(login_as, client: AsyncClient, org
 
 async def test_existing_account_cannot_have_password_reset_via_invite(login_as, client: AsyncClient, orgs) -> None:  # type: ignore[no-untyped-def]
     """Admin tổ chức A mời một người đã có tài khoản ở tổ chức B: không thể chiếm tài khoản bằng cách đặt mật khẩu mới."""
+    beta_admin = await login_as("admin", "beta")
     admin = await login_as("admin")
-    victim = "mentor@beta.test"  # chỉ thuộc tổ chức beta, có mật khẩu
+    victim = f"victim.{uuid.uuid4().hex[:8]}@beta.test"
+    beta_invite = await beta_admin.post(
+        "/api/v1/admin/users", json={"email": victim, "full_name": "Nạn Nhân", "roles": ["mentor"]}
+    )
+    beta_token = beta_invite.json()["invite_link"].rsplit("/", 1)[1]
+    victim_password = "Mật-khẩu-của-nạn-nhân-77"
+    accepted = await client.post(
+        "/api/v1/auth/invitations/accept",
+        json={"token": beta_token, "password": victim_password},
+        headers={"X-Organization": "beta"},
+    )
+    assert accepted.status_code == 200
+    client.cookies.clear()
+
     created = await admin.post(
         "/api/v1/admin/users", json={"email": victim, "full_name": "Kẻ Tấn Công Đặt Tên", "roles": ["mentor"]}
     )
@@ -125,17 +139,18 @@ async def test_existing_account_cannot_have_password_reset_via_invite(login_as, 
     assert hijack.status_code == 401
     # mật khẩu thật của người đó vẫn dùng được ở tổ chức B
     beta = await client.post(
-        "/api/v1/auth/login", json={"email": victim, "password": PASSWORD}, headers={"X-Organization": "beta"}
+        "/api/v1/auth/login", json={"email": victim, "password": victim_password}, headers={"X-Organization": "beta"}
     )
     assert beta.status_code == 200
+    client.cookies.clear()
     # chủ tài khoản chấp nhận bằng đúng mật khẩu hiện có
     legit = await client.post(
-        "/api/v1/auth/invitations/accept", json={"token": token, "password": PASSWORD}, headers=anon
+        "/api/v1/auth/invitations/accept", json={"token": token, "password": victim_password}, headers=anon
     )
     assert legit.status_code == 200
     # tên không bị admin tổ chức A đổi
     me = (await client.get("/api/v1/me", headers=anon)).json()
-    assert me["full_name"] != "Kẻ Tấn Công Đặt Tên"
+    assert me["full_name"] == "Nạn Nhân"
 
 
 async def test_email_outbox_is_delivered_by_backend(login_as, orgs) -> None:  # type: ignore[no-untyped-def]
