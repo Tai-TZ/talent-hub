@@ -7,9 +7,9 @@ import { useGet } from "./hooks";
 
 /**
  * Chọn đợt tuyển và giữ lựa chọn trong URL (?intake=...) để chia sẻ/tải lại được.
- * Mặc định chọn đợt đang mở gần nhất, nếu không có thì đợt đầu danh sách.
+ * Mặc định chọn đợt thoả `prefer` (nếu có), rồi đợt đang mở, rồi đợt đầu danh sách.
  */
-export function useIntakeSelection() {
+export function useIntakeSelection(prefer?: (intake: IntakeT) => boolean) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -18,8 +18,8 @@ export function useIntakeSelection() {
   const selected = useMemo(() => {
     const list = query.data ?? [];
     const wanted = params.get("intake");
-    return list.find((i) => i.id === wanted) ?? list.find((i) => i.status === "open") ?? list[0];
-  }, [query.data, params]);
+    return list.find((i) => i.id === wanted) ?? (prefer ? list.find(prefer) : undefined) ?? list.find((i) => i.status === "open") ?? list[0];
+  }, [query.data, params, prefer]);
 
   const select = useCallback(
     (id: string) => {

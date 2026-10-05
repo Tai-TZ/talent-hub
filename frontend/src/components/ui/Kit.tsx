@@ -182,3 +182,30 @@ export function DemoNotice({ show }: { show: boolean }) {
     </p>
   );
 }
+
+/** Biểu đồ khoảng tin cậy (forest plot): chấm là ước lượng, thanh là khoảng 90%; tô đậm khi khoảng không chứa 0. */
+export function ForestPlot({
+  rows,
+}: {
+  rows: { label: string; value: number; lo: number; hi: number; significant: boolean }[];
+}) {
+  const extent = Math.max(0.5, ...rows.flatMap((r) => [Math.abs(r.lo), Math.abs(r.hi), Math.abs(r.value)]));
+  const pos = (v: number) => `${((v + extent) / (2 * extent)) * 100}%`;
+  return (
+    <ul className="forest" aria-label="Ảnh hưởng của từng tiêu chí đến khả năng đạt yêu cầu">
+      {rows.map((r) => (
+        <li key={r.label} className="forest__row">
+          <span className="forest__label">{r.label}</span>
+          <span className="forest__plot" aria-hidden="true">
+            <span className="forest__zero" />
+            <span className={`forest__ci ${r.significant ? "forest__ci--sig" : ""}`} style={{ left: pos(r.lo), width: `calc(${pos(r.hi)} - ${pos(r.lo)})` }} />
+            <span className={`forest__dot ${r.significant ? "forest__dot--sig" : ""}`} style={{ left: pos(r.value) }} />
+          </span>
+          <span className="forest__value">
+            {r.value.toFixed(2)} <small>[{r.lo.toFixed(2)}; {r.hi.toFixed(2)}]</small>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
