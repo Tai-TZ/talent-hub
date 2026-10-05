@@ -37,6 +37,7 @@ export type ComposerRunDetail = S["ComposerRunDetailOut"];
 export type Funnel = S["FunnelOut"];
 export type Fairness = S["FairnessOut"];
 export type Lab = S["LabOut"];
+export type LabIntake = S["LabIntakeOut"];
 
 export type AdminOverview = S["OverviewOut"];
 export type AccountPage = S["AccountPageOut"];

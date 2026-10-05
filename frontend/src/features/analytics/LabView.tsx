@@ -3,13 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { Checkbox, Range } from "@/components/ui/Fields";
+import { Range } from "@/components/ui/Fields";
+import { CheckIcon } from "@/components/icons";
 import { BarList, DemoNotice, ForestPlot, PageHeader, Stat } from "@/components/ui/Kit";
 import { QueryState } from "@/components/ui/QueryState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import type { IntakeT, Lab } from "@/lib/contracts";
+import type { Lab, LabIntake } from "@/lib/contracts";
 import { fmtNumber, fmtPct } from "@/lib/format";
 import { errorText, useGet, useSend } from "@/lib/hooks";
+import { commonCriteria, defaultSelection, groupByCriteria, MAX_LAB_INTAKES, type CriteriaGroup } from "./lab-selection";
 
 type Simulation = NonNullable<Lab["simulation"]>;
 
@@ -133,48 +135,159 @@ function Results({ lab, ids }: { lab: Lab; ids: string[] }) {
   );
 }
 
+const GROUP_TAG = "ABCDEFGHIJ";
+
+function IntakePicker({
+  intakes,
+  groups,
+  selected,
+  onChange,
+  onRun,
+  running,
+}: {
+  intakes: LabIntake[];
+  groups: CriteriaGroup[];
+  selected: string[];
+  onChange: (ids: string[]) => void;
+  onRun: () => void;
+  running: boolean;
+}) {
+  const common = commonCriteria(intakes, selected);
+  const full = selected.length >= MAX_LAB_INTAKES;
+  const outcomes = intakes.filter((i) => selected.includes(i.id)).reduce((sum, i) => sum + i.with_outcome, 0);
+  const toggle = (id: string, on: boolean) => onChange(on ? [...selected, id] : selected.filter((x) => x !== id));
+  // Nhóm có học viên đã có kết quả mới dùng được để đánh giá tiêu chí; nhóm còn lại thu gọn bên dưới.
+  const active = groups.filter((g) => g.withOutcome > 0);
+  const idle = groups.filter((g) => g.withOutcome === 0);
+  const tag = (group: CriteriaGroup) => GROUP_TAG[groups.indexOf(group)] ?? String(groups.indexOf(group) + 1);
+  const names = (group: CriteriaGroup) => group.criteria.map((c) => c.name).join(" · ");
+
+  function renderGroup(group: CriteriaGroup) {
+    const index = groups.indexOf(group);
+    const ids = group.intakes.map((i) => i.id);
+    const allIn = ids.every((id) => selected.includes(id));
+    const twin = groups.find((g) => g !== group && names(g) === names(group));
+    const titleId = `lab-group-${index}`;
+    return (
+      <div key={group.key} role="group" aria-labelledby={titleId} className="lab-group">
+        <div className="lab-group__head">
+          <span id={titleId} className="lab-group__tag" data-tone={index % 4}>
+            Bộ tiêu chí {tag(group)}
+          </span>
+          <span className="lab-group__criteria">{names(group)}</span>
+          {!allIn ? (
+            <button type="button" className="link-button lab-group__pick" onClick={() => onChange(ids.slice(0, MAX_LAB_INTAKES))}>
+              Chỉ chọn nhóm này
+            </button>
+          ) : null}
+        </div>
+        {twin ? (
+          <p className="lab-group__note">
+            Cùng tên tiêu chí với bộ {tag(twin)} nhưng là rubric khác (mã tiêu chí khác), nên không ghép chung được.
+          </p>
+        ) : null}
+        <div className="lab-grid">
+          {group.intakes.map((intake) => {
+            const checked = selected.includes(intake.id);
+            return (
+              <label key={intake.id} className="lab-card" data-checked={checked}>
+                <input type="checkbox" className="lab-card__input" checked={checked} disabled={!checked && full} onChange={(e) => toggle(intake.id, e.target.checked)} />
+                <span className="lab-card__box" aria-hidden="true">
+                  <CheckIcon size={12} />
+                </span>
+                <span className="lab-card__body">
+                  <span className="lab-card__name">{intake.name}</span>
+                  <span className="lab-card__meta">
+                    {intake.with_outcome > 0 ? `${fmtNumber(intake.with_outcome)} có kết quả` : "Chưa có kết quả khoá học"} · {fmtNumber(intake.admitted)} được nhận
+                  </span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <section className="th-card lab-picker" aria-labelledby="lab-picker-title">
+      <div className="lab-picker__head">
+        <div>
+          <h2 id="lab-picker-title" className="th-type-h4">
+            Dữ liệu đưa vào phân tích
+          </h2>
+          <p className="muted">Chọn các đợt đã kết thúc. Chỉ so sánh được các đợt có chung tiêu chí chấm, nên các đợt được gom theo bộ tiêu chí.</p>
+        </div>
+        <p className="lab-picker__summary" aria-live="polite">
+          <strong>{selected.length}</strong> đợt · <strong>{fmtNumber(outcomes)}</strong> học viên có kết quả
+        </p>
+      </div>
+
+      {active.map((group) => renderGroup(group))}
+      {idle.length > 0 ? (
+        <details className="lab-idle" open={active.length === 0 || idle.some((g) => g.intakes.some((i) => selected.includes(i.id)))}>
+          <summary>
+            Đợt chưa có kết quả khoá học ({idle.reduce((n, g) => n + g.intakes.length, 0)} đợt) — chưa dùng được để đánh giá tiêu chí
+          </summary>
+          <div className="lab-idle__body">{idle.map((group) => renderGroup(group))}</div>
+        </details>
+      ) : null}
+
+      <div className="lab-picker__foot">
+        {selected.length === 0 ? (
+          <p className="muted">Chọn ít nhất một đợt để phân tích.</p>
+        ) : common.length === 0 ? (
+          <Alert tone="warning" title="Các đợt đã chọn không có tiêu chí chung">
+            Bỏ chọn các đợt thuộc bộ tiêu chí khác, hoặc bấm &quot;Chỉ chọn nhóm này&quot; ở nhóm cần phân tích.
+          </Alert>
+        ) : (
+          <div className="lab-common">
+            <span className="lab-common__label">Tiêu chí chung ({common.length})</span>
+            <ul className="lab-common__list">
+              {common.map((c) => (
+                <li key={c.id} className="lab-common__chip">
+                  {c.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {full ? <p className="muted">Tối đa {MAX_LAB_INTAKES} đợt mỗi lần phân tích.</p> : null}
+        <Button loading={running} disabled={selected.length === 0 || common.length === 0} onClick={onRun}>
+          Phân tích {selected.length > 0 ? `${selected.length} đợt` : ""}
+        </Button>
+      </div>
+    </section>
+  );
+}
+
 export function LabView() {
-  const intakes = useGet<IntakeT[]>("/intakes");
-  const finished = useMemo(() => (intakes.data ?? []).filter((i) => (i.status === "closed" || i.status === "archived") && (i.counts["ACCEPTED"] ?? 0) + (i.counts["ENROLLED"] ?? 0) > 0), [intakes.data]);
+  const candidates = useGet<LabIntake[]>("/analytics/lab/intakes");
+  const intakes = useMemo(() => candidates.data ?? [], [candidates.data]);
+  const groups = useMemo(() => groupByCriteria(intakes), [intakes]);
   const [picked, setPicked] = useState<string[] | null>(null);
-  const ids = picked ?? finished.map((i) => i.id);
+  const selected = picked ?? defaultSelection(groups);
 
   const lab = useSend<Lab, { intake_ids: string[] }>("POST", "/analytics/lab");
   const run = lab.variables?.intake_ids ?? null;
   const { isIdle, mutate } = lab;
-  // Tự phân tích khi mở trang lần đầu với các đợt đã kết thúc.
+  // Tự phân tích khi mở trang lần đầu với lựa chọn mặc định (nhóm tiêu chí nhiều dữ liệu nhất).
   useEffect(() => {
-    if (isIdle && finished.length > 0) mutate({ intake_ids: finished.map((i) => i.id) });
-  }, [isIdle, finished, mutate]);
+    const initial = defaultSelection(groups);
+    if (isIdle && initial.length > 0) mutate({ intake_ids: initial });
+  }, [isIdle, groups, mutate]);
 
   return (
     <div className="stack">
       <PageHeader title="Rubric Lab" subtitle="Dùng kết quả khoá học của các đợt trước để kiểm tra tiêu chí chấm nào thực sự dự báo thành công, rồi thử đổi trọng số trước khi áp dụng cho đợt sau." />
-      <QueryState query={intakes} lines={2}>
+      <QueryState query={candidates} lines={2}>
         {() =>
-          finished.length === 0 ? (
+          groups.length === 0 ? (
             <Alert tone="info">Chưa có đợt tuyển nào đã đóng và có người được nhận để phân tích. Rubric Lab cần kết quả khoá học của các đợt trước.</Alert>
           ) : (
             <>
-              <DemoNotice show={finished.some((i) => i.name.startsWith("[Minh hoạ]"))} />
-              <fieldset className="th-card panel plain-fieldset stack">
-                <legend className="th-field__label">Các đợt đưa vào phân tích</legend>
-                <div className="row-actions">
-                  {finished.map((i) => (
-                    <Checkbox key={i.id} label={i.name} checked={ids.includes(i.id)} onChange={(e) => setPicked(e.target.checked ? [...ids, i.id] : ids.filter((x) => x !== i.id))} />
-                  ))}
-                </div>
-                <div>
-                  <Button
-                    variant="secondary"
-                    loading={lab.isPending}
-                    disabled={ids.length === 0}
-                    onClick={() => lab.mutate({ intake_ids: ids })}
-                  >
-                    Phân tích lại
-                  </Button>
-                </div>
-              </fieldset>
+              <DemoNotice show={intakes.some((i) => selected.includes(i.id) && i.name.startsWith("[Minh hoạ]"))} />
+              <IntakePicker intakes={intakes} groups={groups} selected={selected} onChange={setPicked} running={lab.isPending} onRun={() => lab.mutate({ intake_ids: selected })} />
               {lab.isError ? <Alert tone="danger">{errorText(lab.error)}</Alert> : null}
               {lab.isPending && !lab.data ? <p className="muted">Đang phân tích…</p> : null}
               {lab.data && run ? <Results key={run.join(",") + lab.data.pool} lab={lab.data} ids={run} /> : null}

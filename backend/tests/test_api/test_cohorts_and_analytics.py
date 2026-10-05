@@ -70,6 +70,20 @@ async def test_rubric_lab_finds_predictive_criteria_and_simulates_new_weights(lo
     assert (await applicant.post("/api/v1/analytics/lab", json={"intake_ids": ids})).status_code == 403
 
 
+async def test_rubric_lab_lists_comparable_intakes_with_their_criteria(login_as, demo_env) -> None:  # type: ignore[no-untyped-def]
+    reviewer = await login_as("reviewer", GAMMA)
+    res = await reviewer.get("/api/v1/analytics/lab/intakes")
+    assert res.status_code == 200, res.text
+    by_name = {i["name"]: i for i in res.json()}
+    history = [by_name[f"[Minh hoạ] Đợt tuyển khoá {k}"] for k in (1, 2, 3)]
+    assert all(i["admitted"] > 0 and i["with_outcome"] > 0 for i in history)
+    assert len({tuple(c["id"] for c in i["criteria"]) for i in history}) == 1  # cùng bộ tiêu chí: so sánh được
+    assert "projects" in {c["id"] for c in history[0]["criteria"]}
+    assert all(i["status"] in ("closed", "archived") for i in res.json())  # đợt đang mở không vào Lab
+    applicant = await login_as("applicant", GAMMA)
+    assert (await applicant.get("/api/v1/analytics/lab/intakes")).status_code == 403
+
+
 async def test_rubric_lab_reuses_analysis_until_data_changes(login_as, demo_env, owner_maker, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     """Chỉnh trọng số không phân tích lại; dữ liệu đổi (kết quả của một học viên) thì tính lại. Kết quả ổn định."""
     reviewer = await login_as("reviewer", GAMMA)

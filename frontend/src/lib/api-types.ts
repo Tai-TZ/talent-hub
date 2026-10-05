@@ -368,6 +368,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/analytics/lab/intakes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lab Intakes */
+        get: operations["lab_intakes_api_v1_analytics_lab_intakes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/applications": {
         parameters: {
             query?: never;
@@ -3055,6 +3072,31 @@ export interface components {
                 [key: string]: number;
             } | null;
         };
+        /** LabIntakeCriterion */
+        LabIntakeCriterion: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+        };
+        /** LabIntakeOut */
+        LabIntakeOut: {
+            /** Admitted */
+            admitted: number;
+            /** Criteria */
+            criteria: components["schemas"]["LabIntakeCriterion"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
+            /** With Outcome */
+            with_outcome: number;
+        };
         /** LabOut */
         LabOut: {
             /** Admitted */
@@ -4846,6 +4888,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lab_intakes_api_v1_analytics_lab_intakes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabIntakeOut"][];
                 };
             };
         };

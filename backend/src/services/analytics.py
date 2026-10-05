@@ -289,6 +289,60 @@ async def _lab_data(db: OrgDb, intake_ids: list[uuid.UUID], setup: _LabSetup) ->
     return data
 
 
+async def lab_intakes(db: OrgDb) -> list[dict[str, Any]]:
+    """Các đợt dùng được cho Rubric Lab (đã đóng, có người được nhận), kèm bộ tiêu chí vòng đầu và số học viên có kết
+    quả, để giao diện gom các đợt cùng bộ tiêu chí và không chọn mặc định những đợt không so sánh được với nhau."""
+    intakes = (
+        (
+            await db.session.execute(
+                select(Intake).where(Intake.status.in_(("closed", "archived"))).order_by(Intake.opens_at.desc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    if not intakes:
+        return []
+    ids = [i.id for i in intakes]
+    admitted = dict(
+        (
+            await db.session.execute(
+                select(Application.intake_id, func.count())
+                .where(Application.intake_id.in_(ids), Application.status.in_(("ACCEPTED", "ENROLLED")))
+                .group_by(Application.intake_id)
+            )
+        ).all()
+    )
+    outcomes = dict(
+        (
+            await db.session.execute(
+                select(Application.intake_id, func.count())
+                .join(Enrollment, Enrollment.application_id == Application.id)
+                .where(Application.intake_id.in_(ids), Enrollment.status.in_(("qualified", "not_qualified")))
+                .group_by(Application.intake_id)
+            )
+        ).all()
+    )
+    out: list[dict[str, Any]] = []
+    for intake in intakes:
+        if not admitted.get(intake.id):
+            continue
+        rubric = await active_rubric(db, intake.id, intake.rounds[0]["key"]) if intake.rounds else None
+        out.append(
+            {
+                "id": intake.id,
+                "name": intake.name,
+                "status": intake.status,
+                "admitted": admitted.get(intake.id, 0),
+                "with_outcome": outcomes.get(intake.id, 0),
+                "criteria": [
+                    {"id": c["id"], "name": c.get("name", c["id"])} for c in (rubric.criteria if rubric else [])
+                ],
+            }
+        )
+    return out
+
+
 async def lab_report(db: OrgDb, intake_ids: list[uuid.UUID], new_weights: dict[str, float] | None) -> dict[str, Any]:
     setup = await _lab_setup(db, intake_ids)
     data = await _lab_data(db, intake_ids, setup)

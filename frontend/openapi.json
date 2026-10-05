@@ -4150,6 +4150,66 @@
         "title": "LabIn",
         "type": "object"
       },
+      "LabIntakeCriterion": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "LabIntakeCriterion",
+        "type": "object"
+      },
+      "LabIntakeOut": {
+        "properties": {
+          "admitted": {
+            "title": "Admitted",
+            "type": "integer"
+          },
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/LabIntakeCriterion"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "with_outcome": {
+            "title": "With Outcome",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "admitted",
+          "with_outcome",
+          "criteria"
+        ],
+        "title": "LabIntakeOut",
+        "type": "object"
+      },
       "LabOut": {
         "properties": {
           "admitted": {
@@ -8213,6 +8273,31 @@
           }
         },
         "summary": "Lab",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/lab/intakes": {
+      "get": {
+        "operationId": "lab_intakes_api_v1_analytics_lab_intakes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LabIntakeOut"
+                  },
+                  "title": "Response Lab Intakes Api V1 Analytics Lab Intakes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Lab Intakes",
         "tags": [
           "analytics"
         ]

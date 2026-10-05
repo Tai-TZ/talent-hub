@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from src.api.deps import Principal, require
-from src.schemas.responses.analytics import FairnessOut, FunnelOut, LabOut
+from src.schemas.responses.analytics import FairnessOut, FunnelOut, LabIntakeOut, LabOut
 from src.services import analytics
 from src.services.tenancy import OrgDb, org_db
 
@@ -31,6 +31,13 @@ async def fairness(
     intake_id: uuid.UUID, _: Principal = Depends(require("analytics.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
     return await analytics.fairness(db, intake_id)
+
+
+@router.get("/lab/intakes", response_model=list[LabIntakeOut])
+async def lab_intakes(
+    _: Principal = Depends(require("analytics.read")), db: OrgDb = Depends(org_db)
+) -> list[dict[str, Any]]:
+    return await analytics.lab_intakes(db)
 
 
 @router.post("/lab", response_model=LabOut)

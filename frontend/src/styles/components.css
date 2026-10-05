@@ -1172,12 +1172,6 @@ a.th-button {
 
 /* ---------- Tinh chỉnh cho điện thoại (vòng QA UX) ---------- */
 @media (max-width: 639px) {
-  /* "Đăng xuất" không được xuống dòng làm vỡ thanh đầu trang. */
-  .shell__actions .th-button {
-    padding-inline: var(--th-space-2);
-    white-space: nowrap;
-  }
-
   /* 6 bước nộp hồ sơ: một hàng cuộn ngang thay vì chiếm sáu dòng. */
   .wizard-steps {
     flex-wrap: nowrap;
@@ -1214,5 +1208,265 @@ body:has(.sticky-actions) .assistant-fab {
 @media (min-width: 1100px) {
   .stacked-only {
     display: none;
+  }
+}
+
+/* ---------- Rubric Lab: chọn dữ liệu theo bộ tiêu chí ---------- */
+.lab-picker {
+  display: grid;
+  gap: var(--th-space-5);
+}
+
+.lab-picker__head {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3) var(--th-space-6);
+  justify-content: space-between;
+}
+
+.lab-picker__head p {
+  margin: var(--th-space-1) 0 0;
+  max-width: 62ch;
+}
+
+.lab-picker__summary {
+  background: var(--th-brand-50);
+  border-radius: var(--th-radius-pill);
+  color: var(--th-brand-800);
+  font-size: var(--th-text-sm);
+  margin: 0;
+  padding: var(--th-space-2) var(--th-space-4);
+  white-space: nowrap;
+}
+
+.lab-group {
+  display: grid;
+  gap: var(--th-space-3);
+  min-width: 0;
+}
+
+.lab-group__head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2) var(--th-space-3);
+}
+
+.lab-group__tag {
+  background: var(--th-brand-100);
+  border-radius: var(--th-radius-pill);
+  color: var(--th-brand-800);
+  font-size: var(--th-text-xs);
+  font-weight: var(--th-font-bold);
+  letter-spacing: var(--th-tracking-wide);
+  padding: 2px var(--th-space-3);
+  text-transform: uppercase;
+}
+
+.lab-group__tag[data-tone="1"] {
+  background: var(--th-green-50);
+  color: var(--th-green-700);
+}
+
+.lab-group__tag[data-tone="2"] {
+  background: var(--th-amber-50);
+  color: var(--th-amber-700);
+}
+
+.lab-group__tag[data-tone="3"] {
+  background: var(--th-red-50);
+  color: var(--th-red-800);
+}
+
+.lab-group__criteria {
+  color: var(--th-text-muted);
+  font-size: var(--th-text-sm);
+}
+
+.lab-group__criteria {
+  flex: 1 1 320px;
+}
+
+.lab-group__pick {
+  font-size: var(--th-text-sm);
+  white-space: nowrap;
+}
+
+.lab-group__note {
+  background: var(--th-amber-50);
+  border-radius: var(--th-radius-md);
+  color: var(--th-amber-700);
+  font-size: var(--th-text-xs);
+  margin: 0;
+  padding: var(--th-space-2) var(--th-space-3);
+}
+
+.lab-idle {
+  border: 1px dashed var(--th-border-default);
+  border-radius: var(--th-radius-lg);
+  padding: var(--th-space-3) var(--th-space-4);
+}
+
+.lab-idle > summary {
+  color: var(--th-text-secondary);
+  cursor: pointer;
+  font-size: var(--th-text-sm);
+  font-weight: var(--th-font-semibold);
+}
+
+.lab-idle > summary:focus-visible {
+  border-radius: var(--th-radius-sm);
+  box-shadow: var(--th-shadow-focus);
+  outline: 0;
+}
+
+.lab-idle__body {
+  display: grid;
+  gap: var(--th-space-5);
+  padding-top: var(--th-space-4);
+}
+
+.lab-grid {
+  display: grid;
+  gap: var(--th-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+
+.lab-card {
+  align-items: flex-start;
+  background: var(--th-surface-card);
+  border: 1px solid var(--th-border-default);
+  border-radius: var(--th-radius-lg);
+  cursor: pointer;
+  display: flex;
+  gap: var(--th-space-3);
+  padding: var(--th-space-3) var(--th-space-4);
+  position: relative;
+  transition:
+    border-color var(--th-duration-fast) var(--th-ease-standard),
+    box-shadow var(--th-duration-fast) var(--th-ease-standard),
+    background var(--th-duration-fast) var(--th-ease-standard);
+}
+
+.lab-card:hover {
+  border-color: var(--th-brand-300);
+  box-shadow: var(--th-shadow-xs);
+}
+
+.lab-card[data-checked="true"] {
+  background: var(--th-brand-50);
+  border-color: var(--th-brand-700);
+}
+
+.lab-card:has(.lab-card__input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.lab-card:has(.lab-card__input:focus-visible) {
+  box-shadow: var(--th-shadow-focus);
+}
+
+/* Ô chọn thật vẫn nằm trong nhãn để trình đọc màn hình và bàn phím dùng được; chỉ ẩn về mặt hình ảnh. */
+.lab-card__input {
+  height: 1px;
+  left: var(--th-space-4);
+  opacity: 0;
+  position: absolute;
+  top: var(--th-space-4);
+  width: 1px;
+}
+
+.lab-card__box {
+  align-items: center;
+  background: var(--th-surface-card);
+  border: 2px solid var(--th-border-strong);
+  border-radius: var(--th-radius-sm);
+  color: transparent;
+  display: inline-flex;
+  flex: none;
+  height: 20px;
+  justify-content: center;
+  margin-top: 2px;
+  width: 20px;
+}
+
+.lab-card[data-checked="true"] .lab-card__box {
+  background: var(--th-brand-700);
+  border-color: var(--th-brand-700);
+  color: var(--th-neutral-0);
+}
+
+.lab-card__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lab-card__name {
+  font-size: var(--th-text-sm);
+  font-weight: var(--th-font-semibold);
+  line-height: var(--th-leading-snug);
+}
+
+.lab-card__meta {
+  color: var(--th-text-muted);
+  font-size: var(--th-text-xs);
+}
+
+.lab-picker__foot {
+  align-items: center;
+  border-top: 1px solid var(--th-border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3) var(--th-space-4);
+  justify-content: space-between;
+  padding-top: var(--th-space-4);
+}
+
+.lab-picker__foot > :first-child {
+  flex: 1 1 320px;
+  margin: 0;
+}
+
+.lab-common {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2);
+}
+
+.lab-common__label {
+  color: var(--th-text-secondary);
+  font-size: var(--th-text-sm);
+  font-weight: var(--th-font-semibold);
+  margin-right: var(--th-space-1);
+}
+
+.lab-common__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lab-common__chip {
+  background: var(--th-surface-subtle);
+  border-radius: var(--th-radius-pill);
+  font-size: var(--th-text-xs);
+  font-weight: var(--th-font-semibold);
+  padding: var(--th-space-1) var(--th-space-3);
+}
+
+@media (max-width: 639px) {
+  .lab-picker__summary {
+    white-space: normal;
+  }
+
+  .lab-picker__foot .th-button {
+    width: 100%;
   }
 }

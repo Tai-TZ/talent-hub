@@ -102,3 +102,17 @@ class LabOut(Out):
     old_weights: dict[str, float]
     simulation: LabSimulation | None = None
     new_weights: dict[str, float] | None = None
+
+
+class LabIntakeCriterion(Out):
+    id: str
+    name: str
+
+
+class LabIntakeOut(Out):
+    id: uuid.UUID
+    name: str
+    status: str
+    admitted: int
+    with_outcome: int
+    criteria: list[LabIntakeCriterion]
