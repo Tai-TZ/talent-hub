@@ -134,10 +134,11 @@ Có thể dùng `make db-up migrate seed run-be run-fe`; xem [Makefile](Makefile
 
 ### Cấu hình AI
 
-Mặc định dùng động cơ luật offline, không cần khoá. Để dùng Claude:
+Mặc định dùng động cơ luật offline, không cần khoá. Để dùng LLM (trong `backend/.env`):
 
 ```bash
-ANTHROPIC_API_KEY=...        # trong backend/.env
+LLM_API_KEY=...              # OpenRouter (mặc định); OpenAI/Gemini: đổi LLM_BASE_URL và tên mô hình, xem .env.example
+# hoặc ANTHROPIC_API_KEY=... để dùng Claude
 AI_ENGINE=llm                # hoặc đổi trong Quản trị → Cài đặt của từng tổ chức
 ```
 
