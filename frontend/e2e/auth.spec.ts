@@ -47,13 +47,45 @@ test("người dùng chỉ thấy chức năng đúng vai trò", async ({ page }
   await expect(page.getByText("Bạn không có quyền xem nhật ký hoạt động.")).toBeVisible();
 });
 
-test("đăng xuất xoá phiên", async ({ page }) => {
+test("đăng xuất (từ menu tài khoản) xoá phiên", async ({ page }) => {
   await login(page, "reviewer@northwind.test");
   await expect(page).toHaveURL(/\/dashboard$/);
-  await page.getByRole("button", { name: "Đăng xuất" }).click();
+  await page.getByRole("button", { name: /^Tài khoản/ }).click();
+  await page.getByRole("menuitem", { name: "Đăng xuất" }).click();
   await expect(page).toHaveURL(/\/login/);
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/login/);
+});
+
+test("menu tài khoản dùng được bằng bàn phím và dẫn tới đổi mật khẩu", async ({ page }) => {
+  await login(page, "reviewer@northwind.test");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  const trigger = page.getByRole("button", { name: /^Tài khoản/ });
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("menuitem", { name: "Đổi mật khẩu" })).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("menuitem", { name: "Đăng xuất" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+
+  await trigger.click();
+  await page.getByRole("menuitem", { name: "Đổi mật khẩu" }).click();
+  await expect(page).toHaveURL(/\/account\/password$/);
+  await expect(page.getByRole("menu")).toHaveCount(0);
+});
+
+test("nút ngôn ngữ đổi qua lại Tiếng Việt và English", async ({ page }) => {
+  await login(page, "reviewer@northwind.test");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.getByRole("button", { name: /Chuyển sang English/ }).click();
+  await expect(page.getByRole("button", { name: /Switch to Tiếng Việt/ })).toContainText("ENG");
+  await expect(page.getByRole("button", { name: /^Account/ })).toBeVisible();
+  await page.getByRole("button", { name: /Switch to Tiếng Việt/ }).click();
+  await expect(page.getByRole("button", { name: /Chuyển sang English/ })).toContainText("VIE");
 });
 
 test("menu di động mở bằng nút và đóng bằng phím Escape", async ({ page, isMobile }) => {

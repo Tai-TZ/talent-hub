@@ -9,12 +9,7 @@ import { useI18n, useMe } from "../providers";
 import { LanguageSwitch } from "../LanguageSwitch";
 import { BarsIcon, CloseIcon } from "../icons";
 import { Assistant } from "@/features/assistant/Assistant";
-import { Button } from "../ui/Button";
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "")).toUpperCase();
-}
+import { UserMenu } from "./UserMenu";
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { t } = useI18n();
@@ -50,7 +45,6 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppShell({ orgName, children }: { orgName: string; children: ReactNode }) {
   const { t } = useI18n();
-  const me = useMe();
   const router = useRouter();
   const pathname = usePathname();
   const drawer = useRef<HTMLDialogElement>(null);
@@ -87,15 +81,7 @@ export function AppShell({ orgName, children }: { orgName: string; children: Rea
         </Link>
         <div className="shell__actions">
           <LanguageSwitch />
-          <div className="user-chip" title={me.email}>
-            <span className="th-avatar th-avatar--sm" aria-hidden="true">
-              {initials(me.full_name)}
-            </span>
-            <span className="user-chip__name">{me.full_name}</span>
-          </div>
-          <Button variant="tertiary" size="sm" onClick={logout} loading={signingOut}>
-            {t.nav.logout}
-          </Button>
+          <UserMenu onLogout={logout} signingOut={signingOut} />
         </div>
       </header>
 

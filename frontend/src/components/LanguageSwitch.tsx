@@ -1,38 +1,36 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useTransition, type ReactNode } from "react";
 import { setLocale } from "@/app/actions";
-import { LOCALES, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
+import { FlagUS, FlagVN } from "./icons";
 import { useI18n } from "./providers";
 
-/** Chuyển ngôn ngữ giao diện; lựa chọn lưu trong cookie phía server nên server component cũng đổi theo. */
+const DISPLAY: Record<Locale, { code: string; flag: () => ReactNode; next: Locale }> = {
+  vi: { code: "VIE", flag: () => <FlagVN />, next: "en" },
+  en: { code: "ENG", flag: () => <FlagUS />, next: "vi" },
+};
+
+/** Một nút: hiện ngôn ngữ đang dùng (cờ + mã), bấm để đổi sang ngôn ngữ còn lại. Lựa chọn lưu trong cookie phía server
+ * nên server component cũng đổi theo. */
 export function LanguageSwitch() {
   const { locale, t } = useI18n();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const current = DISPLAY[locale];
 
-  function change(next: Locale) {
+  function toggle() {
     startTransition(async () => {
-      await setLocale(next);
+      await setLocale(current.next);
       router.refresh();
     });
   }
 
   return (
-    <div className="lang-switch" role="group" aria-label={t.common.language}>
-      {LOCALES.map((code) => (
-        <button
-          key={code}
-          type="button"
-          className="lang-switch__btn"
-          aria-pressed={locale === code}
-          disabled={pending}
-          onClick={() => change(code)}
-        >
-          {code.toUpperCase()}
-        </button>
-      ))}
-    </div>
+    <button type="button" className="lang-toggle" onClick={toggle} disabled={pending} aria-label={t.common.switchLanguage} title={t.common.switchLanguage}>
+      {current.flag()}
+      <span className="lang-toggle__code">{current.code}</span>
+    </button>
   );
 }

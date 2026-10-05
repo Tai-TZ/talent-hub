@@ -8,6 +8,7 @@ const vi = {
     save: "Lưu",
     close: "Đóng",
     language: "Ngôn ngữ",
+    switchLanguage: "Ngôn ngữ: Tiếng Việt. Chuyển sang English",
     genericError: "Có lỗi xảy ra. Vui lòng thử lại.",
     networkError: "Không kết nối được máy chủ. Kiểm tra mạng và thử lại.",
   },
@@ -18,6 +19,7 @@ const vi = {
     audit: "Nhật ký hoạt động",
     password: "Đổi mật khẩu",
     logout: "Đăng xuất",
+    account: "Tài khoản",
   },
   login: {
     title: "Đăng nhập",

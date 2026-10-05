@@ -38,7 +38,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/admin/costs", label: text("Chi phí"), group: "admin", permission: "cost.read" },
   { href: "/admin/settings", label: text("Cài đặt"), group: "admin", permission: "user.manage" },
   { href: "/admin/audit-logs", label: (t) => t.nav.audit, group: "admin", permission: "audit.read" },
-  { href: "/account/password", label: (t) => t.nav.password, group: "main" },
 ];
 
 export function visibleNav(permissions: readonly string[]): NavItem[] {

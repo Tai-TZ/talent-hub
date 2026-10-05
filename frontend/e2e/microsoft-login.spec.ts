@@ -33,7 +33,8 @@ test("ứng viên tự đăng ký bằng Microsoft rồi lần sau vào lại đ
   await expect(page.getByRole("link", { name: "Tài khoản" })).toHaveCount(0);
 
   // Đăng xuất rồi vào lại bằng cùng danh tính Microsoft (đổi email hiển thị cũng không tạo tài khoản mới).
-  await page.getByRole("button", { name: "Đăng xuất" }).click();
+  await page.getByRole("button", { name: /^Tài khoản/ }).click();
+  await page.getByRole("menuitem", { name: "Đăng xuất" }).click();
   await expect(page).toHaveURL(/\/login/);
   await page.getByRole("link", { name: "Đăng nhập bằng Microsoft" }).click();
   await signInAtIdp(page, email, "Nguyễn Minh Anh");

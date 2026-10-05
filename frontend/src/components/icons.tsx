@@ -94,3 +94,43 @@ export function MicrosoftMark({ size = 18 }: { size?: number }) {
     </svg>
   );
 }
+
+/** Cờ vẽ bằng SVG (emoji cờ không hiển thị trên Windows). Tỉ lệ 3:2, bo góc nhẹ. */
+export function FlagVN({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={(size * 2) / 3} viewBox="0 0 30 20" aria-hidden="true" focusable="false" className="flag">
+      <rect width="30" height="20" fill="#da251d" />
+      <polygon fill="#ff0" points="15,4 16.76,9.42 22.47,9.42 17.85,12.77 19.62,18.19 15,14.84 10.38,18.19 12.15,12.77 7.53,9.42 13.24,9.42" />
+    </svg>
+  );
+}
+
+export function FlagUS({ size = 20 }: { size?: number }) {
+  const stripes = Array.from({ length: 7 }, (_, i) => <rect key={i} y={(i * 2 * 20) / 13} width="30" height={20 / 13} fill="#b22234" />);
+  const stars = [2, 5, 8].flatMap((y) => [2.2, 5.2, 8.2, 11.2].map((x) => <circle key={`${x}-${y}`} cx={x} cy={y} r="0.75" fill="#fff" />));
+  return (
+    <svg width={size} height={(size * 2) / 3} viewBox="0 0 30 20" aria-hidden="true" focusable="false" className="flag">
+      <rect width="30" height="20" fill="#fff" />
+      {stripes}
+      <rect width="13.4" height={(20 * 7) / 13} fill="#3c3b6e" />
+      {stars}
+    </svg>
+  );
+}
+
+/** Font Awesome Free 6.7.2 (CC BY 4.0): key, right-from-bracket. */
+export function KeyIcon(props: IconProps) {
+  return (
+    <Svg viewBox="0 0 512 512" fill="currentColor" {...props}>
+      <path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z" />
+    </Svg>
+  );
+}
+
+export function SignOutIcon(props: IconProps) {
+  return (
+    <Svg viewBox="0 0 512 512" fill="currentColor" {...props}>
+      <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
+    </Svg>
+  );
+}

@@ -10,6 +10,7 @@ const en: Messages = {
     save: "Save",
     close: "Close",
     language: "Language",
+    switchLanguage: "Language: English. Switch to Tiếng Việt",
     genericError: "Something went wrong. Please try again.",
     networkError: "Can't reach the server. Check your connection and try again.",
   },
@@ -20,6 +21,7 @@ const en: Messages = {
     audit: "Activity log",
     password: "Change password",
     logout: "Sign out",
+    account: "Account",
   },
   login: {
     title: "Sign in",
