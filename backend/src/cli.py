@@ -164,6 +164,24 @@ async def cmd_seed_dev(_: argparse.Namespace) -> None:
     print(f"Đã seed dữ liệu dev. Tài khoản dạng <vai_trò>@<tổ_chức>.test, mật khẩu: {DEV_PASSWORD}")
 
 
+async def cmd_seed_demo(args: argparse.Namespace) -> None:
+    from src.demo.seed import seed_demo
+
+    if get_settings().environment != "local":
+        raise SystemExit("seed-demo chỉ chạy ở môi trường local")
+    maker = _maker()
+    async with maker() as session, session.begin():
+        org = (await session.execute(select(Organization).where(Organization.slug == args.org))).scalar_one_or_none()
+        if org is None:
+            raise SystemExit(f"Không có tổ chức '{args.org}'. Chạy seed-dev trước.")
+        await set_org_context(session, org.id)
+        summary = await seed_demo(session, org, current_applications=args.current)
+    print("Đã nạp dữ liệu minh hoạ (TỔNG HỢP, không phải dữ liệu thật):")
+    for c in summary["cohorts"]:
+        print(f"  {c['code']}: {c['applicants']} hồ sơ, nhận {c['admitted']}, đạt yêu cầu {c['qualified']}")
+    print(f"  Đợt đang tuyển: {summary['current']['applications']} hồ sơ đã nộp (id {summary['current']['intake_id']})")
+
+
 def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
     parser = argparse.ArgumentParser(prog="src.cli")
@@ -180,6 +198,10 @@ def main() -> None:
     create.set_defaults(func=cmd_org_create)
 
     sub.add_parser("seed-dev").set_defaults(func=cmd_seed_dev)
+    demo = sub.add_parser("seed-demo")
+    demo.add_argument("--org", default="northwind")
+    demo.add_argument("--current", type=int, default=600)
+    demo.set_defaults(func=cmd_seed_demo)
 
     args = parser.parse_args()
     asyncio.run(args.func(args))
