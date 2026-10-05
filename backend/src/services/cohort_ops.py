@@ -524,6 +524,18 @@ def suggestion_from(matrix: list[dict[str, Any]]) -> str:
     return "qualified" if all(m["met"] for m in matrix) else "not_qualified"
 
 
+async def can_assess(db: OrgDb, actor: Actor, enrollment_id: uuid.UUID) -> bool:
+    """Mentor chỉ làm việc với học viên mình phụ trách (qua vị trí thực chiến); quản lý đào tạo thì với tất cả."""
+    if "training.manage" in actor.permissions:
+        return True
+    mine = await db.session.execute(
+        select(Placement.id)
+        .where(Placement.enrollment_id == enrollment_id, Placement.mentor_membership_id == actor.membership_id)
+        .limit(1)
+    )
+    return mine.first() is not None
+
+
 async def add_assessment(
     db: OrgDb,
     enrollment_id: uuid.UUID,
@@ -545,17 +557,8 @@ async def add_assessment(
         raise ValidationFailedError("Mức không hợp lệ", {"level": f"Từ 1 đến {competency.max_level}"})
     if len(evidence.strip()) < 15:
         raise ValidationFailedError("Cần nêu bằng chứng cho mức đánh giá", {"evidence": "Tối thiểu 15 ký tự"})
-    # Mentor chỉ đánh giá học viên mình phụ trách; người quản lý đào tạo đánh giá được tất cả.
-    if "training.manage" not in assessor.permissions:
-        mine = (
-            await db.session.execute(
-                select(Placement.id).where(
-                    Placement.enrollment_id == enrollment_id, Placement.mentor_membership_id == assessor.membership_id
-                )
-            )
-        ).scalar_one_or_none()
-        if mine is None:
-            raise PermissionDeniedError("Bạn chỉ đánh giá được học viên mình phụ trách")
+    if not await can_assess(db, assessor, enrollment_id):
+        raise PermissionDeniedError("Bạn chỉ đánh giá được học viên mình phụ trách")
     row = CompetencyAssessment(
         organization_id=db.org.id,
         enrollment_id=enrollment.id,
