@@ -13,6 +13,17 @@ AI đọc hồ sơ có dẫn chứng kiểm chứng được · con người quy
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_RLS-4169E1?logo=postgresql&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-252_backend_·_76_e2e-2f9a62)
 ![i18n](https://img.shields.io/badge/UI-Ti%E1%BA%BFng_Vi%E1%BB%87t_·_English-134d8b)
+[![License](https://img.shields.io/badge/license-Proprietary-c72127)](LICENSE)
+
+[![AI](https://img.shields.io/badge/AI-c72127?style=flat-square)](https://github.com/topics/artificial-intelligence)
+[![EdTech](https://img.shields.io/badge/EdTech-134d8b?style=flat-square)](https://github.com/topics/edtech)
+[![RAG](https://img.shields.io/badge/RAG-5b49a6?style=flat-square)](https://github.com/topics/rag)
+[![LLM](https://img.shields.io/badge/LLM-5b49a6?style=flat-square)](https://github.com/topics/llm)
+[![Human-in-the-loop](https://img.shields.io/badge/Human--in--the--loop-0e623a?style=flat-square)](https://github.com/topics/human-in-the-loop)
+[![Multi-tenant (RLS)](https://img.shields.io/badge/Multi--tenant_RLS-4169E1?style=flat-square)](https://github.com/topics/multi-tenancy)
+[![Learning analytics](https://img.shields.io/badge/Learning_analytics-0e623a?style=flat-square)](https://github.com/topics/learning-analytics)
+[![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=flat-square&logo=powerbi&logoColor=black)](https://github.com/topics/powerbi)
+[![WCAG AA](https://img.shields.io/badge/Accessibility_WCAG_AA-874e00?style=flat-square)](https://github.com/topics/accessibility)
 
 <br/>
 
@@ -39,6 +50,27 @@ Chương trình chạy nhiều khoá liên tiếp, mỗi khoá chọn khoảng 5
 | Dữ liệu nằm rời rạc ở LMS, CRM, Excel | **Tích hợp bằng khoá API**: Power BI, LMS, CRM; chi phí AI và chi phí trên mỗi học viên được nhận |
 
 Chiến lược sản phẩm, đối thủ và lợi thế cạnh tranh: [docs/11-product-strategy.md](docs/11-product-strategy.md).
+
+## Giao diện
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/assets/readme/screens/triage.png" alt="Bảng sàng lọc AI cho đợt 20.000 hồ sơ: số hồ sơ theo nhóm gợi ý và phân bố điểm"/><br/><sub><b>Sàng lọc AI 20.000 hồ sơ</b>: nhóm gợi ý, mục ưu tiên xem kỹ, phân bố điểm; AI không quyết định kết quả.</sub></td>
+    <td width="50%"><img src="docs/assets/readme/screens/queue.png" alt="Hàng đợi hồ sơ có bộ lọc, chấm mù và gợi ý của AI"/><br/><sub><b>Hàng đợi hồ sơ</b>: lọc, tìm theo mã, chấm mù; gợi ý AI chỉ hiện với người có quyền.</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/readme/screens/quality.png" alt="Trang chất lượng chương trình: chuẩn đầu ra theo năng lực, cảnh báo dữ liệu và đề xuất cải tiến"/><br/><sub><b>Chất lượng chương trình</b>: chuẩn đầu ra theo năng lực và nhánh, cảnh báo dữ liệu, đề xuất cải tiến.</sub></td>
+    <td><img src="docs/assets/readme/screens/rubric-lab.png" alt="Rubric Lab: hệ số và khoảng tin cậy của từng tiêu chí tuyển sinh"/><br/><sub><b>Rubric Lab</b>: tiêu chí tuyển sinh nào thật sự dự báo kết quả học, thử trọng số mới.</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/readme/screens/assistant.png" alt="Trợ lý hỏi đáp trả lời kèm trích nguồn tài liệu"/><br/><sub><b>Trợ lý hỏi đáp</b>: trả lời kèm trích nguồn, từ chối khi thiếu căn cứ, có đánh giá hữu ích.</sub></td>
+    <td><img src="docs/assets/readme/screens/integrations.png" alt="Quản trị tích hợp: khoá API có phạm vi và mẫu kết nối Power BI"/><br/><sub><b>Tích hợp</b>: khoá API có phạm vi, mẫu Power BI / LMS / CRM, tải CSV khử định danh.</sub></td>
+  </tr>
+</table>
+
+<p align="center"><img src="docs/assets/readme/screens/mobile-apply.png" alt="Hồ sơ ứng tuyển nhiều bước trên điện thoại, tự lưu bản nháp" width="280"/><br/><sub><b>Cổng ứng viên trên điện thoại</b>: hồ sơ 6 bước, tự lưu nháp, mobile-first.</sub></p>
+
+> Ảnh chụp từ dữ liệu minh hoạ **tổng hợp** (tổ chức <code>northwind</code> và <code>scale</code>), không phải dữ liệu thật.
 
 ## Hành trình: từ hồ sơ đến kết quả, rồi quay lại cải tiến
 
@@ -271,4 +303,4 @@ Chi tiết số liệu đã đo, lỗi đã tìm và sửa, việc tiếp theo: 
 
 ## Giấy phép
 
-Chưa chọn giấy phép; mã nguồn hiện là nội bộ.
+**Độc quyền — bảo lưu mọi quyền.** Không cấp giấy phép sử dụng, sao chép, sửa đổi hay phân phối khi chưa có văn bản chấp thuận của chủ sở hữu. Xem [LICENSE](LICENSE).
