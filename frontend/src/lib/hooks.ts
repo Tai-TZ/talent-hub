@@ -4,12 +4,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 
 /** Đọc dữ liệu; truyền `null` để tạm tắt (ví dụ khi chưa chọn đợt tuyển). */
-export function useGet<T>(path: string | null, options: { refetchInterval?: number | false; staleTime?: number } = {}) {
+export function useGet<T>(
+  path: string | null,
+  options: { refetchInterval?: number | false | ((data: T | undefined) => number | false); staleTime?: number } = {},
+) {
+  const interval = options.refetchInterval;
   return useQuery<T, ApiError>({
     queryKey: ["api", path],
     queryFn: () => api<T>(path as string),
     enabled: path !== null,
-    refetchInterval: options.refetchInterval,
+    refetchInterval: typeof interval === "function" ? (query) => interval(query.state.data) : interval,
     staleTime: options.staleTime,
   });
 }

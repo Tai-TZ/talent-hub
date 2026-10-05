@@ -54,7 +54,7 @@ export function StatusPanel({ view, onEdit, onChanged }: { view: ApplicationView
 
   return (
     <div className="stack">
-      <section className="th-card form-card stack" aria-labelledby="progress-title">
+      <section className="th-card panel panel--form stack" aria-labelledby="progress-title">
         <div className="row-actions">
           <h2 id="progress-title" className="th-type-h3">
             Tình trạng hồ sơ
@@ -101,7 +101,7 @@ export function StatusPanel({ view, onEdit, onChanged }: { view: ApplicationView
         ) : null}
       </section>
 
-      <section className="th-card form-card stack" aria-labelledby="timeline-title">
+      <section className="th-card panel panel--form stack" aria-labelledby="timeline-title">
         <h2 id="timeline-title" className="th-type-h4">
           Lịch sử xử lý
         </h2>

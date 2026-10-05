@@ -30,7 +30,7 @@ const INTAKE_STATUS: Record<string, Entry> = {
 
 const TIER: Record<string, Entry> = {
   invite: ["Nên mời", "success"],
-  review: ["Cần xem kỹ", "warning"],
+  review: ["Cần xem xét", "warning"],
   decline_likely: ["Khả năng loại", "danger"],
 };
 
@@ -142,6 +142,7 @@ const EVENT_LABELS: Record<string, string> = {
   "decision.waitlisted": "Vào danh sách dự bị",
   "application.enrolled": "Đã nhập học",
   "application.withdrawn": "Đã rút hồ sơ",
+  "round.started": "Bắt đầu xét vòng đầu",
 };
 
 export function eventLabel(type: string): string {

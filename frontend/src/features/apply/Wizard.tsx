@@ -144,7 +144,7 @@ export function Wizard({
         {save.kind === "idle" && "Bản nháp tự động lưu khi bạn nhập."}
       </p>
 
-      <section className="th-card form-card stack" aria-labelledby="step-title">
+      <section className="th-card panel panel--form stack" aria-labelledby="step-title">
         <h2 id="step-title" className="th-type-h3">
           {STEPS[stepIndex]?.label}
         </h2>

@@ -426,8 +426,9 @@ class HeuristicEngine:
             confidence = min(confidence, 0.4)  # đẩy sang nhóm "cần xem" thay vì tin điểm
         tier, attention = decide_tier(total, confidence, flags, thresholds)
         best = max(results, key=lambda r: r.score / r.max if r.max else 0, default=None)
+        names = {c["id"]: c.get("name", c["id"]) for c in criteria}
         summary = (
-            f"Mạnh nhất: {best.id} ({best.score:g}/{best.max:g})."
+            f"Tiêu chí mạnh nhất: {names.get(best.id, best.id)} ({best.score:g}/{best.max:g})."
             if best and best.score
             else "Chưa thấy điểm mạnh rõ rệt từ nội dung hồ sơ."
         )

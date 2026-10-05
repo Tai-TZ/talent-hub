@@ -682,3 +682,164 @@
     text-align: center;
   }
 }
+
+/* ---------- Nút lọc dạng chip, tô sáng bằng chứng, AI ---------- */
+.chip {
+  align-items: center;
+  background: var(--th-surface-card);
+  border: 1px solid var(--th-border-default);
+  border-radius: var(--th-radius-pill);
+  color: var(--th-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: var(--th-font-semibold) var(--th-text-sm) / 1 var(--th-font-brand);
+  gap: var(--th-space-2);
+  min-height: var(--th-control-sm);
+  padding: 0 var(--th-space-3);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--th-brand-700);
+  border-color: var(--th-brand-700);
+  color: var(--th-neutral-0);
+}
+
+.chip:focus-visible {
+  box-shadow: var(--th-shadow-focus);
+  outline: 0;
+}
+
+.chip__count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.evidence-mark {
+  background: var(--th-amber-50);
+  border-bottom: 2px solid var(--th-amber-700);
+  color: inherit;
+}
+
+.record-section {
+  border-top: 1px solid var(--th-border-subtle);
+  padding-top: var(--th-space-4);
+}
+
+.record-section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.record-section__title {
+  color: var(--th-text-secondary);
+  font-size: var(--th-text-xs);
+  font-weight: var(--th-font-bold);
+  letter-spacing: var(--th-tracking-caps);
+  margin: 0 0 var(--th-space-3);
+  text-transform: uppercase;
+}
+
+.record-subtitle {
+  font-size: var(--th-text-sm);
+  margin: var(--th-space-3) 0 var(--th-space-1);
+}
+
+.record-text {
+  line-height: var(--th-leading-relaxed, 1.6);
+  margin: var(--th-space-1) 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.ai-criterion {
+  border: 1px solid var(--th-border-subtle);
+  border-radius: var(--th-radius-md);
+  display: grid;
+  gap: var(--th-space-2);
+  padding: var(--th-space-3);
+}
+
+.ai-criterion--active {
+  border-color: var(--th-amber-700);
+}
+
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-3);
+  justify-content: flex-end;
+}
+
+/* Ô chọn đợt tuyển cần rộng hơn các bộ lọc còn lại để không bị cắt tên. */
+.toolbar .th-field:first-child {
+  flex: 2 1 320px;
+  max-width: 560px;
+}
+
+/* Khối nội dung rộng hết cột; biểu mẫu giới hạn chiều rộng cho dễ đọc. */
+.panel {
+  max-width: none;
+}
+
+.panel--form {
+  max-width: 880px;
+}
+
+/* ---------- Thang điểm dạng nút chọn ---------- */
+.plain-fieldset {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.score-legend {
+  display: flex;
+  gap: var(--th-space-3);
+  justify-content: space-between;
+  padding: 0;
+  width: 100%;
+}
+
+.score-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--th-space-2);
+}
+
+.score-option input {
+  appearance: none;
+  height: 0;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+
+.score-option span {
+  align-items: center;
+  background: var(--th-surface-card);
+  border: 1px solid var(--th-border-default);
+  border-radius: var(--th-radius-sm);
+  color: var(--th-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: var(--th-font-semibold) var(--th-text-sm) / 1 var(--th-font-brand);
+  height: var(--th-control-sm);
+  justify-content: center;
+  min-width: 40px;
+}
+
+.score-option:hover span {
+  border-color: var(--th-brand-700);
+}
+
+.score-option input:checked + span {
+  background: var(--th-brand-700);
+  border-color: var(--th-brand-700);
+  color: var(--th-neutral-0);
+}
+
+.score-option input:focus-visible + span {
+  box-shadow: var(--th-shadow-focus);
+}
