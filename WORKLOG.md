@@ -19,12 +19,18 @@ Sản phẩm chạy được đầu-cuối trên máy local (Docker chỉ cho Po
 | Hồ sơ năng lực có chữ ký (Skill Passport) | **Chưa làm** |
 | Trang giới thiệu công khai (`/`) | Chưa làm |
 
-Chất lượng hiện tại: backend 186 test, độ phủ 94%, ruff/mypy sạch; frontend 23 test đơn vị + 58 kịch bản e2e (desktop và mobile, gồm quét trợ năng WCAG A/AA); semgrep, pip-audit, npm audit đều sạch.
+Chất lượng hiện tại: backend 188 test, độ phủ 94%, ruff/mypy sạch; frontend 23 test đơn vị + 58 kịch bản e2e (desktop và mobile, gồm quét trợ năng WCAG A/AA); semgrep, pip-audit, npm audit đều sạch.
 
 ## Đã đo (số thật, tái lập được)
 
 - **Độ trễ API** (`backend/tools/bench_api.py`, ~1.700 hồ sơ, đợt lớn nhất 600): p95 dưới 40 ms cho các màn đọc; Rubric Lab 328 ms; Composer cho một khoá 160 ms; báo cáo xét đạt giảm 520 ms → 37 ms sau khi gộp truy vấn.
-- **Sàng lọc AI offline ở quy mô 20.000 hồ sơ**: 184 giây (khoảng 108 hồ sơ/giây), 0 lỗi. Chạy được nhưng chậm so với kỳ vọng; xem việc tiếp theo số 1.
+- **Sàng lọc AI offline ở quy mô 20.000 hồ sơ** (đo 05/10/2026 trên cùng máy, DB nhân bản): mã cũ 209 giây (95 hồ sơ/giây) → nay **khoảng 9–10 giây (~2.000 hồ sơ/giây)**, qua API thật (`uvicorn --reload`) job xong trong 9,3 giây. Kết quả ghi vào DB **giống hệt từng dòng** với mã cũ (20.000/20.000). Trong lúc chạy, API khác vẫn phản hồi: `GET /me` p50 17 ms, tối đa 176 ms. Đã làm:
+  - Động cơ luật: lọc từ khoá bằng tìm chuỗi con trước regex đã biên dịch sẵn; `find_span` có đường nhanh không biên dịch regex cho mỗi trích dẫn (test đối chiếu ngẫu nhiên với regex gốc).
+  - Ghi kết quả bằng `INSERT` nhiều dòng theo lô 500 (hoặc mỗi 2 giây), tiến độ cập nhật chung giao dịch (trước: mỗi 25 hồ sơ một session + ORM).
+  - Đợt từ 1.000 hồ sơ chấm bằng động cơ luật trong `ProcessPoolExecutor` (`TRIAGE_WORKERS`, mặc định 4; 0 = tắt), dò trùng chạy song song.
+  - Một truy vấn duy nhất, nội dung lấy dạng chuỗi JSON (giải mã ở tiến trình con): giảm khựng do GC từ 230–340 ms xuống ~50 ms.
+  - Ghi chú đo: CPU laptop hạ xung sau vài giây chạy nặng nên số tuyệt đối dao động; so sánh trước/sau luôn đo cùng điều kiện.
+- **Độ trễ API trên đợt 20.000 hồ sơ** (`bench_api.py --org scale`, p50): phần lớn màn dưới 100 ms; chậm: lọc hàng đợi "ưu tiên xem kỹ" ~965 ms, Rubric Lab ~740 ms (p95 1,6 s), bảng triage ~590 ms, báo cáo xét đạt ~350 ms. (Đo trên DB có ~8 lượt chấm mỗi hồ sơ do chạy lại nhiều lần; `_LATEST` dùng `DISTINCT ON` nên lượt chấm lại càng nhiều càng chậm.) Composer trả 409 ở tổ chức `scale` vì không có học viên đang học (dữ liệu, không phải lỗi).
 - **Trợ lý hỏi đáp** (`eval/README.md`): bộ phát triển 100% (đã tinh chỉnh theo bộ này nên không có ý nghĩa thước đo); **bộ giữ riêng 71% câu có đáp án đúng, 88% câu không có đáp án được từ chối đúng, 91% chính xác khi đã trả lời**. Các câu trượt đều là từ chối an toàn do khác từ đồng nghĩa.
 
 ## Lỗi thật tìm được qua các vòng QA (đã sửa)
@@ -35,7 +41,7 @@ Chất lượng hiện tại: backend 186 test, độ phủ 94%, ruff/mypy sạc
 
 ## Việc tiếp theo (theo thứ tự nên làm)
 
-1. **Hiệu năng sàng lọc 20.000 hồ sơ**: đo nút cổ chai (`src/services/triage.py`: nạp nội dung, phát hiện trùng lặp bằng chỉ mục shingle, ghi từng cụm, `CHUNK`), mục tiêu từ 500 hồ sơ/giây. Sau đó chạy `python tools/bench_api.py --org scale` để đo hàng đợi, bảng triage, phân tích trên đợt 20.000 hồ sơ (tổ chức `scale` đã nạp sẵn trong DB dev và đã sàng lọc xong).
+1. **Màn đọc chậm ở quy mô 20.000 hồ sơ** (sàng lọc đã xong, xem mục "Đã đo"): lọc hàng đợi theo "ưu tiên xem kỹ", bảng triage (`_LATEST` trong `src/services/triage.py` quét mọi lượt chấm bằng `DISTINCT ON`; cân nhắc cột/bảng "lượt chấm mới nhất" hoặc chỉ mục phù hợp), Rubric Lab. Mục tiêu p95 dưới 300 ms. Đo bằng `python tools/bench_api.py --org scale`.
 2. **Vòng QA 6 (nghiệp vụ)**: viết kiểm thử bất biến (không vượt chỉ tiêu, bốn mắt, chấm mù, điểm AI chỉ cho người có `triage.read`) chạy với dữ liệu ngẫu nhiên; rà lại trải nghiệm bàn phím cho mọi hộp thoại.
 3. **Skill Passport**: chứng nhận hoàn thành ký Ed25519 (khoá theo tổ chức), trang xác minh công khai `/verify/[id]`, huỷ/thu hồi, hiển thị trong trang học viên. Đây là phần "khó sao chép" cho đối tác doanh nghiệp.
 4. **Trợ lý với Claude thật**: đặt `ANTHROPIC_API_KEY` trong `backend/.env`, chạy `eval-assistant --engine llm` trên bộ giữ riêng và so sánh; thêm bộ phân loại ý định (câu hỏi tra cứu so với yêu cầu thực hiện tác vụ hoặc dò dữ liệu cá nhân).
