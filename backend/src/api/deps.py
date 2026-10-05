@@ -12,6 +12,7 @@ from src.services.auth import load_roles
 from src.services.rbac import permissions_for
 from src.services.security import decode_access_token
 from src.services.tenancy import OrgDb, org_db
+from src.services.workflow import Actor
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,10 @@ def request_meta(request: Request) -> RequestMeta:
         ip=request.client.host if request.client else None,
         request_id=getattr(request.state, "request_id", None),
     )
+
+
+def actor_of(principal: Principal) -> Actor:
+    return Actor(user_id=principal.user_id, membership_id=principal.membership_id, permissions=principal.permissions)
 
 
 def _unauthenticated() -> HTTPException:
