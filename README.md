@@ -180,14 +180,17 @@ cd frontend && npm run e2e                   # cần backend chạy; desktop và
 
 | Hạng mục | Tình trạng |
 |---|---|
-| Nền tảng đa tổ chức, xác thực, phân quyền, audit | Hoàn thành, có test |
-| Tuyển sinh: đợt tuyển, hồ sơ, rubric, chấm điểm, phê duyệt bốn mắt | Hoàn thành ở backend, có test |
-| Sàng lọc AI hàng loạt (động cơ luật và Claude) | Hoàn thành ở backend, có test |
-| Quản trị IT: tài khoản, tài liệu, chi phí, cài đặt | Hoàn thành ở backend, có test |
-| Vận hành khoá, Cohort Composer, phễu, công bằng, Rubric Lab | Hoàn thành ở backend, có test |
-| Giao diện: đăng nhập, tổng quan, đổi mật khẩu, nhật ký | Hoàn thành |
-| Giao diện: tuyển sinh, quản trị, khoá học, phân tích | Đang xây dựng |
-| Đăng nhập Microsoft (OIDC), trợ lý hỏi đáp có trích nguồn, hồ sơ năng lực có chữ ký | Chưa làm |
+| Nền tảng đa tổ chức, xác thực, phân quyền, nhật ký kiểm toán | Hoàn thành, có test |
+| Đăng nhập bằng tài khoản do admin cấp và bằng Microsoft (OIDC, PKCE) | Hoàn thành, có test; chưa thử với Entra thật |
+| Tuyển sinh: đợt tuyển, hồ sơ, chấm độc lập, phê duyệt bốn mắt | Hoàn thành (BE + FE), có e2e 4 vai trò |
+| Sàng lọc AI hàng loạt có bằng chứng kiểm chứng (luật offline và Claude) | Hoàn thành; chưa đo với Claude thật |
+| Vận hành khoá, Cohort Composer, mentor, xét đạt, phụ cấp | Hoàn thành (BE + FE), có test |
+| Phễu, giám sát công bằng, Rubric Lab | Hoàn thành (BE + FE) |
+| Quản trị IT: tài khoản, tài liệu, chi phí, cài đặt | Hoàn thành (BE + FE) |
+| Trợ lý hỏi đáp có trích nguồn và bộ đánh giá ([eval/](eval/README.md)) | Hoàn thành; động cơ offline đã đo trên bộ giữ riêng, động cơ LLM chưa đo |
+| Hồ sơ năng lực có chữ ký, trang giới thiệu công khai | Chưa làm |
+
+Chi tiết số liệu đã đo, lỗi đã tìm và sửa, việc tiếp theo: xem [WORKLOG.md](WORKLOG.md).
 
 > **Về dữ liệu minh hoạ:** bộ sinh dữ liệu trong `backend/src/demo` tạo người, hồ sơ, điểm và kết quả **giả**. Số liệu thu được từ đó không phải kết quả của Northwind University và không dùng làm bằng chứng hiệu quả.
 
