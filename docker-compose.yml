@@ -9,7 +9,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: talenthub
     ports:
-      - "5432:5432"
+      # Chỉ mở trên localhost: Docker publish cổng vượt qua tường lửa của máy (ufw), mà DB này có tài khoản postgres/postgres.
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d:ro
