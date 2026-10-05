@@ -2,6 +2,7 @@ import { cookies, headers } from "next/headers";
 import { cache } from "react";
 import { backendFetch, buildBackendHeaders } from "./backend";
 import { DEFAULT_LOCALE, getMessages, isLocale, LOCALE_COOKIE, type Locale, type Messages } from "./i18n";
+import type { Dict } from "./i18n/define";
 import type { Me, OrgInfo } from "./types";
 
 async function requestContext() {
@@ -48,4 +49,9 @@ export async function getPathname(): Promise<string> {
 export async function getT(): Promise<{ locale: Locale; t: Messages }> {
   const locale = await getLocale();
   return { locale, t: getMessages(locale) };
+}
+
+/** Chuỗi của một khu (tạo bằng `defineMessages`) cho server component, theo ngôn ngữ đang chọn. */
+export async function getMessagesFor<T>(dict: Dict<T>): Promise<T> {
+  return dict[await getLocale()];
 }

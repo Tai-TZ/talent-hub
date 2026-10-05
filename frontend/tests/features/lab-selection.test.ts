@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { initials } from "@/components/shell/UserMenu";
+import { initials } from "@/lib/format";
 import { commonCriteria, defaultSelection, groupByCriteria, MAX_LAB_INTAKES } from "@/features/analytics/lab-selection";
 import type { LabIntake } from "@/lib/contracts";
 

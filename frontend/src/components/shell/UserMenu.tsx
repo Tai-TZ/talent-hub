@@ -2,14 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { initials } from "@/lib/format";
 import { ChevronDownIcon, KeyIcon, SignOutIcon } from "../icons";
 import { useI18n, useMe } from "../providers";
 
-/** Chữ cái đầu của từ đầu và từ cuối, chỉ lấy chữ (bỏ ngoặc, số): "reviewer (northwind)" → "RV". */
-export function initials(name: string): string {
-  const words = name.match(/\p{L}[\p{L}\p{M}]*/gu) ?? [];
-  return ((words[0]?.[0] ?? "") + (words.length > 1 ? (words.at(-1)?.[0] ?? "") : "")).toUpperCase() || "?";
-}
 
 /** Menu tài khoản theo mẫu "menu button" của WAI-ARIA: mũi tên lên/xuống, Home/End, Escape trả focus về nút. */
 export function UserMenu({ onLogout, signingOut }: { onLogout: () => void; signingOut: boolean }) {

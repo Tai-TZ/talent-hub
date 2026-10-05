@@ -10,33 +10,32 @@ export interface NavItem {
   exact?: boolean;
 }
 
-export const NAV_GROUPS: Record<NavItem["group"], string | null> = {
+/** Tiêu đề nhóm menu (null = không có tiêu đề). */
+export const NAV_GROUPS: Record<NavItem["group"], ((t: Messages) => string) | null> = {
   main: null,
-  admissions: "Tuyển sinh",
-  training: "Đào tạo",
-  insight: "Phân tích",
-  admin: "Quản trị hệ thống",
+  admissions: (t) => t.nav.groups.admissions,
+  training: (t) => t.nav.groups.training,
+  insight: (t) => t.nav.groups.insight,
+  admin: (t) => t.nav.groups.admin,
 };
-
-const text = (value: string) => () => value;
 
 /** Danh mục điều hướng; mỗi mục chỉ hiện khi người dùng có permission tương ứng. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/dashboard", label: (t) => t.nav.dashboard, group: "main" },
-  { href: "/apply", label: text("Hồ sơ của tôi"), group: "admissions", permission: "application.read.own" },
-  { href: "/staff/queue", label: text("Hàng đợi hồ sơ"), group: "admissions", permission: "application.read" },
-  { href: "/staff/triage", label: text("Sàng lọc AI"), group: "admissions", permission: "triage.read" },
-  { href: "/staff/approvals", label: text("Phê duyệt"), group: "admissions", permission: "decision.approve" },
-  { href: "/intakes", label: text("Đợt tuyển"), group: "admissions", permission: "intake.manage" },
-  { href: "/cohorts", label: text("Khoá học"), group: "training", permission: "cohort.read" },
-  { href: "/mentor", label: text("Học viên của tôi"), group: "training", permission: "mentor.assess" },
-  { href: "/analytics", label: text("Phễu và công bằng"), group: "insight", permission: "analytics.read", exact: true },
-  { href: "/analytics/lab", label: text("Rubric Lab"), group: "insight", permission: "analytics.read" },
-  { href: "/admin", label: text("Tổng quan hệ thống"), group: "admin", permission: "audit.read", exact: true },
-  { href: "/admin/users", label: text("Tài khoản"), group: "admin", permission: "user.manage" },
-  { href: "/admin/documents", label: text("Tài liệu"), group: "admin", permission: "kb.manage" },
-  { href: "/admin/costs", label: text("Chi phí"), group: "admin", permission: "cost.read" },
-  { href: "/admin/settings", label: text("Cài đặt"), group: "admin", permission: "user.manage" },
+  { href: "/apply", label: (t) => t.nav.items.myApplications, group: "admissions", permission: "application.read.own" },
+  { href: "/staff/queue", label: (t) => t.nav.items.queue, group: "admissions", permission: "application.read" },
+  { href: "/staff/triage", label: (t) => t.nav.items.triage, group: "admissions", permission: "triage.read" },
+  { href: "/staff/approvals", label: (t) => t.nav.items.approvals, group: "admissions", permission: "decision.approve" },
+  { href: "/intakes", label: (t) => t.nav.items.intakes, group: "admissions", permission: "intake.manage" },
+  { href: "/cohorts", label: (t) => t.nav.items.cohorts, group: "training", permission: "cohort.read" },
+  { href: "/mentor", label: (t) => t.nav.items.mentees, group: "training", permission: "mentor.assess" },
+  { href: "/analytics", label: (t) => t.nav.items.funnel, group: "insight", permission: "analytics.read", exact: true },
+  { href: "/analytics/lab", label: (t) => t.nav.items.lab, group: "insight", permission: "analytics.read" },
+  { href: "/admin", label: (t) => t.nav.items.adminOverview, group: "admin", permission: "audit.read", exact: true },
+  { href: "/admin/users", label: (t) => t.nav.items.accounts, group: "admin", permission: "user.manage" },
+  { href: "/admin/documents", label: (t) => t.nav.items.documents, group: "admin", permission: "kb.manage" },
+  { href: "/admin/costs", label: (t) => t.nav.items.costs, group: "admin", permission: "cost.read" },
+  { href: "/admin/settings", label: (t) => t.nav.items.settings, group: "admin", permission: "user.manage" },
   { href: "/admin/audit-logs", label: (t) => t.nav.audit, group: "admin", permission: "audit.read" },
 ];
 

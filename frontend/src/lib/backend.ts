@@ -22,7 +22,14 @@ export function buildBackendHeaders(ctx: ForwardContext): Headers {
   if (ctx.contentType) headers.set("content-type", ctx.contentType);
   if (ctx.origin) headers.set("origin", ctx.origin);
   headers.set("accept", ctx.accept ?? "application/json");
+  // Ngôn ngữ giao diện (cookie `locale`) để backend trả thông điệp lỗi đúng ngôn ngữ người dùng đang xem.
+  headers.set("accept-language", localeFromCookie(ctx.cookie));
   return headers;
+}
+
+function localeFromCookie(cookie: string | null | undefined): string {
+  const match = /(?:^|;\s*)locale=([a-z]{2})(?:;|$)/.exec(cookie ?? "");
+  return match?.[1] === "en" ? "en" : "vi";
 }
 
 export function backendFetch(path: string, init: RequestInit & { headers: Headers }): Promise<Response> {

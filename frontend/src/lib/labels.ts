@@ -1,152 +1,214 @@
-/** Nhãn và sắc thái hiển thị cho các giá trị trạng thái do BE trả về (khu nhân sự/quản trị dùng tiếng Việt). */
+/** Nhãn và sắc thái hiển thị cho các giá trị trạng thái do BE trả về, theo ngôn ngữ giao diện.
+ *
+ * Trong component dùng `useLabels()` (components/providers). Các export ở cuối là bản tiếng Việt cho mã cũ.
+ */
+import type { Locale } from "./i18n";
 
 export type Tone = "info" | "success" | "warning" | "danger";
 type Entry = readonly [label: string, tone: Tone];
+type Bi = readonly [vi: string, en: string];
+type Table = Record<string, readonly [vi: string, en: string, tone: Tone]>;
 
-function lookup(table: Record<string, Entry>, key: string | null | undefined): Entry {
-  if (!key) return ["—", "info"];
-  return table[key] ?? [key, "info"];
-}
-
-const APPLICATION_STATUS: Record<string, Entry> = {
-  DRAFT: ["Bản nháp", "info"],
-  SUBMITTED: ["Đã nộp", "info"],
-  IN_ROUND: ["Đang xét", "info"],
-  NEEDS_INFO: ["Cần bổ sung", "warning"],
-  PENDING_APPROVAL: ["Chờ phê duyệt", "warning"],
-  ACCEPTED: ["Được nhận", "success"],
-  REJECTED: ["Không đạt", "danger"],
-  WAITLISTED: ["Dự bị", "warning"],
-  ENROLLED: ["Đã nhập học", "success"],
-  WITHDRAWN: ["Đã rút hồ sơ", "danger"],
+const APPLICATION_STATUS: Table = {
+  DRAFT: ["Bản nháp", "Draft", "info"],
+  SUBMITTED: ["Đã nộp", "Submitted", "info"],
+  IN_ROUND: ["Đang xét", "In review", "info"],
+  NEEDS_INFO: ["Cần bổ sung", "Needs information", "warning"],
+  PENDING_APPROVAL: ["Chờ phê duyệt", "Pending approval", "warning"],
+  ACCEPTED: ["Được nhận", "Accepted", "success"],
+  REJECTED: ["Không đạt", "Not accepted", "danger"],
+  WAITLISTED: ["Dự bị", "Waitlisted", "warning"],
+  ENROLLED: ["Đã nhập học", "Enrolled", "success"],
+  WITHDRAWN: ["Đã rút hồ sơ", "Withdrawn", "danger"],
 };
 
-const INTAKE_STATUS: Record<string, Entry> = {
-  draft: ["Nháp", "info"],
-  open: ["Đang mở", "success"],
-  closed: ["Đã đóng", "warning"],
-  archived: ["Lưu trữ", "info"],
+const INTAKE_STATUS: Table = {
+  draft: ["Nháp", "Draft", "info"],
+  open: ["Đang mở", "Open", "success"],
+  closed: ["Đã đóng", "Closed", "warning"],
+  archived: ["Lưu trữ", "Archived", "info"],
 };
 
-const TIER: Record<string, Entry> = {
-  invite: ["Nên mời", "success"],
-  review: ["Cần xem xét", "warning"],
-  decline_likely: ["Khả năng loại", "danger"],
+const TIER: Table = {
+  invite: ["Nên mời", "Invite", "success"],
+  review: ["Cần xem xét", "Review", "warning"],
+  decline_likely: ["Khả năng loại", "Likely decline", "danger"],
 };
 
-const OUTCOME: Record<string, Entry> = {
-  accepted: ["Nhận", "success"],
-  rejected: ["Không nhận", "danger"],
-  waitlisted: ["Dự bị", "warning"],
+const OUTCOME: Table = {
+  accepted: ["Nhận", "Accept", "success"],
+  rejected: ["Không nhận", "Reject", "danger"],
+  waitlisted: ["Dự bị", "Waitlist", "warning"],
 };
 
-const ENROLLMENT_STATUS: Record<string, Entry> = {
-  active: ["Đang học", "info"],
-  withdrawn: ["Đã rút", "danger"],
-  qualified: ["Đạt", "success"],
-  not_qualified: ["Chưa đạt", "danger"],
+const ENROLLMENT_STATUS: Table = {
+  active: ["Đang học", "Studying", "info"],
+  withdrawn: ["Đã rút", "Withdrawn", "danger"],
+  qualified: ["Đạt", "Qualified", "success"],
+  not_qualified: ["Chưa đạt", "Not qualified", "danger"],
 };
 
-const ACCOUNT_STATUS: Record<string, Entry> = {
-  invited: ["Đã mời", "warning"],
-  active: ["Hoạt động", "success"],
-  suspended: ["Bị khoá", "danger"],
+const ACCOUNT_STATUS: Table = {
+  invited: ["Đã mời", "Invited", "warning"],
+  active: ["Hoạt động", "Active", "success"],
+  suspended: ["Bị khoá", "Suspended", "danger"],
 };
 
-const JOB_STATUS: Record<string, Entry> = {
-  queued: ["Đang chờ", "info"],
-  running: ["Đang chạy", "info"],
-  done: ["Hoàn tất", "success"],
-  failed: ["Lỗi", "danger"],
+const JOB_STATUS: Table = {
+  queued: ["Đang chờ", "Queued", "info"],
+  running: ["Đang chạy", "Running", "info"],
+  done: ["Hoàn tất", "Done", "success"],
+  failed: ["Lỗi", "Failed", "danger"],
 };
 
-const DOC_STATUS: Record<string, Entry> = {
-  ready: ["Sẵn sàng", "success"],
-  failed: ["Lỗi xử lý", "danger"],
-  retired: ["Đã gỡ", "warning"],
+const DOC_STATUS: Table = {
+  ready: ["Sẵn sàng", "Ready", "success"],
+  failed: ["Lỗi xử lý", "Processing failed", "danger"],
+  retired: ["Đã gỡ", "Retired", "warning"],
 };
 
-const SUGGESTION: Record<string, Entry> = {
-  qualified: ["Gợi ý: đạt", "success"],
-  not_qualified: ["Gợi ý: chưa đạt", "danger"],
-  pending: ["Chưa đủ đánh giá", "warning"],
-  no_targets: ["Chưa có chuẩn năng lực", "info"],
+const SUGGESTION: Table = {
+  qualified: ["Gợi ý: đạt", "Suggested: qualified", "success"],
+  not_qualified: ["Gợi ý: chưa đạt", "Suggested: not qualified", "danger"],
+  pending: ["Chưa đủ đánh giá", "Not enough assessments", "warning"],
+  no_targets: ["Chưa có chuẩn năng lực", "No competency targets", "info"],
 };
 
-const RECOMMENDATION: Record<string, Entry> = {
-  advance: ["Cho đi tiếp", "success"],
-  waitlist: ["Dự bị", "warning"],
-  reject: ["Không đạt", "danger"],
+const RECOMMENDATION: Table = {
+  advance: ["Cho đi tiếp", "Advance", "success"],
+  waitlist: ["Dự bị", "Waitlist", "warning"],
+  reject: ["Không đạt", "Reject", "danger"],
 };
 
 export const RECOMMENDATIONS = ["advance", "waitlist", "reject"] as const;
 
-export const applicationStatus = (s: string | null | undefined) => lookup(APPLICATION_STATUS, s);
-export const intakeStatus = (s: string | null | undefined) => lookup(INTAKE_STATUS, s);
-export const tierLabel = (s: string | null | undefined) => lookup(TIER, s);
-export const outcomeLabel = (s: string | null | undefined) => lookup(OUTCOME, s);
-export const enrollmentStatus = (s: string | null | undefined) => lookup(ENROLLMENT_STATUS, s);
-export const accountStatus = (s: string | null | undefined) => lookup(ACCOUNT_STATUS, s);
-export const jobStatus = (s: string | null | undefined) => lookup(JOB_STATUS, s);
-export const docStatus = (s: string | null | undefined) => lookup(DOC_STATUS, s);
-export const suggestionLabel = (s: string | null | undefined) => lookup(SUGGESTION, s);
-export const recommendationLabel = (s: string | null | undefined) => lookup(RECOMMENDATION, s);
-
-export const ROLE_LABELS: Record<string, string> = {
-  applicant: "Ứng viên",
-  reviewer: "Người chấm hồ sơ",
-  approver: "Người phê duyệt",
-  cohort_manager: "Quản lý khoá học",
-  training_manager: "Quản lý đào tạo",
-  mentor: "Mentor",
-  admin: "Quản trị viên (IT)",
-  platform_admin: "Quản trị nền tảng",
+const ROLES: Record<string, Bi> = {
+  applicant: ["Ứng viên", "Applicant"],
+  reviewer: ["Người chấm hồ sơ", "Reviewer"],
+  approver: ["Người phê duyệt", "Approver"],
+  cohort_manager: ["Quản lý khoá học", "Cohort manager"],
+  training_manager: ["Quản lý đào tạo", "Training manager"],
+  mentor: ["Mentor", "Mentor"],
+  admin: ["Quản trị viên (IT)", "Administrator (IT)"],
+  platform_admin: ["Quản trị nền tảng", "Platform admin"],
 };
 
-export const COST_CATEGORY_LABELS: Record<string, string> = {
-  stipend: "Phụ cấp học viên",
-  ai: "Chi phí AI",
-  infrastructure: "Hạ tầng",
-  partner: "Đối tác",
-  operations: "Vận hành",
-  other: "Khác",
+const COST_CATEGORIES: Record<string, Bi> = {
+  stipend: ["Phụ cấp học viên", "Learner stipends"],
+  ai: ["Chi phí AI", "AI costs"],
+  infrastructure: ["Hạ tầng", "Infrastructure"],
+  partner: ["Đối tác", "Partners"],
+  operations: ["Vận hành", "Operations"],
+  other: ["Khác", "Other"],
 };
 
-export const SETTING_LABELS: Record<string, string> = {
-  usd_vnd_rate: "Tỷ giá USD/VND",
-  ai_monthly_budget_usd: "Trần chi phí AI hằng tháng (USD)",
-  ai_engine: "Động cơ sàng lọc AI",
-  stipend_vnd_per_month: "Phụ cấp mỗi học viên mỗi tháng (VND)",
-  invite_ttl_hours: "Thời hạn link lời mời (giờ)",
-  microsoft_signup: "Ứng viên tự đăng ký bằng Microsoft",
-  microsoft_allowed_tenants: "Giới hạn tenant Microsoft được phép",
+const SETTINGS: Record<string, Bi> = {
+  usd_vnd_rate: ["Tỷ giá USD/VND", "USD/VND exchange rate"],
+  ai_monthly_budget_usd: ["Trần chi phí AI hằng tháng (USD)", "Monthly AI budget cap (USD)"],
+  ai_engine: ["Động cơ sàng lọc AI", "AI screening engine"],
+  assistant_engine: ["Động cơ trợ lý hỏi đáp", "Q&A assistant engine"],
+  stipend_vnd_per_month: ["Phụ cấp mỗi học viên mỗi tháng (VND)", "Monthly stipend per learner (VND)"],
+  invite_ttl_hours: ["Thời hạn link lời mời (giờ)", "Invitation link lifetime (hours)"],
+  microsoft_signup: ["Ứng viên tự đăng ký bằng Microsoft", "Applicant self-signup with Microsoft"],
+  microsoft_allowed_tenants: ["Giới hạn tenant Microsoft được phép", "Allowed Microsoft tenants"],
 };
 
-export const FIELD_LABELS: Record<string, string> = {
-  "profile.full_name": "Họ tên",
-  "profile.phone": "Số điện thoại",
-  "content.education": "Học vấn",
-  "content.skills": "Kỹ năng",
-  "content.essays.motivation": "Động lực",
+const FIELDS: Record<string, Bi> = {
+  "profile.full_name": ["Họ tên", "Full name"],
+  "profile.phone": ["Số điện thoại", "Phone number"],
+  "content.education": ["Học vấn", "Education"],
+  "content.skills": ["Kỹ năng", "Skills"],
+  "content.essays.motivation": ["Động lực", "Motivation"],
 };
 
-const EVENT_LABELS: Record<string, string> = {
-  "application.created": "Tạo hồ sơ",
-  "application.submitted": "Đã nộp hồ sơ",
-  "status.in_round": "Bắt đầu xét vòng đầu",
-  "round.advanced": "Chuyển sang vòng tiếp theo",
-  "info.requested": "Cần bổ sung thông tin",
-  "application.info_provided": "Đã bổ sung thông tin",
-  "decision.proposed": "Có đề xuất quyết định, chờ phê duyệt",
-  "decision.returned": "Đề xuất được trả lại để xem xét thêm",
-  "decision.accepted": "Hồ sơ được nhận",
-  "decision.rejected": "Hồ sơ không đạt",
-  "decision.waitlisted": "Vào danh sách dự bị",
-  "application.enrolled": "Đã nhập học",
-  "application.withdrawn": "Đã rút hồ sơ",
-  "round.started": "Bắt đầu xét vòng đầu",
+const EVENTS: Record<string, Bi> = {
+  "application.created": ["Tạo hồ sơ", "Application created"],
+  "application.submitted": ["Đã nộp hồ sơ", "Application submitted"],
+  "status.in_round": ["Bắt đầu xét vòng đầu", "First round review started"],
+  "round.advanced": ["Chuyển sang vòng tiếp theo", "Moved to the next round"],
+  "info.requested": ["Cần bổ sung thông tin", "More information requested"],
+  "application.info_provided": ["Đã bổ sung thông tin", "Information provided"],
+  "decision.proposed": ["Có đề xuất quyết định, chờ phê duyệt", "Decision proposed, awaiting approval"],
+  "decision.returned": ["Đề xuất được trả lại để xem xét thêm", "Proposal returned for further review"],
+  "decision.accepted": ["Hồ sơ được nhận", "Application accepted"],
+  "decision.rejected": ["Hồ sơ không đạt", "Application not accepted"],
+  "decision.waitlisted": ["Vào danh sách dự bị", "Added to the waitlist"],
+  "application.enrolled": ["Đã nhập học", "Enrolled"],
+  "application.withdrawn": ["Đã rút hồ sơ", "Application withdrawn"],
+  "round.started": ["Bắt đầu xét vòng đầu", "First round review started"],
 };
 
-export function eventLabel(type: string): string {
-  return EVENT_LABELS[type] ?? (type.startsWith("status.") ? "Cập nhật trạng thái" : type);
+const STATUS_UPDATED: Bi = ["Cập nhật trạng thái", "Status updated"];
+
+export interface Labels {
+  applicationStatus: (s: string | null | undefined) => Entry;
+  intakeStatus: (s: string | null | undefined) => Entry;
+  tier: (s: string | null | undefined) => Entry;
+  outcome: (s: string | null | undefined) => Entry;
+  enrollmentStatus: (s: string | null | undefined) => Entry;
+  accountStatus: (s: string | null | undefined) => Entry;
+  jobStatus: (s: string | null | undefined) => Entry;
+  docStatus: (s: string | null | undefined) => Entry;
+  suggestion: (s: string | null | undefined) => Entry;
+  recommendation: (s: string | null | undefined) => Entry;
+  role: (code: string) => string;
+  costCategory: (code: string) => string;
+  setting: (key: string) => string;
+  field: (path: string) => string;
+  event: (type: string) => string;
 }
+
+const cache = new Map<Locale, Labels>();
+
+export function labels(locale: Locale): Labels {
+  const hit = cache.get(locale);
+  if (hit) return hit;
+  const i = locale === "vi" ? 0 : 1;
+  const status = (table: Table) => (s: string | null | undefined): Entry => {
+    if (!s) return ["—", "info"];
+    const row = table[s];
+    return row ? [row[i], row[2]] : [s, "info"];
+  };
+  const text = (table: Record<string, Bi>) => (key: string) => table[key]?.[i] ?? key;
+  const l: Labels = {
+    applicationStatus: status(APPLICATION_STATUS),
+    intakeStatus: status(INTAKE_STATUS),
+    tier: status(TIER),
+    outcome: status(OUTCOME),
+    enrollmentStatus: status(ENROLLMENT_STATUS),
+    accountStatus: status(ACCOUNT_STATUS),
+    jobStatus: status(JOB_STATUS),
+    docStatus: status(DOC_STATUS),
+    suggestion: status(SUGGESTION),
+    recommendation: status(RECOMMENDATION),
+    role: text(ROLES),
+    costCategory: text(COST_CATEGORIES),
+    setting: text(SETTINGS),
+    field: text(FIELDS),
+    event: (type) => EVENTS[type]?.[i] ?? (type.startsWith("status.") ? STATUS_UPDATED[i] : type),
+  };
+  cache.set(locale, l);
+  return l;
+}
+
+// ---- Bản tiếng Việt cho mã chưa chuyển sang useLabels() ----
+const vi = labels("vi");
+export const applicationStatus = vi.applicationStatus;
+export const intakeStatus = vi.intakeStatus;
+export const tierLabel = vi.tier;
+export const outcomeLabel = vi.outcome;
+export const enrollmentStatus = vi.enrollmentStatus;
+export const accountStatus = vi.accountStatus;
+export const jobStatus = vi.jobStatus;
+export const docStatus = vi.docStatus;
+export const suggestionLabel = vi.suggestion;
+export const recommendationLabel = vi.recommendation;
+export const eventLabel = vi.event;
+const viTable = (table: Record<string, Bi>) => Object.fromEntries(Object.entries(table).map(([k, v]) => [k, v[0]]));
+export const ROLE_LABELS: Record<string, string> = viTable(ROLES);
+export const COST_CATEGORY_LABELS: Record<string, string> = viTable(COST_CATEGORIES);
+export const SETTING_LABELS: Record<string, string> = viTable(SETTINGS);
+export const FIELD_LABELS: Record<string, string> = viTable(FIELDS);
+/** Danh sách mã (không kèm nhãn) để dựng ô chọn. */
+export const ROLE_CODES = Object.keys(ROLES);
+export const COST_CATEGORY_CODES = Object.keys(COST_CATEGORIES);

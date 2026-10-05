@@ -17,7 +17,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const items = visibleNav(me.permissions);
   const groups = (Object.keys(NAV_GROUPS) as (keyof typeof NAV_GROUPS)[])
-    .map((key) => ({ key, title: NAV_GROUPS[key], items: items.filter((i) => i.group === key) }))
+    .map((key) => ({ key, title: NAV_GROUPS[key]?.(t) ?? null, items: items.filter((i) => i.group === key) }))
     .filter((g) => g.items.length > 0);
   return (
     <nav aria-label={t.nav.primary}>

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
+import type { Locale } from "./i18n";
 
 /** Đọc dữ liệu; truyền `null` để tạm tắt (ví dụ khi chưa chọn đợt tuyển). */
 export function useGet<T>(
@@ -46,12 +47,30 @@ export function useSend<TOut = unknown, TIn = void>(
 }
 
 /** Thông điệp hiển thị cho người dùng từ một lỗi bất kỳ. */
-export function errorText(error: unknown, fallback = "Đã có lỗi xảy ra. Vui lòng thử lại."): string {
+const ERRORS = {
+  vi: {
+    generic: "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    forbidden: "Bạn không có quyền thực hiện thao tác này.",
+    rateLimited: "Thao tác quá nhanh, vui lòng thử lại sau ít phút.",
+    code: (id: string) => ` (mã ${id})`,
+  },
+  en: {
+    generic: "Something went wrong. Please try again.",
+    forbidden: "You don't have permission to do this.",
+    rateLimited: "Too many requests. Please try again in a few minutes.",
+    code: (id: string) => ` (ref ${id})`,
+  },
+} satisfies Record<Locale, unknown>;
+
+/** Thông điệp lỗi nghiệp vụ (4xx) do backend trả về đã theo ngôn ngữ người dùng (BFF gửi Accept-Language). */
+export function errorText(error: unknown, fallback?: string, locale: Locale = "vi"): string {
+  const m = ERRORS[locale];
+  const base = fallback ?? m.generic;
   if (error instanceof ApiError) {
-    if (error.status === 403) return "Bạn không có quyền thực hiện thao tác này.";
-    if (error.status === 429) return "Thao tác quá nhanh, vui lòng thử lại sau ít phút.";
-    if (error.status >= 500) return `${fallback}${error.requestId ? ` (mã ${error.requestId.slice(0, 8)})` : ""}`;
-    return error.message || fallback;
+    if (error.status === 403) return m.forbidden;
+    if (error.status === 429) return m.rateLimited;
+    if (error.status >= 500) return `${base}${error.requestId ? m.code(error.requestId.slice(0, 8)) : ""}`;
+    return error.message || base;
   }
-  return fallback;
+  return base;
 }
