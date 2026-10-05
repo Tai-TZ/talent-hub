@@ -14,6 +14,21 @@ from src.models.admissions import (
     Rubric,
 )
 from src.models.base import Base
+from src.models.cohort import (
+    CohortClass,
+    CohortTrack,
+    Competency,
+    CompetencyAssessment,
+    ComposerRun,
+    Enrollment,
+    Partner,
+    PartnerDemand,
+    Placement,
+    RoundResult,
+    StipendEntry,
+    Track,
+    TrackTarget,
+)
 from src.models.identity import (
     AuditLog,
     Organization,
@@ -25,6 +40,19 @@ from src.models.identity import (
 )
 
 __all__ = [
+    "CohortClass",
+    "CohortTrack",
+    "Competency",
+    "CompetencyAssessment",
+    "ComposerRun",
+    "Enrollment",
+    "Partner",
+    "PartnerDemand",
+    "Placement",
+    "RoundResult",
+    "StipendEntry",
+    "Track",
+    "TrackTarget",
     "Budget",
     "CostEntry",
     "EmailOutbox",
