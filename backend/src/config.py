@@ -47,6 +47,18 @@ class Settings(BaseSettings):
     password_hash_concurrency: int = 4
 
     max_body_bytes: int = 1_048_576
+    max_upload_bytes: int = 22_000_000  # 15 MB tệp sau khi mã hoá base64
+
+    # Email: console (ghi log) | smtp | none. Local dùng Mailpit tại localhost:1025 khi chọn smtp.
+    email_backend: str = "console"
+    email_from: str = "Talent Hub <no-reply@talenthub.local>"
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    smtp_starttls: bool = False
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    # Gốc URL của giao diện, dùng để dựng link trong email (lời mời, đặt lại mật khẩu).
+    public_base_url: str = "http://localhost:3000"
 
     # AI: "heuristic" chạy offline không cần khoá; "llm" dùng Claude và tự lùi về luật khi dịch vụ lỗi.
     ai_engine: str = "heuristic"

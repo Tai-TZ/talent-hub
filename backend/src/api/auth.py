@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from src.api.deps import Principal, current_principal, request_meta
 from src.config import get_settings
 from src.errors import InvalidCredentialsError, InvalidRefreshTokenError, RateLimitedError
+from src.services import accounts
 from src.services import auth as auth_service
 from src.services.audit import RequestMeta
 from src.services.auth import SessionResult, SessionTokens
@@ -148,3 +149,38 @@ async def me(principal: Principal = Depends(current_principal), db: OrgDb = Depe
         permissions=sorted(permissions_for(principal.roles)),
         must_change_password=principal.must_change_password,
     )
+
+
+class AcceptIn(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    password: str = Field(min_length=1, max_length=256)
+
+
+def _mask_email(email: str) -> str:
+    local, _, domain = email.partition("@")
+    return f"{local[:1]}{'*' * max(len(local) - 1, 2)}@{domain}"
+
+
+@router.get("/invitations/{token}")
+async def invitation_preview(token: str, request: Request, db: OrgDb = Depends(org_db)) -> dict[str, object]:
+    await _throttle_login(request, request_meta(request))
+    _, membership, user = await accounts.accept_invitation(db, token=token, password=None)
+    inv_kind = "reset" if membership.status == "active" else "invite"
+    return {
+        "organization": db.org.name,
+        "email": _mask_email(user.email),
+        "kind": inv_kind,
+        # Người đã có mật khẩu ở nơi khác phải nhập đúng mật khẩu đó, không được đặt lại.
+        "has_password": user.password_hash is not None and inv_kind == "invite",
+    }
+
+
+@router.post("/invitations/accept", response_model=MeOut)
+async def accept_invitation(body: AcceptIn, request: Request, response: Response, db: OrgDb = Depends(org_db)) -> MeOut:
+    meta = request_meta(request)
+    await _throttle_login(request, meta)
+    result = await accounts.accept(db, token=body.token, password=body.password, meta=meta)
+    out = _me_from_session(result, db)
+    await db.commit()
+    _set_cookies(response, result.tokens)
+    return out

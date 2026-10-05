@@ -193,13 +193,20 @@ async def logout(db: OrgDb, *, raw_token: str, meta: RequestMeta) -> None:
     await db.commit()
 
 
-def validate_new_password(new_password: str, *, current_password: str, email: str) -> None:
+def check_password_strength(new_password: str, *, email: str) -> None:
     if len(new_password) < MIN_PASSWORD_LENGTH:
         raise PasswordPolicyError(f"Mật khẩu mới phải có ít nhất {MIN_PASSWORD_LENGTH} ký tự")
+    if len(new_password) > 256:
+        raise PasswordPolicyError("Mật khẩu quá dài")
+    local = email.split("@")[0].lower()
+    if new_password.lower() == email.lower() or (len(local) >= 3 and local in new_password.lower()):
+        raise PasswordPolicyError("Mật khẩu không được chứa tên tài khoản email")
+
+
+def validate_new_password(new_password: str, *, current_password: str, email: str) -> None:
+    check_password_strength(new_password, email=email)
     if new_password == current_password:
         raise PasswordPolicyError("Mật khẩu mới phải khác mật khẩu hiện tại")
-    if new_password.lower() == email.lower() or email.split("@")[0].lower() in new_password.lower():
-        raise PasswordPolicyError("Mật khẩu không được chứa tên tài khoản email")
 
 
 async def change_password(

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from src.api.admin import router as admin_router
 from src.api.applications import router as applications_router
 from src.api.audit import router as audit_router
 from src.api.auth import me_router
@@ -88,7 +89,14 @@ def create_app() -> FastAPI:
     app.include_router(me_router, prefix="/api/v1")
     app.include_router(audit_router, prefix="/api/v1")
     app.include_router(org_router, prefix="/api/v1")
-    for router in (intakes_router, applications_router, staff_router, notifications_router, triage_router):
+    for router in (
+        intakes_router,
+        applications_router,
+        staff_router,
+        notifications_router,
+        triage_router,
+        admin_router,
+    ):
         app.include_router(router, prefix="/api/v1")
     return app
 

@@ -11,7 +11,7 @@ from src.ai.factory import get_engine
 from src.api.deps import Principal, request_meta, require
 from src.config import get_settings
 from src.errors import ConflictError
-from src.services import jobs, triage
+from src.services import costs, jobs, org_settings, triage
 from src.services.audit import write_audit
 from src.services.intakes import get_intake
 from src.services.tenancy import OrgDb, org_db
@@ -46,7 +46,11 @@ async def start_triage(
     principal: Principal = Depends(require("triage.run")),
     db: OrgDb = Depends(org_db),
 ) -> dict[str, Any]:
+    org_engine = str(await org_settings.get(db, "ai_engine"))
+    engine = getattr(request.app.state, "screening_engine", None) or get_engine(get_settings(), org_engine)
     round_key, total = await triage.preflight(db, intake_id, body.round)
+    if engine.name.startswith("llm"):
+        await costs.ai_budget_guard(db)  # chặn khi đã chạm trần chi phí AI của tháng
     if await jobs.active_job(db, "triage", "intake_id", str(intake_id)) is not None:
         raise ConflictError("Đang có một lượt sàng lọc chạy cho đợt tuyển này")
     job = await jobs.create_job(
@@ -68,7 +72,6 @@ async def start_triage(
     org_id, job_id = db.org.id, job.id
     await db.commit()
 
-    engine = getattr(request.app.state, "screening_engine", None) or get_engine(get_settings())
     work = functools.partial(
         triage.run_triage, engine=engine, intake_id=intake_id, round_key=round_key, force=body.force
     )

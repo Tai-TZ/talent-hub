@@ -18,6 +18,8 @@ logger = logging.getLogger("talenthub.access")
 UNSAFE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9-]{8,64}$")
 DOC_PATHS = ("/docs", "/redoc", "/openapi.json")
+# Chỉ endpoint tải tài liệu được nhận body lớn (JSON base64); mọi nơi khác giữ giới hạn nhỏ.
+UPLOAD_PATH = "/api/v1/admin/documents"
 
 
 class RequestContextMiddleware:
@@ -25,6 +27,7 @@ class RequestContextMiddleware:
         self.app = app
         self.allowed_origins = frozenset(settings.allowed_origins)
         self.max_body = settings.max_body_bytes
+        self.max_upload = settings.max_upload_bytes
         self.hsts = settings.cookie_secure
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
@@ -62,7 +65,7 @@ class RequestContextMiddleware:
             await send(message)
 
         try:
-            rejection = self._reject(method, headers)
+            rejection = self._reject(method, headers, path)
             if rejection is not None:
                 await rejection(scope, receive, send_wrapper)
             else:
@@ -80,7 +83,7 @@ class RequestContextMiddleware:
                 )
             request_id_var.reset(token)
 
-    def _reject(self, method: str, headers: Headers) -> JSONResponse | None:
+    def _reject(self, method: str, headers: Headers, path: str) -> JSONResponse | None:
         if method not in UNSAFE_METHODS:
             return None
         # Chặn CSRF: yêu cầu ghi từ trình duyệt phải đến từ nguồn được phép.
@@ -88,6 +91,7 @@ class RequestContextMiddleware:
         if origin is not None and origin not in self.allowed_origins:
             return JSONResponse(status_code=403, content={"detail": "Nguồn yêu cầu không được phép"})
         length = headers.get("content-length")
-        if length is not None and (not length.isdigit() or int(length) > self.max_body):
+        limit = self.max_upload if method == "POST" and path == UPLOAD_PATH else self.max_body
+        if length is not None and (not length.isdigit() or int(length) > limit):
             return JSONResponse(status_code=413, content={"detail": "Nội dung yêu cầu quá lớn"})
         return None

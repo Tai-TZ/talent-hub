@@ -73,6 +73,20 @@ def spawn(
     task.add_done_callback(_tasks.discard)
 
 
+def background(coro: Awaitable[Any]) -> None:
+    """Chạy việc nền không cần theo dõi (ví dụ gửi email), giữ tham chiếu và ghi log nếu lỗi."""
+
+    async def run() -> None:
+        try:
+            await coro
+        except Exception:  # noqa: BLE001 - việc nền không được làm sập tiến trình
+            logger.exception("background task failed")
+
+    task = asyncio.create_task(run())
+    _tasks.add(task)
+    task.add_done_callback(_tasks.discard)
+
+
 async def set_progress(org_id: uuid.UUID, job_id: uuid.UUID, *, done: int, total: int | None = None) -> None:
     values: dict[str, Any] = {"done": done}
     if total is not None:
