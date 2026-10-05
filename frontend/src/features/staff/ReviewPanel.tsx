@@ -14,7 +14,7 @@ import { RECOMMENDATIONS, recommendationLabel } from "@/lib/labels";
 import { computeTotal } from "./evidence";
 
 /** Thang điểm dạng nút chọn (nhanh hơn thanh trượt, phân biệt được "chưa chấm" với "0"); thang lớn hơn 10 dùng ô nhập số. */
-function ScorePicker({ name, label, help, max, value, onChange }: { name: string; label: string; help?: string; max: number; value: number | undefined; onChange: (v: number) => void }) {
+export function ScorePicker({ name, label, help, max, value, onChange }: { name: string; label: string; help?: string; max: number; value: number | undefined; onChange: (v: number | undefined) => void }) {
   const options = Number.isInteger(max) && max <= 10 ? Array.from({ length: max + 1 }, (_, i) => i) : null;
   return (
     <fieldset className="plain-fieldset stack">
@@ -41,7 +41,8 @@ function ScorePicker({ name, label, help, max, value, onChange }: { name: string
           step={0.5}
           value={value ?? ""}
           aria-label={`Điểm ${label} (0 đến ${max})`}
-          onChange={(e) => (e.target.value === "" ? undefined : onChange(Math.min(max, Math.max(0, Number(e.target.value)))))}
+          // Ô trống nghĩa là "chưa chấm": phải báo lên để xoá điểm, nếu không ô số bị kéo về giá trị cũ và không xoá được.
+          onChange={(e) => onChange(e.target.value === "" ? undefined : Math.min(max, Math.max(0, Number(e.target.value))))}
         />
       )}
     </fieldset>
@@ -127,7 +128,14 @@ export function ReviewPanel({ app, onChanged }: { app: StaffApplication; onChang
           help={c.description || undefined}
           max={c.max}
           value={scores[c.id]}
-          onChange={(v) => setScores((prev) => ({ ...prev, [c.id]: v }))}
+          onChange={(v) =>
+            setScores((prev) => {
+              const next = { ...prev };
+              if (v === undefined) delete next[c.id];
+              else next[c.id] = v;
+              return next;
+            })
+          }
         />
       ))}
 
