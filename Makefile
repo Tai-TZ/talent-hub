@@ -1,4 +1,4 @@
-.PHONY: db-up db-down migrate seed run-be run-fe test-be test-fe lint typecheck check e2e audit
+.PHONY: api-types db-up db-down migrate seed run-be run-fe test-be test-fe lint typecheck check e2e audit
 
 BE = backend
 FE = frontend
@@ -36,6 +36,11 @@ test-fe:
 
 e2e:
 	cd $(FE) && npm run e2e
+
+# Sinh lại kiểu TypeScript của FE từ OpenAPI của BE (chạy sau mỗi lần đổi API)
+api-types:
+	cd $(BE) && ../$(PY) -m src.cli openapi --out ../$(FE)/openapi.json
+	cd $(FE) && npm run api:types
 
 # ---- Chất lượng ----
 lint:

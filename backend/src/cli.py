@@ -182,6 +182,17 @@ async def cmd_seed_demo(args: argparse.Namespace) -> None:
     print(f"  Đợt đang tuyển: {summary['current']['applications']} hồ sơ đã nộp (id {summary['current']['intake_id']})")
 
 
+async def cmd_openapi(args: argparse.Namespace) -> None:
+    import json
+
+    from src.main import create_app
+
+    spec = json.dumps(create_app().openapi(), ensure_ascii=False, indent=2, sort_keys=True)
+    with open(args.out, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(spec + "\n")
+    print(f"Đã ghi {args.out}")
+
+
 def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
     parser = argparse.ArgumentParser(prog="src.cli")
@@ -202,6 +213,10 @@ def main() -> None:
     demo.add_argument("--org", default="northwind")
     demo.add_argument("--current", type=int, default=600)
     demo.set_defaults(func=cmd_seed_demo)
+
+    spec = sub.add_parser("openapi", help="Xuất đặc tả OpenAPI để FE sinh kiểu TypeScript")
+    spec.add_argument("--out", default="openapi.json")
+    spec.set_defaults(func=cmd_openapi)
 
     args = parser.parse_args()
     asyncio.run(args.func(args))
