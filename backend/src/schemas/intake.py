@@ -1,9 +1,8 @@
 import re
 import uuid
-from datetime import datetime
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
 SLUG = re.compile(r"^[a-z][a-z0-9_]{1,39}$")
 
@@ -69,8 +68,9 @@ class IntakeIn(BaseModel):
     cohort_id: uuid.UUID | None = None
     name: Annotated[str, Field(min_length=1, max_length=200)]
     description: Annotated[str, Field(max_length=4000)] = ""
-    opens_at: datetime
-    closes_at: datetime
+    # Bắt buộc có múi giờ: so sánh với cột timestamptz của DB, giá trị "naive" sẽ gây TypeError (500).
+    opens_at: AwareDatetime
+    closes_at: AwareDatetime
     quota: int = Field(gt=0, le=100000)
     rounds: Annotated[list[RoundIn], Field(min_length=1, max_length=6)]
     approval_mode: Literal["two_level"] = "two_level"
@@ -95,7 +95,7 @@ class IntakePatch(BaseModel):
 
     name: Annotated[str, Field(min_length=1, max_length=200)] | None = None
     description: Annotated[str, Field(max_length=4000)] | None = None
-    closes_at: datetime | None = None
+    closes_at: AwareDatetime | None = None
     quota: int | None = Field(default=None, gt=0, le=100000)
     ai_screening_enabled: bool | None = None
     blind_review: bool | None = None

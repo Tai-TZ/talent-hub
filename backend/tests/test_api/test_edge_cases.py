@@ -166,6 +166,28 @@ async def test_search_wildcards_are_treated_as_literal_text(login_as: Any) -> No
     assert res["total"] == 0
 
 
+async def test_intake_dates_without_timezone_are_client_errors_not_500(login_as: Any) -> None:
+    admin = await login_as("admin")
+    intake = await create_open_intake(admin)
+    naive = await admin.patch(f"/api/v1/intakes/{intake['id']}", json={"closes_at": "2030-12-01T00:00:00"})
+    assert naive.status_code == 422, naive.text
+    aware = await admin.patch(f"/api/v1/intakes/{intake['id']}", json={"closes_at": "2030-12-01T00:00:00+07:00"})
+    assert aware.status_code == 200, aware.text
+    program = (await admin.post("/api/v1/programs", json={"code": "tz1", "name_vi": "P"})).json()
+    mixed = await admin.post(
+        "/api/v1/intakes",
+        json={
+            "program_id": program["id"],
+            "name": "Múi giờ lẫn lộn",
+            "opens_at": "2030-01-01T00:00:00",
+            "closes_at": "2030-02-01T00:00:00Z",
+            "quota": 3,
+            "rounds": [{"key": "r1", "label": "Vòng 1", "type": "review"}],
+        },
+    )
+    assert mixed.status_code == 422, mixed.text
+
+
 async def test_costs_and_settings_reject_non_finite_and_absurd_numbers(login_as: Any) -> None:
     admin = await login_as("admin")
     today = datetime.now(UTC).date().isoformat()
