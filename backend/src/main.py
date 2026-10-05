@@ -8,10 +8,12 @@ from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from src.api.admin import router as admin_router
+from src.api.analytics import router as analytics_router
 from src.api.applications import router as applications_router
 from src.api.audit import router as audit_router
 from src.api.auth import me_router
 from src.api.auth import router as auth_router
+from src.api.cohorts import router as cohorts_router
 from src.api.errors import register_error_handlers
 from src.api.intakes import router as intakes_router
 from src.api.notifications import router as notifications_router
@@ -96,6 +98,8 @@ def create_app() -> FastAPI:
         notifications_router,
         triage_router,
         admin_router,
+        cohorts_router,
+        analytics_router,
     ):
         app.include_router(router, prefix="/api/v1")
     return app
