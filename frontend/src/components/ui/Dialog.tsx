@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { CloseIcon } from "../icons";
 
 interface Props {
@@ -19,6 +19,7 @@ interface Props {
  */
 export function Dialog({ open, title, onClose, children, footer, size = "md", closeLabel = "Đóng" }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const el = ref.current;
@@ -31,7 +32,7 @@ export function Dialog({ open, title, onClose, children, footer, size = "md", cl
     <dialog
       ref={ref}
       className={`dialog dialog--${size}`}
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
       onClose={onClose}
       onClick={(e) => {
         if (e.target === ref.current) onClose();
@@ -40,7 +41,7 @@ export function Dialog({ open, title, onClose, children, footer, size = "md", cl
       {open ? (
         <div className="dialog__panel">
           <header className="dialog__header">
-            <h2 id="dialog-title" className="th-type-h4">
+            <h2 id={titleId} className="th-type-h4">
               {title}
             </h2>
             <button type="button" className="icon-btn" onClick={onClose} aria-label={closeLabel}>

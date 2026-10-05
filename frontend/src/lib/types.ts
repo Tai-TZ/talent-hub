@@ -36,4 +36,6 @@ export interface Problem {
   detail?: string;
   status?: number;
   request_id?: string | null;
+  /** Lỗi theo từng trường, khoá là đường dẫn dạng "content.essays.motivation". */
+  fields?: Record<string, string>;
 }

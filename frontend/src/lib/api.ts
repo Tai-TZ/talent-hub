@@ -5,6 +5,7 @@ export class ApiError extends Error {
     public readonly status: number,
     message: string,
     public readonly requestId?: string | null,
+    public readonly fields: Record<string, string> = {},
   ) {
     super(message);
     this.name = "ApiError";
@@ -27,14 +28,16 @@ export function refreshSession(): Promise<boolean> {
 async function toError(res: Response): Promise<ApiError> {
   let detail = "";
   let requestId: string | null | undefined;
+  let fields: Record<string, string> | undefined;
   try {
     const body = (await res.json()) as Problem;
     detail = body.detail ?? body.title ?? "";
     requestId = body.request_id;
+    fields = body.fields;
   } catch {
     // Phản hồi không phải JSON: giữ thông điệp rỗng, giao diện sẽ dùng thông điệp chung.
   }
-  return new ApiError(res.status, detail, requestId ?? res.headers.get("x-request-id"));
+  return new ApiError(res.status, detail, requestId ?? res.headers.get("x-request-id"), fields);
 }
 
 export async function api<T>(path: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {

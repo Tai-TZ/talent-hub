@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api } from "@/lib/api";
-import { visibleNav } from "@/lib/nav";
+import { isActive, NAV_GROUPS, visibleNav } from "@/lib/nav";
 import { useI18n, useMe } from "../providers";
 import { LanguageSwitch } from "../LanguageSwitch";
 import { BarsIcon, CloseIcon } from "../icons";
@@ -19,20 +19,30 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { t } = useI18n();
   const me = useMe();
   const pathname = usePathname();
+  const items = visibleNav(me.permissions);
+  const groups = (Object.keys(NAV_GROUPS) as (keyof typeof NAV_GROUPS)[])
+    .map((key) => ({ key, title: NAV_GROUPS[key], items: items.filter((i) => i.group === key) }))
+    .filter((g) => g.items.length > 0);
   return (
     <nav aria-label={t.nav.primary}>
-      <ul className="nav-list">
-        {visibleNav(me.permissions).map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return (
-            <li key={item.href}>
-              <Link href={item.href} className="nav-link" aria-current={active ? "page" : undefined} onClick={onNavigate}>
-                {item.label(t)}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {groups.map((group) => (
+        <div key={group.key} role="group" aria-labelledby={group.title ? `nav-group-${group.key}` : undefined}>
+          {group.title ? (
+            <p className="nav-group" id={`nav-group-${group.key}`}>
+              {group.title}
+            </p>
+          ) : null}
+          <ul className="nav-list">
+            {group.items.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="nav-link" aria-current={isActive(item, pathname) ? "page" : undefined} onClick={onNavigate}>
+                  {item.label(t)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
   );
 }
