@@ -81,7 +81,7 @@ function Bubble({ message, onRate }: { message: Message; onRate: (helpful: boole
   );
 }
 
-function Chat() {
+export function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -160,6 +160,9 @@ function Chat() {
           placeholder="Ví dụ: Hồ sơ cần những gì?"
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
+            // Bộ gõ (Telex/VNI trên macOS, IME) dùng Enter để chốt chữ đang gõ: lúc đó không được gửi câu hỏi.
+            // Safari báo isComposing = false ở phím chốt nhưng keyCode là 229.
+            if (e.nativeEvent.isComposing || e.keyCode === 229) return;
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               void ask(text);
