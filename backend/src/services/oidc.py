@@ -355,6 +355,21 @@ async def complete_login(
         if account is not None and account.user_id != user.id:
             raise OidcError("already_linked", "Tài khoản Microsoft này đã được liên kết với người dùng khác")
         if account is None:
+            # Người được mời đã có tài khoản (mật khẩu hoặc Microsoft khác) ở tổ chức khác: người giữ link mời
+            # (kể cả admin đã tạo nó) không được gắn Microsoft của mình vào danh tính đó. Giống luồng mật khẩu,
+            # chủ tài khoản phải đăng nhập bằng cách cũ rồi tự liên kết.
+            has_credential = (
+                user.password_hash is not None
+                or (
+                    await db.session.execute(select(OAuthAccount.id).where(OAuthAccount.user_id == user.id).limit(1))
+                ).scalar_one_or_none()
+                is not None
+            )
+            if has_credential:
+                raise OidcError(
+                    "account_exists",
+                    "Email này đã có tài khoản. Hãy đăng nhập bằng cách cũ rồi liên kết Microsoft trong phần tài khoản",
+                )
             await _link(db, user, claims)
         if membership.status == "invited":
             membership.status = "active"
