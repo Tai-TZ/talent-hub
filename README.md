@@ -10,7 +10,13 @@ AI đọc hồ sơ có dẫn chứng kiểm chứng được · con người quy
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_RLS-4169E1?logo=postgresql&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-252_backend_·_72_e2e-2f9a62)
+![i18n](https://img.shields.io/badge/UI-Ti%E1%BA%BFng_Vi%E1%BB%87t_·_English-134d8b)
+
+<br/>
+
+<img src="docs/assets/readme/architecture.svg" alt="Sơ đồ kiến trúc isometric: Next.js BFF, FastAPI, PostgreSQL có RLS theo tổ chức, bên cạnh là LLM tuỳ chọn và các tích hợp Power BI, LMS, CRM" width="100%"/>
 
 </div>
 
@@ -22,63 +28,112 @@ Khách hàng đầu tiên là **Northwind University** với chương trình *nh
 
 ### Vấn đề
 
-Chương trình chạy nhiều khoá liên tiếp, mỗi khoá chọn khoảng 500 học viên từ hàng nghìn hồ sơ. Bảng tính và CRM tuyển sinh thông thường không giải quyết được bốn việc:
+Chương trình chạy nhiều khoá liên tiếp, mỗi khoá chọn khoảng 500 học viên từ hàng nghìn hồ sơ. Bảng tính và CRM tuyển sinh thông thường không giải quyết được năm việc:
 
 | Nỗi đau | Cách Talent Hub xử lý |
 |---|---|
-| Đọc hàng nghìn hồ sơ trong vài ngày, chấm lệch nhau, dễ bị "neo" bởi điểm người khác | **Sàng lọc AI có dẫn chứng**, chấm mù, AI chỉ hiện sau khi reviewer chốt điểm của mình |
+| Đọc hàng nghìn hồ sơ trong vài ngày, chấm lệch nhau, dễ bị "neo" bởi điểm người khác | **Sàng lọc AI có dẫn chứng** (~2.000 hồ sơ/giây), chấm mù, AI chỉ hiện sau khi reviewer chốt điểm của mình |
 | Không biết tiêu chí tuyển có dự đoán được thành công hay không | **Rubric Lab**: tiêu chí nào thật sự dự báo kết quả, đổi trọng số thì ai được chọn khác đi, kèm kiểm tra công bằng |
+| Không biết học viên có đạt chuẩn đầu ra, dữ liệu đào tạo thiếu hay sai lúc nào | **Chất lượng chương trình**: mức đạt từng năng lực, cảnh báo dữ liệu thiếu/bất thường, đề xuất cải tiến tự động |
 | Xếp lớp, chia nhánh, ghép vị trí thực chiến bằng tay | **Cohort Composer**: bộ giải tối ưu có giải thích từng quyết định, so sánh phương án rồi mới áp dụng |
-| Không chứng minh được kết quả và chi phí mỗi học viên | **Sổ chi phí, ngân sách, chi phí AI** và chi phí trên mỗi hồ sơ được nhận |
+| Dữ liệu nằm rời rạc ở LMS, CRM, Excel | **Tích hợp bằng khoá API**: Power BI, LMS, CRM; chi phí AI và chi phí trên mỗi học viên được nhận |
 
 Chiến lược sản phẩm, đối thủ và lợi thế cạnh tranh: [docs/11-product-strategy.md](docs/11-product-strategy.md).
+
+## Hành trình: từ hồ sơ đến kết quả, rồi quay lại cải tiến
+
+<img src="docs/assets/readme/journey.svg" alt="Bảy bước: nộp hồ sơ, sàng lọc AI, chấm mù, phê duyệt bốn mắt, nhập học, đánh giá năng lực, chất lượng chương trình; vòng phản hồi về Rubric Lab" width="100%"/>
+
+Vòng đời một hồ sơ (mọi chuyển trạng thái đều do con người, có nhật ký và khoá lạc quan):
+
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> DRAFT
+  DRAFT --> SUBMITTED: ứng viên nộp
+  SUBMITTED --> IN_ROUND: mở vòng xét
+  IN_ROUND --> IN_ROUND: sang vòng kế
+  IN_ROUND --> NEEDS_INFO: yêu cầu bổ sung
+  NEEDS_INFO --> IN_ROUND: ứng viên bổ sung
+  IN_ROUND --> PENDING_APPROVAL: đề xuất quyết định
+  PENDING_APPROVAL --> IN_ROUND: trả lại
+  PENDING_APPROVAL --> ACCEPTED: duyệt (người khác người đề xuất)
+  PENDING_APPROVAL --> REJECTED
+  PENDING_APPROVAL --> WAITLISTED
+  WAITLISTED --> PENDING_APPROVAL: gọi từ danh sách dự bị
+  ACCEPTED --> ENROLLED: nhập học
+  ENROLLED --> [*]
+  REJECTED --> [*]
+  WITHDRAWN --> [*]
+  note right of WITHDRAWN: ứng viên tự rút từ DRAFT, SUBMITTED,<br/>IN_ROUND, NEEDS_INFO, ACCEPTED, WAITLISTED
+```
+
+## Đối chiếu đề bài
+
+| Yêu cầu | Đáp ứng | Ở đâu |
+|---|---|---|
+| Cổng thông tin ứng viên và quản trị | ✅ | Cổng ứng viên, khu nhân sự, đào tạo, phân tích, quản trị IT |
+| Tiếp nhận hồ sơ mẫu, theo dõi trạng thái | ✅ | Hồ sơ 6 bước tự lưu, timeline minh bạch, thông báo |
+| Dashboard chỉ số tuyển sinh / đào tạo | ✅ | Phễu, công bằng, tổng quan khoá, chất lượng chương trình, tổng quan hệ thống |
+| ≥ 2 vai trò, người phụ trách duyệt quyết định quan trọng | ✅ | 7 vai trò; phê duyệt bốn mắt; xét đạt có lý do |
+| Trợ lý AI giải đáp có trích nguồn (RAG) | ✅ | Trợ lý hỏi đáp, từ chối khi thiếu căn cứ; bộ đánh giá trong [eval/](eval/README.md) |
+| Phân tích chất lượng chương trình theo chuẩn đầu ra | ✅ | `/analytics/quality`: mức đạt từng năng lực theo nhánh, so khoá trước |
+| Cảnh báo dữ liệu thiếu/bất thường và báo cáo cải tiến | ✅ | 9 loại cảnh báo, đề xuất có ưu tiên, tải báo cáo Markdown |
+| Power BI | ✅ | Export CSV khử định danh qua khoá API, mẫu Power Query: [docs/12](docs/12-integrations.md) |
+| Tích hợp CRM/LMS qua API | ✅ | Roster + đẩy đánh giá (LMS, idempotent), luồng thay đổi (CRM) |
+| LLM và RAG | ✅ | OpenRouter / OpenAI / Gemini / Claude, tự lùi về động cơ offline |
+| Docker và nền tảng cloud | ◐ | Dockerfile cho BE/FE; chưa triển khai cloud |
 
 ## Tính năng chính
 
 **Tuyển sinh**
 - Đợt tuyển cấu hình được: dãy vòng, rubric có phiên bản, luật đủ điều kiện (chỉ gắn cờ, không tự loại), chỉ tiêu.
-- Cổng ứng viên: hồ sơ nhiều bước, lưu nháp, kiểm tra dữ liệu, timeline minh bạch, thông báo.
-- Quy trình có người phê duyệt: bảng chuyển trạng thái, khoá lạc quan, **nguyên tắc bốn mắt** (người đề xuất khác người duyệt), kiểm soát chỉ tiêu, không chấm hồ sơ của chính mình.
+- Quy trình có người phê duyệt: bảng chuyển trạng thái, khoá lạc quan, **nguyên tắc bốn mắt**, kiểm soát chỉ tiêu, không chấm hồ sơ của chính mình.
 
 **AI có trách nhiệm**
 - Mọi trích dẫn của AI phải xuất hiện **nguyên văn** trong hồ sơ; trích dẫn bịa bị loại và làm giảm độ tin cậy.
 - Chỉ nhận nội dung năng lực, không bao giờ nhận thông tin nhận dạng (tên, giới, ngày sinh, địa chỉ).
 - Chống prompt injection, phát hiện bài luận trùng giữa các hồ sơ, tự lùi về luật offline khi dịch vụ LLM lỗi.
-- Chạy được **không cần khoá API** (động cơ luật); gắn khoá Anthropic để dùng Claude.
+- Chạy được **không cần khoá API**; gắn khoá OpenRouter, OpenAI, Gemini hoặc Anthropic để dùng LLM.
 
-**Vận hành khoá học**
-- Nhập học, lớp theo trình độ hoặc cân bằng, nhánh, đối tác thực chiến, đánh giá năng lực theo mức do mentor thực hiện, xét đạt có kiểm tra ghi đè, sổ phụ cấp nối với sổ chi phí.
+**Vận hành khoá học và chất lượng chương trình**
+- Nhập học, lớp theo trình độ hoặc cân bằng, nhánh, đối tác thực chiến, đánh giá năng lực theo mức (mentor hoặc đồng bộ từ LMS), xét đạt có kiểm tra ghi đè, sổ phụ cấp nối với sổ chi phí.
+- **Chất lượng chương trình**: mức đạt chuẩn đầu ra theo năng lực × nhánh, xu hướng so với khoá trước; cảnh báo học viên chưa xếp nhánh, thiếu đánh giá, đánh giá cũ, mentor chấm lệch mặt bằng, mức nhảy bất thường, quyết định xét đạt ngược dữ liệu, năng lực đạt thấp hoặc tụt; đề xuất cải tiến có mức ưu tiên.
 
-**Quản trị cho bộ phận IT**
-- Cấp tài khoản bằng lời mời, phân vai trò, khoá/mở khoá, nhập hàng loạt có chạy thử.
-- Kho tài liệu (txt, md, pdf, docx) tìm kiếm tiếng Việt không dấu; chi phí và trần chi phí AI; cài đặt tổ chức; nhật ký audit; tổng quan vận hành.
+**Tích hợp và quản trị cho bộ phận IT**
+- Khoá API theo tổ chức có phạm vi (`export.read`, `lms.read`, `lms.write`, `crm.read`), chỉ lưu băm, hiện một lần, thu hồi tức thì, mọi lần dùng đều ghi nhật ký.
+- Cấp tài khoản bằng lời mời, phân vai trò, khoá/mở khoá, nhập hàng loạt có chạy thử; kho tài liệu tìm kiếm tiếng Việt không dấu; chi phí và trần chi phí AI; nhật ký audit.
+
+**Giao diện**: mobile-first, trợ năng WCAG A/AA (quét tự động trong e2e), **song ngữ Việt/Anh** (đang mở rộng dần cho từng khu).
 
 ## Kiến trúc
 
-```mermaid
-flowchart LR
-  U[Trình duyệt] -->|cùng origin, cookie httpOnly| FE[frontend<br/>Next.js BFF]
-  FE -->|X-Organization từ Host| BE[backend<br/>FastAPI]
-  BE --> PG[(PostgreSQL<br/>RLS theo tổ chức)]
-  BE --> AI{{Claude API<br/>tuỳ chọn}}
-  BE -.->|email outbox| SMTP[SMTP / Mailpit]
-```
-
 - **Backend** phân tầng: `api` (HTTP) → `services` (nghiệp vụ, không phụ thuộc FastAPI) → `models` (ORM). Bộ giải (`composer`), phân tích (`analytics`) và AI (`ai`) là các gói hàm thuần, dễ kiểm thử.
-- **Đa tổ chức**: một database, một schema, cột `organization_id` cùng **Row-Level Security** bắt buộc (`FORCE`), vai trò runtime không phải superuser và không có `BYPASSRLS`. Test cô lập chéo tổ chức chạy trong CI.
-- **Frontend** là BFF: trình duyệt chỉ nói chuyện với Next.js, không cần CORS, token không lộ cho JavaScript.
+- **Frontend** là BFF: trình duyệt chỉ nói chuyện với Next.js, không cần CORS, token không lộ cho JavaScript; tổ chức được tính từ tên miền.
+- **Đa tổ chức**: một database, một schema, cột `organization_id` cùng **Row-Level Security** bắt buộc (`FORCE`), vai trò runtime không phải superuser và không có `BYPASSRLS`. Test tự phát hiện bảng thiếu policy.
+
+<div align="center">
+<img src="docs/assets/readme/tenancy.svg" alt="Ba lớp dữ liệu của ba tổ chức; truy vấn với app.org_id = northwind chỉ đọc được lớp northwind, hai lớp còn lại bị RLS chặn" width="760"/>
+</div>
 
 Chi tiết: [docs/02-architecture.md](docs/02-architecture.md) · [docs/09-multi-tenancy.md](docs/09-multi-tenancy.md).
+
+## Hiệu năng
+
+<img src="docs/assets/readme/performance.svg" alt="Sàng lọc 20.000 hồ sơ từ 95 lên khoảng 2.000 hồ sơ mỗi giây; Rubric Lab p95 từ 1.839 xuống 49 mili giây" width="100%"/>
+
+- Sàng lọc chấm song song ở tiến trình con nên **API vẫn phản hồi** trong lúc chạy (p50 17 ms); kết quả trước/sau tối ưu giống hệt từng dòng.
+- Ở quy mô 20.000 hồ sơ, mọi màn đọc có p95 dưới 300 ms. Cách đo và số liệu đầy đủ: [WORKLOG.md](WORKLOG.md).
 
 ## Công nghệ
 
 | Lớp | Công nghệ |
 |---|---|
 | Backend | Python 3.12, FastAPI, SQLAlchemy 2 (async), Alembic, Pydantic v2, asyncpg |
-| Dữ liệu | PostgreSQL 16 (image kèm pgvector), Redis tuỳ chọn (giới hạn tốc độ khi chạy nhiều tiến trình) |
-| AI và phân tích | SDK `anthropic`, NumPy, SciPy (thuật toán Hungarian, hồi quy logistic) |
-| Frontend | Next.js 16 (App Router), React 19, TypeScript, TanStack Query |
-| Giao diện | Design tokens theo bộ style Northwind University, mobile-first, trợ năng WCAG |
+| Dữ liệu | PostgreSQL 16 (RLS, tìm kiếm toàn văn tiếng Việt), Redis tuỳ chọn (giới hạn tốc độ khi chạy nhiều tiến trình) |
+| AI và phân tích | Provider chuẩn OpenAI (OpenRouter, OpenAI, Gemini) qua `httpx`, SDK `anthropic`, NumPy, SciPy (Hungarian, hồi quy logistic, bootstrap) |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, TanStack Query, i18n theo khu có kiểm tra thiếu khoá |
+| Tích hợp | Khoá API có phạm vi, CSV cho Power BI, LMS/CRM qua REST |
 | Chất lượng | pytest, Ruff, mypy (strict), Vitest, Playwright, axe, Semgrep, GitHub Actions |
 
 ## Cấu trúc thư mục
@@ -87,7 +142,7 @@ Chi tiết: [docs/02-architecture.md](docs/02-architecture.md) · [docs/09-multi
 ├── backend/                 # BE: FastAPI
 │   ├── src/
 │   │   ├── api/             # router HTTP, không chứa nghiệp vụ
-│   │   ├── services/        # nghiệp vụ: workflow, tuyển sinh, khoá học, chi phí...
+│   │   ├── services/        # nghiệp vụ: workflow, tuyển sinh, khoá học, chất lượng, tích hợp...
 │   │   ├── ai/              # động cơ sàng lọc, provider LLM
 │   │   ├── composer/        # bộ giải xếp lớp/nhánh/thực chiến
 │   │   ├── analytics/       # Rubric Lab
@@ -97,11 +152,12 @@ Chi tiết: [docs/02-architecture.md](docs/02-architecture.md) · [docs/09-multi
 │   └── tests/
 ├── frontend/                # FE: Next.js
 │   ├── src/app/             # trang và route handler (BFF)
-│   ├── src/components/      # thành phần giao diện
-│   ├── src/styles/          # token Northwind University và style ứng dụng
+│   ├── src/features/        # từng khu chức năng (kèm từ điển vi/en)
+│   ├── src/components/      # thành phần giao diện dùng chung
 │   └── e2e/                 # Playwright
-├── db/init/                 # vai trò và extension cho Postgres local
-├── docs/                    # thiết kế và quyết định kiến trúc
+├── docs/                    # thiết kế, quyết định kiến trúc, tích hợp
+│   └── assets/              # sơ đồ README (sinh bằng build_readme_diagrams.py)
+├── eval/                    # bộ đánh giá trợ lý hỏi đáp
 └── docker-compose.yml
 ```
 
@@ -134,35 +190,44 @@ Có thể dùng `make db-up migrate seed run-be run-fe`; xem [Makefile](Makefile
 
 ### Cấu hình AI
 
-Mặc định dùng động cơ luật offline, không cần khoá. Để dùng LLM (trong `backend/.env`):
+Mặc định dùng động cơ luật offline, không cần khoá. Để dùng LLM, thêm vào `backend/.env`:
 
 ```bash
-LLM_API_KEY=...              # OpenRouter (mặc định); OpenAI/Gemini: đổi LLM_BASE_URL và tên mô hình, xem .env.example
+LLM_API_KEY=sk-or-...        # OpenRouter (mặc định). OpenAI/Gemini: đặt thêm LLM_BASE_URL và tên mô hình, xem .env.example
 # hoặc ANTHROPIC_API_KEY=... để dùng Claude
-AI_ENGINE=llm                # hoặc đổi trong Quản trị → Cài đặt của từng tổ chức
 ```
 
-Chi phí AI được ghi theo từng lần gọi, quy đổi VND theo tỷ giá của tổ chức và có trần theo tháng.
+Sau đó vào **Quản trị › Cài đặt** của tổ chức, đổi *Động cơ sàng lọc AI* và *Động cơ trợ lý hỏi đáp* sang `llm` (cài đặt theo tổ chức được ưu tiên hơn cấu hình chung). Chi phí AI được ghi theo từng lần gọi, quy đổi VND theo tỷ giá của tổ chức và có trần theo tháng.
+
+### Tích hợp Power BI, LMS, CRM
+
+Admin tạo khoá ở **Quản trị › Tích hợp** (hoặc qua API `POST /api/v1/integrations/keys`), rồi:
+
+```bash
+curl -H "Authorization: Bearer $KEY" https://<tổ-chức>.example/api/v1/integrations/exports/competency_attainment.csv
+```
+
+Hướng dẫn kết nối Power BI (Power Query M), LMS và CRM: [docs/12-integrations.md](docs/12-integrations.md).
 
 ## Kiểm thử và chất lượng
 
 ```bash
 make check                                   # lint + kiểm tra kiểu + test cả hai phía
-cd backend && pytest --cov                   # cần Postgres chạy; độ phủ tối thiểu 85%
+cd backend && pytest --cov                   # cần Postgres chạy; độ phủ tối thiểu 85% (hiện 95%)
 cd frontend && npm run e2e                   # cần backend chạy; desktop và mobile, kèm kiểm tra trợ năng
 ```
 
 - Test cô lập RLS tự động phát hiện bảng thiếu policy, kiểm tra không truy cập chéo tổ chức qua cả API lẫn SQL.
-- Có test đồng thời (duyệt song song, đề xuất song song) và test chống chiếm tài khoản.
-- CI chạy lint, mypy, pytest có ngưỡng độ phủ, kiểm toán phụ thuộc và quét Semgrep.
+- Test đồng thời (duyệt song song, đề xuất song song), test chống chiếm tài khoản, quét IDOR chéo tổ chức trên mọi endpoint.
+- Tối ưu hiệu năng được kiểm chứng bằng so khớp đầu ra trước/sau trên dữ liệu thật và dữ liệu ngẫu nhiên.
 
 ## Bảo mật
 
 - Mật khẩu Argon2 chạy ngoài event loop và giới hạn đồng thời; JWT có `iss`/`aud`; refresh token xoay vòng có phát hiện dùng lại; khoá tài khoản; giới hạn tốc độ đăng nhập.
 - Chống CSRF theo Origin, giới hạn kích thước body, header bảo mật, CSP có nonce ở frontend.
-- Lời mời và đặt lại mật khẩu chỉ gửi qua email; người đã có tài khoản phải nhập đúng mật khẩu hiện có (admin một tổ chức không chiếm được tài khoản cross-tenant).
-- Cấu hình bị từ chối khi chạy ngoài `local` mà còn giá trị không an toàn.
-- Audit log chỉ thêm; vai trò runtime không ghi được bảng toàn cục.
+- Đăng nhập Microsoft định danh theo `iss` + `sub` (chống nOAuth); lời mời và đặt lại mật khẩu chỉ gửi qua email.
+- Khoá tích hợp chỉ lưu băm SHA-256, phạm vi tối thiểu, BFF chỉ chuyển header `Authorization` cho `/api/v1/integrations/*`.
+- Cấu hình bị từ chối khi chạy ngoài `local` mà còn giá trị không an toàn; audit log chỉ thêm.
 
 ## Tài liệu
 
@@ -176,6 +241,7 @@ cd frontend && npm run e2e                   # cần backend chạy; desktop và
 | [08 Lộ trình](docs/08-roadmap.md) | Các mốc và tiêu chí nghiệm thu |
 | [09 Đa tổ chức](docs/09-multi-tenancy.md) · [10 Northwind University](docs/10-sample-tenant.md) | Cô lập dữ liệu, cấu hình cho Northwind University |
 | [11 Chiến lược sản phẩm](docs/11-product-strategy.md) | Vấn đề, đối thủ, USP, các khoảnh khắc WOW |
+| [12 Tích hợp](docs/12-integrations.md) | Khoá API, Power BI, LMS, CRM |
 
 ## Trạng thái
 
@@ -184,12 +250,13 @@ cd frontend && npm run e2e                   # cần backend chạy; desktop và
 | Nền tảng đa tổ chức, xác thực, phân quyền, nhật ký kiểm toán | Hoàn thành, có test |
 | Đăng nhập bằng tài khoản do admin cấp và bằng Microsoft (OIDC, PKCE) | Hoàn thành, có test; chưa thử với Entra thật |
 | Tuyển sinh: đợt tuyển, hồ sơ, chấm độc lập, phê duyệt bốn mắt | Hoàn thành (BE + FE), có e2e 4 vai trò |
-| Sàng lọc AI hàng loạt có bằng chứng kiểm chứng (luật offline và Claude) | Hoàn thành; chưa đo với Claude thật |
+| Sàng lọc AI hàng loạt có bằng chứng kiểm chứng | Hoàn thành; ~2.000 hồ sơ/giây offline; chưa đo với LLM thật |
 | Vận hành khoá, Cohort Composer, mentor, xét đạt, phụ cấp | Hoàn thành (BE + FE), có test |
-| Phễu, giám sát công bằng, Rubric Lab | Hoàn thành (BE + FE) |
-| Quản trị IT: tài khoản, tài liệu, chi phí, cài đặt | Hoàn thành (BE + FE) |
-| Trợ lý hỏi đáp có trích nguồn và bộ đánh giá ([eval/](eval/README.md)) | Hoàn thành; động cơ offline đã đo trên bộ giữ riêng, động cơ LLM chưa đo |
-| Hồ sơ năng lực có chữ ký, trang giới thiệu công khai | Chưa làm |
+| Phễu, giám sát công bằng, Rubric Lab, chất lượng chương trình | Hoàn thành (BE + FE), song ngữ |
+| Tích hợp Power BI, LMS, CRM bằng khoá API | Backend và tài liệu hoàn thành; trang quản lý khoá trên giao diện đang làm |
+| Trợ lý hỏi đáp có trích nguồn và bộ đánh giá ([eval/](eval/README.md)) | Hoàn thành; động cơ offline đã đo trên bộ giữ riêng |
+| Giao diện tiếng Anh | Thanh đầu trang, menu, khu phân tích; các khu khác đang dịch |
+| Triển khai cloud, hồ sơ năng lực có chữ ký, trang giới thiệu công khai | Chưa làm |
 
 Chi tiết số liệu đã đo, lỗi đã tìm và sửa, việc tiếp theo: xem [WORKLOG.md](WORKLOG.md).
 
@@ -199,6 +266,7 @@ Chi tiết số liệu đã đo, lỗi đã tìm và sửa, việc tiếp theo: 
 
 - Commit nhỏ, theo từng đợt có ý nghĩa, thông điệp dạng `feat(backend): …`, `fix(frontend): …`.
 - Mọi tính năng mới đi kèm test; giữ ruff, mypy và độ phủ xanh trước khi đẩy.
+- Sơ đồ README: sửa `docs/assets/build_readme_diagrams.py` rồi chạy lại để sinh SVG.
 - Quy tắc dành cho agent lập trình nằm trong [CLAUDE.md](CLAUDE.md).
 
 ## Giấy phép
