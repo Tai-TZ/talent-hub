@@ -24,6 +24,7 @@ PERMISSIONS: dict[str, frozenset[str]] = {
         {
             "application.read",
             "decision.approve",
+            "triage.read",
             "intake.read",
             "analytics.read",
             "assistant.use",
@@ -31,6 +32,8 @@ PERMISSIONS: dict[str, frozenset[str]] = {
     ),
     "cohort_manager": frozenset(
         {
+            "application.read",
+            "pii.read",
             "cohort.read",
             "cohort.manage",
             "intake.read",
@@ -65,6 +68,12 @@ PERMISSIONS: dict[str, frozenset[str]] = {
             "export.read",
             "training.read",
             "cohort.read",
+            "triage.read",
+            "triage.run",
+            "pii.read",
+            "cost.read",
+            "cost.manage",
+            "job.read",
             "assistant.use",
         }
     ),

@@ -39,4 +39,5 @@ def configure_logging(level: str) -> None:
     root.setLevel(level.upper())
     # Access log do middleware của ứng dụng ghi (có request_id, org, thời gian).
     logging.getLogger("uvicorn.access").disabled = True
-    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+    for noisy in ("sqlalchemy.engine", "httpx", "httpcore"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
