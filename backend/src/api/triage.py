@@ -11,6 +11,7 @@ from src.ai.factory import get_engine
 from src.api.deps import Principal, request_meta, require
 from src.config import get_settings
 from src.errors import ConflictError
+from src.schemas.responses.staff import JobOut, TriageBoardOut, TriageStartOut
 from src.services import costs, jobs, org_settings, triage
 from src.services.audit import write_audit
 from src.services.intakes import get_intake
@@ -38,7 +39,7 @@ def _job_out(job: Any) -> dict[str, Any]:
     }
 
 
-@router.post("/intakes/{intake_id}/triage", status_code=202)
+@router.post("/intakes/{intake_id}/triage", status_code=202, response_model=TriageStartOut)
 async def start_triage(
     intake_id: uuid.UUID,
     body: TriageIn,
@@ -79,14 +80,14 @@ async def start_triage(
     return {"job_id": job_id, "total": total, "round": round_key, "engine": engine.name}
 
 
-@router.get("/jobs/{job_id}")
+@router.get("/jobs/{job_id}", response_model=JobOut)
 async def get_job(
     job_id: uuid.UUID, _: Principal = Depends(require("job.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
     return _job_out(await jobs.get_job(db, job_id))
 
 
-@router.get("/intakes/{intake_id}/triage")
+@router.get("/intakes/{intake_id}/triage", response_model=TriageBoardOut)
 async def triage_board(
     intake_id: uuid.UUID,
     round_key: str | None = Query(None, alias="round"),

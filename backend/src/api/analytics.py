@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from src.api.deps import Principal, require
+from src.schemas.responses.analytics import FairnessOut, FunnelOut, LabOut
 from src.services import analytics
 from src.services.tenancy import OrgDb, org_db
 
@@ -18,21 +19,21 @@ class LabIn(BaseModel):
     weights: dict[str, float] | None = None
 
 
-@router.get("/funnel")
+@router.get("/funnel", response_model=FunnelOut)
 async def funnel(
     intake_id: uuid.UUID, _: Principal = Depends(require("analytics.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
     return await analytics.funnel(db, intake_id)
 
 
-@router.get("/fairness")
+@router.get("/fairness", response_model=FairnessOut)
 async def fairness(
     intake_id: uuid.UUID, _: Principal = Depends(require("analytics.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
     return await analytics.fairness(db, intake_id)
 
 
-@router.post("/lab")
+@router.post("/lab", response_model=LabOut)
 async def lab(
     body: LabIn, _: Principal = Depends(require("analytics.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:

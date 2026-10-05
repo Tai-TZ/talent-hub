@@ -23,6 +23,50 @@
         "title": "AcceptIn",
         "type": "object"
       },
+      "AccountCreatedOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "invite_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invite Link"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "title": "Membership Id",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "membership_id",
+          "email",
+          "roles",
+          "status",
+          "invite_link"
+        ],
+        "title": "AccountCreatedOut",
+        "type": "object"
+      },
       "AccountIn": {
         "properties": {
           "email": {
@@ -51,6 +95,114 @@
           "roles"
         ],
         "title": "AccountIn",
+        "type": "object"
+      },
+      "AccountOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "has_password": {
+            "title": "Has Password",
+            "type": "boolean"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "title": "Membership Id",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "membership_id",
+          "email",
+          "full_name",
+          "status",
+          "roles",
+          "last_login_at",
+          "locked",
+          "has_password",
+          "created_at"
+        ],
+        "title": "AccountOut",
+        "type": "object"
+      },
+      "AccountPageOut": {
+        "properties": {
+          "assignable_roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assignable Roles",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AccountOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor",
+          "total",
+          "assignable_roles"
+        ],
+        "title": "AccountPageOut",
         "type": "object"
       },
       "AccountPatch": {
@@ -83,6 +235,499 @@
           }
         },
         "title": "AccountPatch",
+        "type": "object"
+      },
+      "AccountUpdatedOut": {
+        "properties": {
+          "membership_id": {
+            "format": "uuid",
+            "title": "Membership Id",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "membership_id",
+          "roles",
+          "status"
+        ],
+        "title": "AccountUpdatedOut",
+        "type": "object"
+      },
+      "AdvanceOut": {
+        "properties": {
+          "current_round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Round"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status",
+          "current_round",
+          "version"
+        ],
+        "title": "AdvanceOut",
+        "type": "object"
+      },
+      "AiAssessmentOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "engine": {
+            "title": "Engine",
+            "type": "string"
+          },
+          "evidence": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/EvidenceOut"
+              },
+              "type": "array"
+            },
+            "title": "Evidence",
+            "type": "object"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "input_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Input Fields",
+            "type": "array"
+          },
+          "locked": {
+            "const": false,
+            "default": false,
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "needs_attention": {
+            "title": "Needs Attention",
+            "type": "boolean"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "scores": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AiScoreOut"
+            },
+            "title": "Scores",
+            "type": "object"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          },
+          "total_score": {
+            "title": "Total Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "engine",
+          "model",
+          "prompt_version",
+          "total_score",
+          "confidence",
+          "tier",
+          "needs_attention",
+          "scores",
+          "evidence",
+          "flags",
+          "rationale",
+          "input_fields",
+          "created_at"
+        ],
+        "title": "AiAssessmentOut",
+        "type": "object"
+      },
+      "AiLockedOut": {
+        "description": "Chống neo: reviewer chưa chốt điểm chỉ thấy cờ trung tính, chưa thấy điểm/nhóm AI.",
+        "properties": {
+          "locked": {
+            "const": true,
+            "default": true,
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "needs_attention": {
+            "title": "Needs Attention",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "needs_attention"
+        ],
+        "title": "AiLockedOut",
+        "type": "object"
+      },
+      "AiScoreOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "max": {
+            "title": "Max",
+            "type": "number"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "score",
+          "max",
+          "confidence"
+        ],
+        "title": "AiScoreOut",
+        "type": "object"
+      },
+      "AiUsageRowOut": {
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "input_tokens": {
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "output_tokens": {
+            "title": "Output Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "cost_usd",
+          "input_tokens",
+          "output_tokens",
+          "calls"
+        ],
+        "title": "AiUsageRowOut",
+        "type": "object"
+      },
+      "ApplicationSummaryOut": {
+        "properties": {
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "current_round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Round"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intake": {
+            "$ref": "#/components/schemas/IntakeRef"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "current_round",
+          "candidate_code",
+          "version",
+          "intake",
+          "submitted_at"
+        ],
+        "title": "ApplicationSummaryOut",
+        "type": "object"
+      },
+      "ApplicationViewOut": {
+        "properties": {
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "content": {
+            "$ref": "#/components/schemas/ContentOut"
+          },
+          "current_round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Round"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intake": {
+            "$ref": "#/components/schemas/IntakeRef"
+          },
+          "owner": {
+            "title": "Owner",
+            "type": "boolean"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfileOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "candidate_code",
+          "status",
+          "current_round",
+          "version",
+          "intake",
+          "profile",
+          "content",
+          "flags",
+          "submitted_at",
+          "owner"
+        ],
+        "title": "ApplicationViewOut",
+        "type": "object"
+      },
+      "ApprovalRowOut": {
+        "properties": {
+          "ai_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Score"
+          },
+          "ai_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Tier"
+          },
+          "application_id": {
+            "format": "uuid",
+            "title": "Application Id",
+            "type": "string"
+          },
+          "avg_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Score"
+          },
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "decision_id": {
+            "format": "uuid",
+            "title": "Decision Id",
+            "type": "string"
+          },
+          "flag_count": {
+            "title": "Flag Count",
+            "type": "integer"
+          },
+          "intake": {
+            "additionalProperties": true,
+            "title": "Intake",
+            "type": "object"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "proposal_reason": {
+            "title": "Proposal Reason",
+            "type": "string"
+          },
+          "proposed_by_me": {
+            "title": "Proposed By Me",
+            "type": "boolean"
+          },
+          "proposed_outcome": {
+            "title": "Proposed Outcome",
+            "type": "string"
+          },
+          "review_count": {
+            "title": "Review Count",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "decision_id",
+          "application_id",
+          "candidate_code",
+          "name",
+          "intake",
+          "proposed_outcome",
+          "proposal_reason",
+          "proposed_by_me",
+          "review_count",
+          "avg_score",
+          "ai_tier",
+          "ai_score",
+          "flag_count",
+          "version"
+        ],
+        "title": "ApprovalRowOut",
         "type": "object"
       },
       "ApproveIn": {
@@ -177,6 +822,46 @@
           }
         },
         "title": "AssignIn",
+        "type": "object"
+      },
+      "AssignedOut": {
+        "properties": {
+          "class_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "track_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Id"
+          }
+        },
+        "required": [
+          "id",
+          "class_id",
+          "track_id"
+        ],
+        "title": "AssignedOut",
         "type": "object"
       },
       "AuditLogOut": {
@@ -331,6 +1016,54 @@
         "title": "BudgetIn",
         "type": "object"
       },
+      "BurnOut": {
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget"
+          },
+          "ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratio"
+          },
+          "spent": {
+            "title": "Spent",
+            "type": "number"
+          },
+          "status": {
+            "enum": [
+              "none",
+              "ok",
+              "warning",
+              "over"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "budget",
+          "spent",
+          "ratio",
+          "status"
+        ],
+        "title": "BurnOut",
+        "type": "object"
+      },
       "CapacityIn": {
         "properties": {
           "capacity": {
@@ -344,6 +1077,89 @@
           "capacity"
         ],
         "title": "CapacityIn",
+        "type": "object"
+      },
+      "CategoryBurnOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "budget": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget"
+          },
+          "ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratio"
+          },
+          "spent": {
+            "title": "Spent",
+            "type": "number"
+          },
+          "status": {
+            "enum": [
+              "none",
+              "ok",
+              "warning",
+              "over"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "budget",
+          "spent",
+          "ratio",
+          "status",
+          "amount"
+        ],
+        "title": "CategoryBurnOut",
+        "type": "object"
+      },
+      "ChunkPreviewOut": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "heading": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heading"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ordinal",
+          "heading",
+          "content"
+        ],
+        "title": "ChunkPreviewOut",
         "type": "object"
       },
       "ClassIn": {
@@ -373,6 +1189,64 @@
           "capacity"
         ],
         "title": "ClassIn",
+        "type": "object"
+      },
+      "ClassStat": {
+        "properties": {
+          "assigned": {
+            "title": "Assigned",
+            "type": "integer"
+          },
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "level",
+          "capacity",
+          "assigned"
+        ],
+        "title": "ClassStat",
+        "type": "object"
+      },
+      "CohortCreatedOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ],
+        "title": "CohortCreatedOut",
         "type": "object"
       },
       "CohortIn": {
@@ -413,6 +1287,313 @@
           "capacity"
         ],
         "title": "CohortIn",
+        "type": "object"
+      },
+      "CohortListItem": {
+        "properties": {
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "capacity",
+          "starts_on",
+          "status"
+        ],
+        "title": "CohortListItem",
+        "type": "object"
+      },
+      "CohortOverviewOut": {
+        "properties": {
+          "accepted_waiting_enrollment": {
+            "title": "Accepted Waiting Enrollment",
+            "type": "integer"
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/ClassStat"
+            },
+            "title": "Classes",
+            "type": "array"
+          },
+          "cohort": {
+            "$ref": "#/components/schemas/CohortRef"
+          },
+          "enrollments": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Enrollments",
+            "type": "object"
+          },
+          "tracks": {
+            "items": {
+              "$ref": "#/components/schemas/TrackStat"
+            },
+            "title": "Tracks",
+            "type": "array"
+          },
+          "unplaced": {
+            "title": "Unplaced",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cohort",
+          "enrollments",
+          "accepted_waiting_enrollment",
+          "classes",
+          "tracks",
+          "unplaced"
+        ],
+        "title": "CohortOverviewOut",
+        "type": "object"
+      },
+      "CohortRef": {
+        "properties": {
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "capacity",
+          "starts_on",
+          "status"
+        ],
+        "title": "CohortRef",
+        "type": "object"
+      },
+      "CompetenciesOut": {
+        "properties": {
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "matrix": {
+            "items": {
+              "$ref": "#/components/schemas/MatrixRowOut"
+            },
+            "title": "Matrix",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "suggestion": {
+            "title": "Suggestion",
+            "type": "string"
+          },
+          "track_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Id"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "track_id",
+          "matrix",
+          "suggestion",
+          "status"
+        ],
+        "title": "CompetenciesOut",
+        "type": "object"
+      },
+      "ComposerAppliedOut": {
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "integer"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "applied",
+          "skipped"
+        ],
+        "title": "ComposerAppliedOut",
+        "type": "object"
+      },
+      "ComposerAssignmentOut": {
+        "properties": {
+          "class_index": {
+            "title": "Class Index",
+            "type": "integer"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "learner_id": {
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "partner_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partner Id"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          }
+        },
+        "required": [
+          "learner_id",
+          "class_index",
+          "track",
+          "partner_id",
+          "explanation"
+        ],
+        "title": "ComposerAssignmentOut",
+        "type": "object"
+      },
+      "ComposerClassMetric": {
+        "properties": {
+          "background": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Background",
+            "type": "object"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "max_score": {
+            "title": "Max Score",
+            "type": "number"
+          },
+          "mean_score": {
+            "title": "Mean Score",
+            "type": "number"
+          },
+          "min_score": {
+            "title": "Min Score",
+            "type": "number"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "std_score": {
+            "title": "Std Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "index",
+          "size",
+          "mean_score",
+          "std_score",
+          "min_score",
+          "max_score",
+          "background"
+        ],
+        "title": "ComposerClassMetric",
         "type": "object"
       },
       "ComposerIn": {
@@ -460,6 +1641,419 @@
           }
         },
         "title": "ComposerIn",
+        "type": "object"
+      },
+      "ComposerMetricsOut": {
+        "properties": {
+          "avg_fit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Fit"
+          },
+          "class_mean_spread": {
+            "title": "Class Mean Spread",
+            "type": "number"
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/ComposerClassMetric"
+            },
+            "title": "Classes",
+            "type": "array"
+          },
+          "learners": {
+            "title": "Learners",
+            "type": "integer"
+          },
+          "placed": {
+            "title": "Placed",
+            "type": "integer"
+          },
+          "placement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Placement Rate"
+          },
+          "pref_first_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pref First Rate"
+          },
+          "pref_top2_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pref Top2 Rate"
+          },
+          "track_fill": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TrackFillOut"
+            },
+            "title": "Track Fill",
+            "type": "object"
+          }
+        },
+        "required": [
+          "learners",
+          "classes",
+          "class_mean_spread",
+          "pref_first_rate",
+          "pref_top2_rate",
+          "avg_fit",
+          "track_fill",
+          "placed",
+          "placement_rate"
+        ],
+        "title": "ComposerMetricsOut",
+        "type": "object"
+      },
+      "ComposerRunDetailOut": {
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/ComposerAssignmentOut"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "cohort_id": {
+            "format": "uuid",
+            "title": "Cohort Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/ComposerMetricsOut"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "cohort_id",
+          "params",
+          "metrics",
+          "created_at",
+          "applied_at",
+          "assignments"
+        ],
+        "title": "ComposerRunDetailOut",
+        "type": "object"
+      },
+      "ComposerRunOut": {
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "cohort_id": {
+            "format": "uuid",
+            "title": "Cohort Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/ComposerMetricsOut"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "cohort_id",
+          "params",
+          "metrics",
+          "created_at",
+          "applied_at"
+        ],
+        "title": "ComposerRunOut",
+        "type": "object"
+      },
+      "ContentOut": {
+        "properties": {
+          "cv_text": {
+            "default": "",
+            "title": "Cv Text",
+            "type": "string"
+          },
+          "education": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/EducationOut"
+            },
+            "title": "Education",
+            "type": "array"
+          },
+          "essays": {
+            "$ref": "#/components/schemas/EssaysOut",
+            "default": {
+              "motivation": "",
+              "problem_solving": ""
+            }
+          },
+          "experience": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ExperienceOut"
+            },
+            "title": "Experience",
+            "type": "array"
+          },
+          "links": {
+            "$ref": "#/components/schemas/LinksOut",
+            "default": {}
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/PreferencesOut",
+            "default": {
+              "tracks": []
+            }
+          },
+          "projects": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProjectOut"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "skills": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "title": "ContentOut",
+        "type": "object"
+      },
+      "CostAiOut": {
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "month_to_date_usd": {
+            "title": "Month To Date Usd",
+            "type": "number"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "usd": {
+            "title": "Usd",
+            "type": "number"
+          },
+          "vnd": {
+            "title": "Vnd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "usd",
+          "vnd",
+          "tokens",
+          "calls",
+          "month_to_date_usd"
+        ],
+        "title": "CostAiOut",
+        "type": "object"
+      },
+      "CostAlertOut": {
+        "properties": {
+          "ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratio"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "status",
+          "ratio"
+        ],
+        "title": "CostAlertOut",
+        "type": "object"
+      },
+      "CostEntryOut": {
+        "properties": {
+          "amount_vnd": {
+            "title": "Amount Vnd",
+            "type": "number"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "cohort_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cohort Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "occurred_on": {
+            "format": "date",
+            "title": "Occurred On",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "void_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Void Reason"
+          },
+          "voided": {
+            "title": "Voided",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "amount_vnd",
+          "occurred_on",
+          "cohort_id",
+          "description",
+          "source",
+          "voided",
+          "void_reason",
+          "created_at"
+        ],
+        "title": "CostEntryOut",
+        "type": "object"
+      },
+      "CostEntryPageOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CostEntryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "CostEntryPageOut",
         "type": "object"
       },
       "CostIn": {
@@ -512,6 +2106,104 @@
         "title": "CostIn",
         "type": "object"
       },
+      "CostSummaryOut": {
+        "properties": {
+          "accepted_count": {
+            "title": "Accepted Count",
+            "type": "integer"
+          },
+          "ai": {
+            "$ref": "#/components/schemas/CostAiOut"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/CostAlertOut"
+            },
+            "title": "Alerts",
+            "type": "array"
+          },
+          "by_category": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryBurnOut"
+            },
+            "title": "By Category",
+            "type": "object"
+          },
+          "cost_per_accepted": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Per Accepted"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "overall": {
+            "$ref": "#/components/schemas/BurnOut"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/CostTimelineOut"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          },
+          "usd_vnd_rate": {
+            "title": "Usd Vnd Rate",
+            "type": "number"
+          }
+        },
+        "required": [
+          "currency",
+          "usd_vnd_rate",
+          "total",
+          "overall",
+          "by_category",
+          "timeline",
+          "ai",
+          "accepted_count",
+          "cost_per_accepted",
+          "alerts"
+        ],
+        "title": "CostSummaryOut",
+        "type": "object"
+      },
+      "CostTimelineOut": {
+        "properties": {
+          "by_category": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "By Category",
+            "type": "object"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "total",
+          "by_category"
+        ],
+        "title": "CostTimelineOut",
+        "type": "object"
+      },
       "CreateIn": {
         "properties": {
           "intake_id": {
@@ -524,6 +2216,19 @@
           "intake_id"
         ],
         "title": "CreateIn",
+        "type": "object"
+      },
+      "CreatedOut": {
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "created"
+        ],
+        "title": "CreatedOut",
         "type": "object"
       },
       "Criterion": {
@@ -584,6 +2289,44 @@
         "title": "Criterion",
         "type": "object"
       },
+      "CriterionOut": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "custom",
+            "title": "Kind",
+            "type": "string"
+          },
+          "max": {
+            "title": "Max",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "weight",
+          "max"
+        ],
+        "title": "CriterionOut",
+        "type": "object"
+      },
       "DemandIn": {
         "properties": {
           "partner_id": {
@@ -609,6 +2352,74 @@
           "slots"
         ],
         "title": "DemandIn",
+        "type": "object"
+      },
+      "DocumentDetailOut": {
+        "properties": {
+          "char_count": {
+            "title": "Char Count",
+            "type": "integer"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "preview": {
+            "items": {
+              "$ref": "#/components/schemas/ChunkPreviewOut"
+            },
+            "title": "Preview",
+            "type": "array"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "visibility",
+          "filename",
+          "size_bytes",
+          "char_count",
+          "chunk_count",
+          "status",
+          "version",
+          "created_at",
+          "preview"
+        ],
+        "title": "DocumentDetailOut",
         "type": "object"
       },
       "DocumentIn": {
@@ -639,6 +2450,135 @@
           "content_base64"
         ],
         "title": "DocumentIn",
+        "type": "object"
+      },
+      "DocumentOut": {
+        "properties": {
+          "char_count": {
+            "title": "Char Count",
+            "type": "integer"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "visibility",
+          "filename",
+          "size_bytes",
+          "char_count",
+          "chunk_count",
+          "status",
+          "version",
+          "created_at"
+        ],
+        "title": "DocumentOut",
+        "type": "object"
+      },
+      "DocumentPageOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "DocumentPageOut",
+        "type": "object"
+      },
+      "EducationOut": {
+        "properties": {
+          "degree": {
+            "default": "",
+            "title": "Degree",
+            "type": "string"
+          },
+          "gpa": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gpa"
+          },
+          "major": {
+            "default": "",
+            "title": "Major",
+            "type": "string"
+          },
+          "school": {
+            "default": "",
+            "title": "School",
+            "type": "string"
+          },
+          "status": {
+            "default": "student",
+            "title": "Status",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "title": "EducationOut",
         "type": "object"
       },
       "EligibilityRule": {
@@ -694,6 +2634,432 @@
         "title": "EligibilityRule",
         "type": "object"
       },
+      "EnrolledOut": {
+        "properties": {
+          "enrolled": {
+            "title": "Enrolled",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enrolled"
+        ],
+        "title": "EnrolledOut",
+        "type": "object"
+      },
+      "EnrollmentOut": {
+        "properties": {
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "class_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Id"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "enrolled_at": {
+            "format": "date-time",
+            "title": "Enrolled At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "track_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Id"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "candidate_code",
+          "status",
+          "class_id",
+          "track_id",
+          "enrolled_at"
+        ],
+        "title": "EnrollmentOut",
+        "type": "object"
+      },
+      "EnrollmentPageOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EnrollmentOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "EnrollmentPageOut",
+        "type": "object"
+      },
+      "EnrollmentStatusOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "EnrollmentStatusOut",
+        "type": "object"
+      },
+      "EssaysOut": {
+        "properties": {
+          "motivation": {
+            "default": "",
+            "title": "Motivation",
+            "type": "string"
+          },
+          "problem_solving": {
+            "default": "",
+            "title": "Problem Solving",
+            "type": "string"
+          }
+        },
+        "title": "EssaysOut",
+        "type": "object"
+      },
+      "EvidenceOut": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "integer"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "field",
+          "quote",
+          "start",
+          "end"
+        ],
+        "title": "EvidenceOut",
+        "type": "object"
+      },
+      "ExperienceOut": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "org": {
+            "default": "",
+            "title": "Org",
+            "type": "string"
+          },
+          "role": {
+            "default": "",
+            "title": "Role",
+            "type": "string"
+          },
+          "years": {
+            "default": 0,
+            "title": "Years",
+            "type": "number"
+          }
+        },
+        "title": "ExperienceOut",
+        "type": "object"
+      },
+      "FairnessIntake": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "FairnessIntake",
+        "type": "object"
+      },
+      "FairnessOut": {
+        "properties": {
+          "intake": {
+            "$ref": "#/components/schemas/FairnessIntake"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "stages": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/GroupRates"
+              },
+              "type": "object"
+            },
+            "title": "Stages",
+            "type": "object"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "intake",
+          "stages",
+          "warnings",
+          "note"
+        ],
+        "title": "FairnessOut",
+        "type": "object"
+      },
+      "FlagOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule"
+          },
+          "severity": {
+            "default": "warning",
+            "title": "Severity",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "label"
+        ],
+        "title": "FlagOut",
+        "type": "object"
+      },
+      "FunnelIntake": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "quota": {
+            "title": "Quota",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "quota",
+          "status"
+        ],
+        "title": "FunnelIntake",
+        "type": "object"
+      },
+      "FunnelOut": {
+        "properties": {
+          "by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Status",
+            "type": "object"
+          },
+          "decisions": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Decisions",
+            "type": "object"
+          },
+          "intake": {
+            "$ref": "#/components/schemas/FunnelIntake"
+          },
+          "median_days_to_decision": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Days To Decision"
+          },
+          "quota_fill": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quota Fill"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/FunnelStage"
+            },
+            "title": "Stages",
+            "type": "array"
+          }
+        },
+        "required": [
+          "intake",
+          "by_status",
+          "stages",
+          "decisions",
+          "median_days_to_decision",
+          "quota_fill"
+        ],
+        "title": "FunnelOut",
+        "type": "object"
+      },
+      "FunnelStage": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "count"
+        ],
+        "title": "FunnelStage",
+        "type": "object"
+      },
+      "GroupRates": {
+        "properties": {
+          "impact_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Impact Ratio"
+          },
+          "rates": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Rates",
+            "type": "object"
+          },
+          "sizes": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Sizes",
+            "type": "object"
+          }
+        },
+        "required": [
+          "rates",
+          "sizes",
+          "impact_ratio"
+        ],
+        "title": "GroupRates",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -705,6 +3071,81 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HistogramBucketOut": {
+        "properties": {
+          "bucket": {
+            "title": "Bucket",
+            "type": "integer"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket",
+          "tier",
+          "count"
+        ],
+        "title": "HistogramBucketOut",
+        "type": "object"
+      },
+      "IdKeyOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key"
+        ],
+        "title": "IdKeyOut",
+        "type": "object"
+      },
+      "IdNameOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "IdNameOut",
+        "type": "object"
+      },
+      "IdOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "IdOut",
         "type": "object"
       },
       "ImportIn": {
@@ -728,6 +3169,31 @@
           "rows"
         ],
         "title": "ImportIn",
+        "type": "object"
+      },
+      "ImportResultOut": {
+        "properties": {
+          "dry_run": {
+            "title": "Dry Run",
+            "type": "boolean"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ImportRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/ImportSummaryOut"
+          }
+        },
+        "required": [
+          "dry_run",
+          "summary",
+          "rows"
+        ],
+        "title": "ImportResultOut",
         "type": "object"
       },
       "ImportRow": {
@@ -757,6 +3223,79 @@
           "roles"
         ],
         "title": "ImportRow",
+        "type": "object"
+      },
+      "ImportRowOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "invite_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invite Link"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "created",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "row",
+          "email",
+          "status"
+        ],
+        "title": "ImportRowOut",
+        "type": "object"
+      },
+      "ImportSummaryOut": {
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "integer"
+          },
+          "error": {
+            "title": "Error",
+            "type": "integer"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ok",
+          "created",
+          "error"
+        ],
+        "title": "ImportSummaryOut",
         "type": "object"
       },
       "IntakeIn": {
@@ -862,6 +3401,116 @@
           "rounds"
         ],
         "title": "IntakeIn",
+        "type": "object"
+      },
+      "IntakeOut": {
+        "properties": {
+          "ai_screening_enabled": {
+            "title": "Ai Screening Enabled",
+            "type": "boolean"
+          },
+          "approval_mode": {
+            "title": "Approval Mode",
+            "type": "string"
+          },
+          "blind_review": {
+            "title": "Blind Review",
+            "type": "boolean"
+          },
+          "closes_at": {
+            "format": "date-time",
+            "title": "Closes At",
+            "type": "string"
+          },
+          "cohort_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cohort Id"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "eligibility_rules": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Eligibility Rules",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "min_reviews": {
+            "title": "Min Reviews",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "opens_at": {
+            "format": "date-time",
+            "title": "Opens At",
+            "type": "string"
+          },
+          "program_id": {
+            "format": "uuid",
+            "title": "Program Id",
+            "type": "string"
+          },
+          "quota": {
+            "title": "Quota",
+            "type": "integer"
+          },
+          "rounds": {
+            "items": {
+              "$ref": "#/components/schemas/RoundOut"
+            },
+            "title": "Rounds",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "program_id",
+          "cohort_id",
+          "name",
+          "description",
+          "opens_at",
+          "closes_at",
+          "quota",
+          "status",
+          "rounds",
+          "approval_mode",
+          "ai_screening_enabled",
+          "blind_review",
+          "min_reviews",
+          "eligibility_rules",
+          "counts"
+        ],
+        "title": "IntakeOut",
         "type": "object"
       },
       "IntakePatch": {
@@ -982,6 +3631,327 @@
         "title": "IntakePatch",
         "type": "object"
       },
+      "IntakeRef": {
+        "properties": {
+          "blind_review": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blind Review"
+          },
+          "closes_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closes At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rounds": {
+            "items": {
+              "$ref": "#/components/schemas/RoundOut"
+            },
+            "title": "Rounds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "rounds"
+        ],
+        "title": "IntakeRef",
+        "type": "object"
+      },
+      "InvitationPreviewOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "has_password": {
+            "title": "Has Password",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "organization": {
+            "title": "Organization",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization",
+          "email",
+          "kind",
+          "has_password"
+        ],
+        "title": "InvitationPreviewOut",
+        "type": "object"
+      },
+      "InviteLinkOut": {
+        "properties": {
+          "invite_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invite Link"
+          }
+        },
+        "required": [
+          "invite_link"
+        ],
+        "title": "InviteLinkOut",
+        "type": "object"
+      },
+      "JobOut": {
+        "properties": {
+          "done": {
+            "title": "Done",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "total",
+          "done",
+          "result",
+          "error",
+          "started_at",
+          "finished_at"
+        ],
+        "title": "JobOut",
+        "type": "object"
+      },
+      "LabAnalysis": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/LabCriterionStat"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "events": {
+            "title": "Events",
+            "type": "integer"
+          },
+          "model_auc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Auc"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "qualified_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualified Rate"
+          },
+          "reliable": {
+            "title": "Reliable",
+            "type": "boolean"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "n",
+          "events",
+          "criteria",
+          "model_auc",
+          "warnings",
+          "reliable"
+        ],
+        "title": "LabAnalysis",
+        "type": "object"
+      },
+      "LabCriterionDef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "weight"
+        ],
+        "title": "LabCriterionDef",
+        "type": "object"
+      },
+      "LabCriterionStat": {
+        "properties": {
+          "auc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auc"
+          },
+          "ci90": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Ci90",
+            "type": "array"
+          },
+          "coef": {
+            "title": "Coef",
+            "type": "number"
+          },
+          "criterion": {
+            "title": "Criterion",
+            "type": "string"
+          },
+          "mean_if_not": {
+            "title": "Mean If Not",
+            "type": "number"
+          },
+          "mean_if_qualified": {
+            "title": "Mean If Qualified",
+            "type": "number"
+          },
+          "significant": {
+            "title": "Significant",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "criterion",
+          "coef",
+          "ci90",
+          "significant",
+          "auc",
+          "mean_if_qualified",
+          "mean_if_not"
+        ],
+        "title": "LabCriterionStat",
+        "type": "object"
+      },
       "LabIn": {
         "properties": {
           "intake_ids": {
@@ -1015,6 +3985,213 @@
         "title": "LabIn",
         "type": "object"
       },
+      "LabOut": {
+        "properties": {
+          "admitted": {
+            "title": "Admitted",
+            "type": "integer"
+          },
+          "analysis": {
+            "$ref": "#/components/schemas/LabAnalysis"
+          },
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/LabCriterionDef"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "new_weights": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Weights"
+          },
+          "old_weights": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Old Weights",
+            "type": "object"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "integer"
+          },
+          "simulation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LabSimulation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "criteria",
+          "analysis",
+          "pool",
+          "admitted",
+          "old_weights"
+        ],
+        "title": "LabOut",
+        "type": "object"
+      },
+      "LabSimulation": {
+        "properties": {
+          "changed_in": {
+            "title": "Changed In",
+            "type": "integer"
+          },
+          "dropped_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dropped Ids",
+            "type": "array"
+          },
+          "fairness_new": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GroupRates"
+            },
+            "title": "Fairness New",
+            "type": "object"
+          },
+          "fairness_old": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GroupRates"
+            },
+            "title": "Fairness Old",
+            "type": "object"
+          },
+          "model_expected_new": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Expected New"
+          },
+          "model_expected_old": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Expected Old"
+          },
+          "model_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Note"
+          },
+          "newly_selected_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Newly Selected Ids",
+            "type": "array"
+          },
+          "observed_new": {
+            "$ref": "#/components/schemas/ObservedRate"
+          },
+          "observed_old": {
+            "$ref": "#/components/schemas/ObservedRate"
+          },
+          "overlap_actual_old": {
+            "title": "Overlap Actual Old",
+            "type": "number"
+          },
+          "overlap_old_new": {
+            "title": "Overlap Old New",
+            "type": "number"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "integer"
+          },
+          "selected": {
+            "title": "Selected",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pool",
+          "selected",
+          "overlap_old_new",
+          "changed_in",
+          "overlap_actual_old",
+          "observed_old",
+          "observed_new",
+          "fairness_old",
+          "fairness_new",
+          "newly_selected_ids",
+          "dropped_ids"
+        ],
+        "title": "LabSimulation",
+        "type": "object"
+      },
+      "LinksOut": {
+        "properties": {
+          "github": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Github"
+          },
+          "linkedin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linkedin"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portfolio"
+          }
+        },
+        "title": "LinksOut",
+        "type": "object"
+      },
       "LoginIn": {
         "properties": {
           "email": {
@@ -1035,6 +4212,64 @@
           "password"
         ],
         "title": "LoginIn",
+        "type": "object"
+      },
+      "MatrixRowOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "competency_id": {
+            "format": "uuid",
+            "title": "Competency Id",
+            "type": "string"
+          },
+          "evidence": {
+            "title": "Evidence",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "met": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Met"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "competency_id",
+          "code",
+          "name",
+          "target",
+          "level",
+          "evidence",
+          "met"
+        ],
+        "title": "MatrixRowOut",
         "type": "object"
       },
       "MeOut": {
@@ -1087,6 +4322,215 @@
         "title": "MeOut",
         "type": "object"
       },
+      "MentorLearnerOut": {
+        "properties": {
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "partner_id": {
+            "format": "uuid",
+            "title": "Partner Id",
+            "type": "string"
+          },
+          "project": {
+            "title": "Project",
+            "type": "string"
+          },
+          "track_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track Id"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "name",
+          "track_id",
+          "project",
+          "partner_id"
+        ],
+        "title": "MentorLearnerOut",
+        "type": "object"
+      },
+      "MovedOut": {
+        "properties": {
+          "moved": {
+            "title": "Moved",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "moved"
+        ],
+        "title": "MovedOut",
+        "type": "object"
+      },
+      "MyReviewOut": {
+        "properties": {
+          "comment": {
+            "title": "Comment",
+            "type": "string"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation"
+          },
+          "scores": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Scores",
+            "type": "object"
+          },
+          "submitted": {
+            "title": "Submitted",
+            "type": "boolean"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          }
+        },
+        "required": [
+          "scores",
+          "comment",
+          "recommendation",
+          "submitted",
+          "total_score"
+        ],
+        "title": "MyReviewOut",
+        "type": "object"
+      },
+      "NotificationListOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "unread": {
+            "title": "Unread",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unread",
+          "items"
+        ],
+        "title": "NotificationListOut",
+        "type": "object"
+      },
+      "NotificationOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          },
+          "read": {
+            "title": "Read",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "body",
+          "link",
+          "read",
+          "created_at"
+        ],
+        "title": "NotificationOut",
+        "type": "object"
+      },
+      "ObservedRate": {
+        "properties": {
+          "known": {
+            "title": "Known",
+            "type": "integer"
+          },
+          "of": {
+            "title": "Of",
+            "type": "integer"
+          },
+          "qualified_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualified Rate"
+          }
+        },
+        "required": [
+          "known",
+          "of",
+          "qualified_rate"
+        ],
+        "title": "ObservedRate",
+        "type": "object"
+      },
       "OrgOut": {
         "properties": {
           "branding": {
@@ -1116,6 +4560,178 @@
         "title": "OrgOut",
         "type": "object"
       },
+      "OverviewAi": {
+        "properties": {
+          "engine": {
+            "title": "Engine",
+            "type": "string"
+          },
+          "llm_configured": {
+            "title": "Llm Configured",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "month_to_date_usd": {
+            "title": "Month To Date Usd",
+            "type": "number"
+          },
+          "monthly_budget_usd": {
+            "title": "Monthly Budget Usd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "engine",
+          "llm_configured",
+          "model",
+          "month_to_date_usd",
+          "monthly_budget_usd"
+        ],
+        "title": "OverviewAi",
+        "type": "object"
+      },
+      "OverviewEmail": {
+        "properties": {
+          "backend": {
+            "title": "Backend",
+            "type": "string"
+          },
+          "queue": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Queue",
+            "type": "object"
+          }
+        },
+        "required": [
+          "backend",
+          "queue"
+        ],
+        "title": "OverviewEmail",
+        "type": "object"
+      },
+      "OverviewOut": {
+        "properties": {
+          "ai": {
+            "$ref": "#/components/schemas/OverviewAi"
+          },
+          "documents": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Documents",
+            "type": "object"
+          },
+          "email": {
+            "$ref": "#/components/schemas/OverviewEmail"
+          },
+          "intakes": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Intakes",
+            "type": "object"
+          },
+          "jobs_24h": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Jobs 24H",
+            "type": "object"
+          },
+          "pending_decisions": {
+            "title": "Pending Decisions",
+            "type": "integer"
+          },
+          "security_24h": {
+            "$ref": "#/components/schemas/OverviewSecurity"
+          },
+          "users": {
+            "$ref": "#/components/schemas/OverviewUsers"
+          }
+        },
+        "required": [
+          "users",
+          "intakes",
+          "pending_decisions",
+          "jobs_24h",
+          "security_24h",
+          "email",
+          "documents",
+          "ai"
+        ],
+        "title": "OverviewOut",
+        "type": "object"
+      },
+      "OverviewSecurity": {
+        "properties": {
+          "failed_logins": {
+            "title": "Failed Logins",
+            "type": "integer"
+          },
+          "logins": {
+            "title": "Logins",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "logins",
+          "failed_logins"
+        ],
+        "title": "OverviewSecurity",
+        "type": "object"
+      },
+      "OverviewUsers": {
+        "properties": {
+          "active_by_role": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Active By Role",
+            "type": "object"
+          },
+          "by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Status",
+            "type": "object"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "by_status",
+          "active_by_role",
+          "locked"
+        ],
+        "title": "OverviewUsers",
+        "type": "object"
+      },
+      "PaidOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "total_vnd": {
+            "title": "Total Vnd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "count",
+          "total_vnd"
+        ],
+        "title": "PaidOut",
+        "type": "object"
+      },
       "PartnerIn": {
         "properties": {
           "name": {
@@ -1137,6 +4753,38 @@
           "name"
         ],
         "title": "PartnerIn",
+        "type": "object"
+      },
+      "PartnerOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "skills",
+          "status"
+        ],
+        "title": "PartnerOut",
         "type": "object"
       },
       "PasswordChangeIn": {
@@ -1191,6 +4839,35 @@
         "title": "PatchIn",
         "type": "object"
       },
+      "PendingDecisionOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "proposal_reason": {
+            "title": "Proposal Reason",
+            "type": "string"
+          },
+          "proposed_by_me": {
+            "title": "Proposed By Me",
+            "type": "boolean"
+          },
+          "proposed_outcome": {
+            "title": "Proposed Outcome",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "proposed_outcome",
+          "proposal_reason",
+          "proposed_by_me"
+        ],
+        "title": "PendingDecisionOut",
+        "type": "object"
+      },
       "PeriodIn": {
         "properties": {
           "period": {
@@ -1237,6 +4914,102 @@
         "title": "PlaceIn",
         "type": "object"
       },
+      "PreferencesOut": {
+        "properties": {
+          "tracks": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Tracks",
+            "type": "array"
+          }
+        },
+        "title": "PreferencesOut",
+        "type": "object"
+      },
+      "ProfileOut": {
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "full_name": {
+            "default": "",
+            "title": "Full Name",
+            "type": "string"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "title": "ProfileOut",
+        "type": "object"
+      },
+      "ProgramCreatedOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Name",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ],
+        "title": "ProgramCreatedOut",
+        "type": "object"
+      },
       "ProgramIn": {
         "properties": {
           "code": {
@@ -1271,6 +5044,76 @@
         "title": "ProgramIn",
         "type": "object"
       },
+      "ProgramOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "cohorts": {
+            "items": {
+              "$ref": "#/components/schemas/CohortListItem"
+            },
+            "title": "Cohorts",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Name",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "cohorts"
+        ],
+        "title": "ProgramOut",
+        "type": "object"
+      },
+      "ProjectOut": {
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          },
+          "tech": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Tech",
+            "type": "array"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "title": "ProjectOut",
+        "type": "object"
+      },
       "ProposalIn": {
         "properties": {
           "outcome": {
@@ -1302,6 +5145,30 @@
         "title": "ProposalIn",
         "type": "object"
       },
+      "ProposalOut": {
+        "properties": {
+          "decision_id": {
+            "format": "uuid",
+            "title": "Decision Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "decision_id",
+          "status",
+          "version"
+        ],
+        "title": "ProposalOut",
+        "type": "object"
+      },
       "QualificationIn": {
         "properties": {
           "outcome": {
@@ -1319,6 +5186,212 @@
           "reason"
         ],
         "title": "QualificationIn",
+        "type": "object"
+      },
+      "QualificationRowOut": {
+        "properties": {
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "met": {
+            "title": "Met",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "suggestion": {
+            "title": "Suggestion",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "status",
+          "suggestion",
+          "met",
+          "total"
+        ],
+        "title": "QualificationRowOut",
+        "type": "object"
+      },
+      "QueueItemOut": {
+        "properties": {
+          "ai_attention": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Attention"
+          },
+          "ai_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Score"
+          },
+          "ai_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Tier"
+          },
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "current_round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Round"
+          },
+          "flag_count": {
+            "title": "Flag Count",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "my_review": {
+            "anyOf": [
+              {
+                "enum": [
+                  "draft",
+                  "submitted"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Review"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "review_count": {
+            "title": "Review Count",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          }
+        },
+        "required": [
+          "id",
+          "candidate_code",
+          "name",
+          "status",
+          "current_round",
+          "submitted_at",
+          "flag_count",
+          "review_count",
+          "my_review",
+          "ai_attention"
+        ],
+        "title": "QueueItemOut",
+        "type": "object"
+      },
+      "QueuePageOut": {
+        "properties": {
+          "blind_review": {
+            "title": "Blind Review",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/QueueItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor",
+          "total",
+          "blind_review"
+        ],
+        "title": "QueuePageOut",
+        "type": "object"
+      },
+      "QueuedOut": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "QueuedOut",
         "type": "object"
       },
       "ReadIn": {
@@ -1426,6 +5499,106 @@
         "title": "ReviewIn",
         "type": "object"
       },
+      "ReviewRowOut": {
+        "properties": {
+          "comment": {
+            "title": "Comment",
+            "type": "string"
+          },
+          "mine": {
+            "title": "Mine",
+            "type": "boolean"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation"
+          },
+          "reviewer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer"
+          },
+          "scores": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Scores",
+            "type": "object"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          }
+        },
+        "required": [
+          "reviewer",
+          "mine",
+          "scores",
+          "total_score",
+          "comment",
+          "recommendation",
+          "submitted_at"
+        ],
+        "title": "ReviewRowOut",
+        "type": "object"
+      },
+      "ReviewSavedOut": {
+        "properties": {
+          "submitted": {
+            "title": "Submitted",
+            "type": "boolean"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          }
+        },
+        "required": [
+          "submitted",
+          "total_score"
+        ],
+        "title": "ReviewSavedOut",
+        "type": "object"
+      },
       "RoundIn": {
         "additionalProperties": false,
         "properties": {
@@ -1457,6 +5630,29 @@
         "title": "RoundIn",
         "type": "object"
       },
+      "RoundOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "type": {
+            "default": "review",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "RoundOut",
+        "type": "object"
+      },
       "RubricIn": {
         "additionalProperties": false,
         "properties": {
@@ -1476,6 +5672,118 @@
         "title": "RubricIn",
         "type": "object"
       },
+      "RubricOut": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/CriterionOut"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "criteria"
+        ],
+        "title": "RubricOut",
+        "type": "object"
+      },
+      "RubricSavedOut": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/CriterionOut"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "round": {
+            "title": "Round",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "criteria",
+          "round"
+        ],
+        "title": "RubricSavedOut",
+        "type": "object"
+      },
+      "SavedOut": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "SavedOut",
+        "type": "object"
+      },
+      "SearchHitOut": {
+        "properties": {
+          "chunk_id": {
+            "format": "uuid",
+            "title": "Chunk Id",
+            "type": "string"
+          },
+          "document_id": {
+            "format": "uuid",
+            "title": "Document Id",
+            "type": "string"
+          },
+          "heading": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heading"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "snippet": {
+            "title": "Snippet",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunk_id",
+          "document_id",
+          "title",
+          "visibility",
+          "heading",
+          "snippet",
+          "score"
+        ],
+        "title": "SearchHitOut",
+        "type": "object"
+      },
       "SettingsIn": {
         "properties": {
           "values": {
@@ -1488,6 +5796,311 @@
           "values"
         ],
         "title": "SettingsIn",
+        "type": "object"
+      },
+      "SettingsOut": {
+        "properties": {
+          "spec": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Spec",
+            "type": "object"
+          },
+          "values": {
+            "additionalProperties": true,
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "values",
+          "spec"
+        ],
+        "title": "SettingsOut",
+        "type": "object"
+      },
+      "SettingsValuesOut": {
+        "properties": {
+          "values": {
+            "additionalProperties": true,
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "SettingsValuesOut",
+        "type": "object"
+      },
+      "StaffApplicationOut": {
+        "properties": {
+          "ai": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiAssessmentOut"
+              },
+              {
+                "$ref": "#/components/schemas/AiLockedOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai"
+          },
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "content": {
+            "$ref": "#/components/schemas/ContentOut"
+          },
+          "current_round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Round"
+          },
+          "disagreement": {
+            "title": "Disagreement",
+            "type": "boolean"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intake": {
+            "$ref": "#/components/schemas/IntakeRef"
+          },
+          "my_review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MyReviewOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner": {
+            "title": "Owner",
+            "type": "boolean"
+          },
+          "pending_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PendingDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfileOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewRowOut"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RubricOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/StaffTimelineOut"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "candidate_code",
+          "status",
+          "current_round",
+          "version",
+          "intake",
+          "profile",
+          "content",
+          "flags",
+          "submitted_at",
+          "owner",
+          "rubric",
+          "my_review",
+          "reviews",
+          "disagreement",
+          "ai",
+          "pending_decision",
+          "timeline"
+        ],
+        "title": "StaffApplicationOut",
+        "type": "object"
+      },
+      "StaffTimelineOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "to_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Status"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "from_status",
+          "to_status",
+          "at",
+          "message"
+        ],
+        "title": "StaffTimelineOut",
+        "type": "object"
+      },
+      "StatusOut": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "StatusOut",
+        "type": "object"
+      },
+      "StatusVersionOut": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "StatusVersionOut",
+        "type": "object"
+      },
+      "StipendSummaryOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_vnd": {
+            "title": "Total Vnd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "period",
+          "status",
+          "count",
+          "total_vnd"
+        ],
+        "title": "StipendSummaryOut",
         "type": "object"
       },
       "SubmitIn": {
@@ -1513,6 +6126,115 @@
           "consent"
         ],
         "title": "SubmitIn",
+        "type": "object"
+      },
+      "TierCountOut": {
+        "properties": {
+          "attention": {
+            "title": "Attention",
+            "type": "integer"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "attention"
+        ],
+        "title": "TierCountOut",
+        "type": "object"
+      },
+      "TimelineEventOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "round": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Round"
+          },
+          "to_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Status"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "from_status",
+          "to_status",
+          "at",
+          "message",
+          "round"
+        ],
+        "title": "TimelineEventOut",
+        "type": "object"
+      },
+      "TrackFillOut": {
+        "properties": {
+          "assigned": {
+            "title": "Assigned",
+            "type": "integer"
+          },
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "assigned",
+          "capacity"
+        ],
+        "title": "TrackFillOut",
         "type": "object"
       },
       "TrackIn": {
@@ -1544,6 +6266,190 @@
         "title": "TrackIn",
         "type": "object"
       },
+      "TrackOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Keywords",
+            "type": "array"
+          },
+          "name": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Name",
+            "type": "object"
+          },
+          "targets": {
+            "items": {
+              "$ref": "#/components/schemas/TrackTargetOut"
+            },
+            "title": "Targets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "keywords",
+          "targets"
+        ],
+        "title": "TrackOut",
+        "type": "object"
+      },
+      "TrackStat": {
+        "properties": {
+          "assigned": {
+            "title": "Assigned",
+            "type": "integer"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Name",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "capacity",
+          "assigned"
+        ],
+        "title": "TrackStat",
+        "type": "object"
+      },
+      "TrackTargetOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "competency_id": {
+            "format": "uuid",
+            "title": "Competency Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "competency_id",
+          "code",
+          "name",
+          "target"
+        ],
+        "title": "TrackTargetOut",
+        "type": "object"
+      },
+      "TriageBoardOut": {
+        "properties": {
+          "ai_enabled": {
+            "title": "Ai Enabled",
+            "type": "boolean"
+          },
+          "histogram": {
+            "items": {
+              "$ref": "#/components/schemas/HistogramBucketOut"
+            },
+            "title": "Histogram",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TriageItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "pool": {
+            "title": "Pool",
+            "type": "integer"
+          },
+          "round": {
+            "title": "Round",
+            "type": "string"
+          },
+          "rounds": {
+            "items": {
+              "$ref": "#/components/schemas/RoundOut"
+            },
+            "title": "Rounds",
+            "type": "array"
+          },
+          "scored": {
+            "title": "Scored",
+            "type": "integer"
+          },
+          "thresholds": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Thresholds",
+            "type": "object"
+          },
+          "tiers": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TierCountOut"
+            },
+            "title": "Tiers",
+            "type": "object"
+          }
+        },
+        "required": [
+          "round",
+          "pool",
+          "scored",
+          "tiers",
+          "histogram",
+          "items",
+          "thresholds",
+          "rounds",
+          "ai_enabled"
+        ],
+        "title": "TriageBoardOut",
+        "type": "object"
+      },
       "TriageIn": {
         "properties": {
           "force": {
@@ -1564,6 +6470,101 @@
           }
         },
         "title": "TriageIn",
+        "type": "object"
+      },
+      "TriageItemOut": {
+        "properties": {
+          "application_id": {
+            "format": "uuid",
+            "title": "Application Id",
+            "type": "string"
+          },
+          "candidate_code": {
+            "title": "Candidate Code",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "engine": {
+            "title": "Engine",
+            "type": "string"
+          },
+          "flag_count": {
+            "title": "Flag Count",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "needs_attention": {
+            "title": "Needs Attention",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          },
+          "total_score": {
+            "title": "Total Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "application_id",
+          "candidate_code",
+          "name",
+          "status",
+          "total_score",
+          "confidence",
+          "tier",
+          "needs_attention",
+          "flag_count",
+          "engine"
+        ],
+        "title": "TriageItemOut",
+        "type": "object"
+      },
+      "TriageStartOut": {
+        "properties": {
+          "engine": {
+            "title": "Engine",
+            "type": "string"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "round": {
+            "title": "Round",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "job_id",
+          "total",
+          "round",
+          "engine"
+        ],
+        "title": "TriageStartOut",
         "type": "object"
       },
       "ValidationError": {
@@ -1686,8 +6687,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/AiUsageRowOut"
                   },
                   "title": "Response Costs Ai Api V1 Admin Costs Ai Get",
                   "type": "array"
@@ -1731,11 +6731,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "Response Costs Budget Api V1 Admin Costs Budgets Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/QueuedOut"
                 }
               }
             },
@@ -1859,9 +6855,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Costs Entries Api V1 Admin Costs Entries Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CostEntryPageOut"
                 }
               }
             },
@@ -1900,9 +6894,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Costs Add Api V1 Admin Costs Entries Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CostEntryOut"
                 }
               }
             },
@@ -1955,9 +6947,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Costs Void Api V1 Admin Costs Entries  Entry Id  Void Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CostEntryOut"
                 }
               }
             },
@@ -2041,9 +7031,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Costs Summary Api V1 Admin Costs Summary Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CostSummaryOut"
                 }
               }
             },
@@ -2117,9 +7105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response List Documents Api V1 Admin Documents Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DocumentPageOut"
                 }
               }
             },
@@ -2158,9 +7144,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Add Document Api V1 Admin Documents Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DocumentOut"
                 }
               }
             },
@@ -2206,8 +7190,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/SearchHitOut"
                   },
                   "title": "Response Search Documents Api V1 Admin Documents Search Get",
                   "type": "array"
@@ -2253,9 +7236,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Document Api V1 Admin Documents  Doc Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DocumentDetailOut"
                 }
               }
             },
@@ -2298,9 +7279,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Restore Document Api V1 Admin Documents  Doc Id  Restore Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DocumentOut"
                 }
               }
             },
@@ -2343,9 +7322,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Retire Document Api V1 Admin Documents  Doc Id  Retire Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DocumentOut"
                 }
               }
             },
@@ -2376,9 +7353,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Overview Api V1 Admin Overview Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/OverviewOut"
                 }
               }
             },
@@ -2399,9 +7374,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Settings  Api V1 Admin Settings Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SettingsOut"
                 }
               }
             },
@@ -2430,9 +7403,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Put Settings Api V1 Admin Settings Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SettingsValuesOut"
                 }
               }
             },
@@ -2544,9 +7515,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response List Users Api V1 Admin Users Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AccountPageOut"
                 }
               }
             },
@@ -2585,9 +7554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create User Api V1 Admin Users Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AccountCreatedOut"
                 }
               }
             },
@@ -2628,9 +7595,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Import Users Api V1 Admin Users Import Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ImportResultOut"
                 }
               }
             },
@@ -2683,9 +7648,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Patch User Api V1 Admin Users  Membership Id  Patch",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AccountUpdatedOut"
                 }
               }
             },
@@ -2728,9 +7691,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Resend Invite Api V1 Admin Users  Membership Id  Invite Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/InviteLinkOut"
                 }
               }
             },
@@ -2773,11 +7734,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "Response Reset Password Api V1 Admin Users  Membership Id  Reset Password Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/QueuedOut"
                 }
               }
             },
@@ -2820,9 +7777,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Fairness Api V1 Analytics Fairness Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FairnessOut"
                 }
               }
             },
@@ -2865,9 +7820,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Funnel Api V1 Analytics Funnel Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FunnelOut"
                 }
               }
             },
@@ -2908,9 +7861,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Lab Api V1 Analytics Lab Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/LabOut"
                 }
               }
             },
@@ -2951,9 +7902,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create Application Api V1 Applications Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApplicationViewOut"
                 }
               }
             },
@@ -2985,8 +7934,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/ApplicationSummaryOut"
                   },
                   "title": "Response My Applications Api V1 Applications Mine Get",
                   "type": "array"
@@ -3022,9 +7970,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get My Application Api V1 Applications  Application Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApplicationViewOut"
                 }
               }
             },
@@ -3075,9 +8021,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Save Application Api V1 Applications  Application Id  Patch",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApplicationViewOut"
                 }
               }
             },
@@ -3130,9 +8074,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Resubmit Application Api V1 Applications  Application Id  Resubmit Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApplicationViewOut"
                 }
               }
             },
@@ -3185,9 +8127,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Submit Application Api V1 Applications  Application Id  Submit Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApplicationViewOut"
                 }
               }
             },
@@ -3231,8 +8171,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/TimelineEventOut"
                   },
                   "title": "Response Application Timeline Api V1 Applications  Application Id  Timeline Get",
                   "type": "array"
@@ -3288,9 +8227,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Withdraw Application Api V1 Applications  Application Id  Withdraw Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ApplicationViewOut"
                 }
               }
             },
@@ -3452,9 +8389,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Invitation Preview Api V1 Auth Invitations  Token  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/InvitationPreviewOut"
                 }
               }
             },
@@ -3617,9 +8552,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create Class Api V1 Cohorts  Cohort Id  Classes Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IdNameOut"
                 }
               }
             },
@@ -3663,8 +8596,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/ComposerRunOut"
                   },
                   "title": "Response Composer Runs Api V1 Cohorts  Cohort Id  Composer Runs Get",
                   "type": "array"
@@ -3718,9 +8650,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Composer Run Api V1 Cohorts  Cohort Id  Composer Runs Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ComposerRunOut"
                 }
               }
             },
@@ -3763,11 +8693,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "integer"
-                  },
-                  "title": "Response Enroll Accepted Api V1 Cohorts  Cohort Id  Enroll Accepted Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/EnrolledOut"
                 }
               }
             },
@@ -3902,9 +8828,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Enrollments Api V1 Cohorts  Cohort Id  Enrollments Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/EnrollmentPageOut"
                 }
               }
             },
@@ -3947,9 +8871,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Cohort Overview Api V1 Cohorts  Cohort Id  Overview Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CohortOverviewOut"
                 }
               }
             },
@@ -4002,11 +8924,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "Response Set Demand Api V1 Cohorts  Cohort Id  Partner Demand Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SavedOut"
                 }
               }
             },
@@ -4050,8 +8968,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/QualificationRowOut"
                   },
                   "title": "Response Qualification Api V1 Cohorts  Cohort Id  Qualification Get",
                   "type": "array"
@@ -4098,8 +9015,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/StipendSummaryOut"
                   },
                   "title": "Response Stipends Api V1 Cohorts  Cohort Id  Stipends Get",
                   "type": "array"
@@ -4155,11 +9071,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "integer"
-                  },
-                  "title": "Response Stipends Generate Api V1 Cohorts  Cohort Id  Stipends Generate Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CreatedOut"
                 }
               }
             },
@@ -4212,9 +9124,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Stipends Pay Api V1 Cohorts  Cohort Id  Stipends Pay Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PaidOut"
                 }
               }
             },
@@ -4277,11 +9187,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "Response Set Track Capacity Api V1 Cohorts  Cohort Id  Tracks  Track Id  Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SavedOut"
                 }
               }
             },
@@ -4324,9 +9230,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Composer Get Api V1 Composer Runs  Run Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ComposerRunDetailOut"
                 }
               }
             },
@@ -4369,9 +9273,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Composer Apply Api V1 Composer Runs  Run Id  Apply Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ComposerAppliedOut"
                 }
               }
             },
@@ -4424,9 +9326,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Assign Api V1 Enrollments  Enrollment Id  Patch",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AssignedOut"
                 }
               }
             },
@@ -4479,9 +9379,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Assess Api V1 Enrollments  Enrollment Id  Assessments Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IdOut"
                 }
               }
             },
@@ -4524,9 +9422,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Competencies Api V1 Enrollments  Enrollment Id  Competencies Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CompetenciesOut"
                 }
               }
             },
@@ -4579,9 +9475,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Place Api V1 Enrollments  Enrollment Id  Placement Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IdOut"
                 }
               }
             },
@@ -4634,9 +9528,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Decide Api V1 Enrollments  Enrollment Id  Qualification Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/EnrollmentStatusOut"
                 }
               }
             },
@@ -4668,8 +9560,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/IntakeOut"
                   },
                   "title": "Response List Intakes Api V1 Intakes Get",
                   "type": "array"
@@ -4701,9 +9592,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create Intake Api V1 Intakes Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeOut"
                 }
               }
             },
@@ -4746,9 +9635,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Intake Api V1 Intakes  Intake Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeOut"
                 }
               }
             },
@@ -4799,9 +9686,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Patch Intake Api V1 Intakes  Intake Id  Patch",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeOut"
                 }
               }
             },
@@ -4844,9 +9729,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Close Intake Api V1 Intakes  Intake Id  Close Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeOut"
                 }
               }
             },
@@ -4889,9 +9772,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Publish Intake Api V1 Intakes  Intake Id  Publish Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeOut"
                 }
               }
             },
@@ -4934,7 +9815,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/RubricOut"
+                  },
                   "title": "Response Get Rubrics Api V1 Intakes  Intake Id  Rubrics Get",
                   "type": "object"
                 }
@@ -4998,9 +9881,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Put Rubric Api V1 Intakes  Intake Id  Rubrics  Round Key  Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/RubricSavedOut"
                 }
               }
             },
@@ -5043,11 +9924,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "integer"
-                  },
-                  "title": "Response Start Round Api V1 Intakes  Intake Id  Start Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MovedOut"
                 }
               }
             },
@@ -5163,9 +10040,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Triage Board Api V1 Intakes  Intake Id  Triage Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/TriageBoardOut"
                 }
               }
             },
@@ -5216,9 +10091,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Start Triage Api V1 Intakes  Intake Id  Triage Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/TriageStartOut"
                 }
               }
             },
@@ -5261,9 +10134,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Job Api V1 Jobs  Job Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/JobOut"
                 }
               }
             },
@@ -5316,8 +10187,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/MentorLearnerOut"
                   },
                   "title": "Response Mentor Learners Api V1 Mentor Learners Get",
                   "type": "array"
@@ -5355,9 +10225,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response List Notifications Api V1 Notifications Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/NotificationListOut"
                 }
               }
             },
@@ -5444,8 +10312,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/PartnerOut"
                   },
                   "title": "Response List Partners Api V1 Partners Get",
                   "type": "array"
@@ -5477,9 +10344,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Save Partner Api V1 Partners Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IdNameOut"
                 }
               }
             },
@@ -5511,8 +10376,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/ProgramOut"
                   },
                   "title": "Response List Programs Api V1 Programs Get",
                   "type": "array"
@@ -5544,9 +10408,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create Program Api V1 Programs Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ProgramCreatedOut"
                 }
               }
             },
@@ -5599,9 +10461,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create Cohort Api V1 Programs  Program Id  Cohorts Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CohortCreatedOut"
                 }
               }
             },
@@ -5654,9 +10514,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Create Track Api V1 Programs  Program Id  Tracks Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IdKeyOut"
                 }
               }
             },
@@ -5802,9 +10660,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Staff Queue Api V1 Staff Applications Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/QueuePageOut"
                 }
               }
             },
@@ -5847,9 +10703,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Staff Application Api V1 Staff Applications  Application Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StaffApplicationOut"
                 }
               }
             },
@@ -5902,9 +10756,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Advance Api V1 Staff Applications  Application Id  Advance Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AdvanceOut"
                 }
               }
             },
@@ -5957,9 +10809,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Propose Api V1 Staff Applications  Application Id  Proposals Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ProposalOut"
                 }
               }
             },
@@ -6012,9 +10862,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Request Info Api V1 Staff Applications  Application Id  Request Info Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StatusVersionOut"
                 }
               }
             },
@@ -6067,9 +10915,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Save Review Api V1 Staff Applications  Application Id  Review Put",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ReviewSavedOut"
                 }
               }
             },
@@ -6120,8 +10966,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/ApprovalRowOut"
                   },
                   "title": "Response Approvals Api V1 Staff Approvals Get",
                   "type": "array"
@@ -6177,9 +11022,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Approve Api V1 Staff Decisions  Decision Id  Approve Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StatusOut"
                 }
               }
             },
@@ -6232,9 +11075,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Return Decision Api V1 Staff Decisions  Decision Id  Return Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StatusOut"
                 }
               }
             },
@@ -6266,8 +11107,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "additionalProperties": true,
-                    "type": "object"
+                    "$ref": "#/components/schemas/TrackOut"
                   },
                   "title": "Response List Tracks Api V1 Tracks Get",
                   "type": "array"

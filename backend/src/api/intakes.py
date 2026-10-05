@@ -10,6 +10,9 @@ from sqlalchemy import func, select
 from src.api.deps import Principal, current_principal, request_meta, require
 from src.models import Application, Cohort, Intake, Program, Rubric
 from src.schemas.intake import IntakeIn, IntakePatch, RubricIn
+from src.schemas.responses.applicant import CohortCreatedOut, IntakeOut, ProgramCreatedOut, ProgramOut
+from src.schemas.responses.common import MovedOut
+from src.schemas.responses.staff import RubricOut, RubricSavedOut
 from src.services import intakes as svc
 from src.services.tenancy import OrgDb, org_db
 
@@ -64,7 +67,7 @@ async def _counts(db: OrgDb, intake_ids: list[uuid.UUID]) -> dict[uuid.UUID, dic
     return out
 
 
-@router.get("/programs")
+@router.get("/programs", response_model=list[ProgramOut])
 async def list_programs(
     _: Principal = Depends(require("intake.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -92,7 +95,7 @@ async def list_programs(
     ]
 
 
-@router.post("/programs", status_code=201)
+@router.post("/programs", status_code=201, response_model=ProgramCreatedOut)
 async def create_program(
     body: ProgramIn, _: Principal = Depends(require("intake.manage")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -108,7 +111,7 @@ async def create_program(
     return out
 
 
-@router.post("/programs/{program_id}/cohorts", status_code=201)
+@router.post("/programs/{program_id}/cohorts", status_code=201, response_model=CohortCreatedOut)
 async def create_cohort(
     program_id: uuid.UUID, body: CohortIn, _: Principal = Depends(require("intake.manage")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -129,7 +132,7 @@ async def create_cohort(
     return out
 
 
-@router.get("/intakes")
+@router.get("/intakes", response_model=list[IntakeOut])
 async def list_intakes(
     principal: Principal = Depends(current_principal), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -142,7 +145,7 @@ async def list_intakes(
     return [_intake_out(i, counts.get(i.id)) for i in intakes]
 
 
-@router.post("/intakes", status_code=201)
+@router.post("/intakes", status_code=201, response_model=IntakeOut)
 async def create_intake(
     body: IntakeIn,
     request: Request,
@@ -155,7 +158,7 @@ async def create_intake(
     return out
 
 
-@router.get("/intakes/{intake_id}")
+@router.get("/intakes/{intake_id}", response_model=IntakeOut)
 async def get_intake(
     intake_id: uuid.UUID, principal: Principal = Depends(current_principal), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -169,7 +172,7 @@ async def get_intake(
     return _intake_out(intake, counts.get(intake.id))
 
 
-@router.patch("/intakes/{intake_id}")
+@router.patch("/intakes/{intake_id}", response_model=IntakeOut)
 async def patch_intake(
     intake_id: uuid.UUID,
     body: IntakePatch,
@@ -183,7 +186,7 @@ async def patch_intake(
     return out
 
 
-@router.get("/intakes/{intake_id}/rubrics")
+@router.get("/intakes/{intake_id}/rubrics", response_model=dict[str, RubricOut])
 async def get_rubrics(
     intake_id: uuid.UUID,
     _: Principal = Depends(require("intake.read")),
@@ -202,7 +205,7 @@ async def get_rubrics(
     }
 
 
-@router.put("/intakes/{intake_id}/rubrics/{round_key}")
+@router.put("/intakes/{intake_id}/rubrics/{round_key}", response_model=RubricSavedOut)
 async def put_rubric(
     intake_id: uuid.UUID,
     round_key: str,
@@ -219,7 +222,7 @@ async def put_rubric(
     return out
 
 
-@router.post("/intakes/{intake_id}/publish")
+@router.post("/intakes/{intake_id}/publish", response_model=IntakeOut)
 async def publish_intake(
     intake_id: uuid.UUID,
     request: Request,
@@ -232,7 +235,7 @@ async def publish_intake(
     return out
 
 
-@router.post("/intakes/{intake_id}/close")
+@router.post("/intakes/{intake_id}/close", response_model=IntakeOut)
 async def close_intake(
     intake_id: uuid.UUID,
     request: Request,
@@ -245,7 +248,7 @@ async def close_intake(
     return out
 
 
-@router.post("/intakes/{intake_id}/start")
+@router.post("/intakes/{intake_id}/start", response_model=MovedOut)
 async def start_round(
     intake_id: uuid.UUID,
     request: Request,

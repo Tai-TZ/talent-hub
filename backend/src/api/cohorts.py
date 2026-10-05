@@ -9,6 +9,28 @@ from sqlalchemy import select
 
 from src.api.deps import Principal, actor_of, request_meta, require
 from src.models import Competency, ComposerRun, Enrollment, OrgMembership, Partner, Placement, Track, TrackTarget, User
+from src.schemas.responses.cohorts import (
+    AssignedOut,
+    CohortOverviewOut,
+    CompetenciesOut,
+    ComposerAppliedOut,
+    ComposerRunDetailOut,
+    ComposerRunOut,
+    CreatedOut,
+    EnrolledOut,
+    EnrollmentPageOut,
+    EnrollmentStatusOut,
+    IdKeyOut,
+    IdNameOut,
+    IdOut,
+    MentorLearnerOut,
+    PaidOut,
+    PartnerOut,
+    QualificationRowOut,
+    SavedOut,
+    StipendSummaryOut,
+    TrackOut,
+)
 from src.services import cohort_ops as ops
 from src.services import composer_service as composer
 from src.services.tenancy import OrgDb, org_db
@@ -77,14 +99,14 @@ class ComposerIn(BaseModel):
     track_capacity: dict[str, int] | None = None
 
 
-@router.get("/cohorts/{cohort_id}/overview")
+@router.get("/cohorts/{cohort_id}/overview", response_model=CohortOverviewOut)
 async def cohort_overview(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
     return await ops.cohort_overview(db, cohort_id)
 
 
-@router.get("/cohorts/{cohort_id}/enrollments")
+@router.get("/cohorts/{cohort_id}/enrollments", response_model=EnrollmentPageOut)
 async def enrollments(
     cohort_id: uuid.UUID,
     status: str | None = Query(None, pattern="^(active|withdrawn|qualified|not_qualified)$"),
@@ -102,7 +124,7 @@ async def enrollments(
     return {"items": items, "total": total}
 
 
-@router.post("/cohorts/{cohort_id}/enroll-accepted")
+@router.post("/cohorts/{cohort_id}/enroll-accepted", response_model=EnrolledOut)
 async def enroll_accepted(
     cohort_id: uuid.UUID,
     request: Request,
@@ -114,7 +136,7 @@ async def enroll_accepted(
     return {"enrolled": count}
 
 
-@router.patch("/enrollments/{enrollment_id}")
+@router.patch("/enrollments/{enrollment_id}", response_model=AssignedOut)
 async def assign(
     enrollment_id: uuid.UUID,
     body: AssignIn,
@@ -136,7 +158,7 @@ async def assign(
 
 
 # ---------- Nhánh, lớp ----------
-@router.get("/tracks")
+@router.get("/tracks", response_model=list[TrackOut])
 async def list_tracks(
     _: Principal = Depends(require("intake.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -162,7 +184,7 @@ async def list_tracks(
     ]
 
 
-@router.post("/programs/{program_id}/tracks", status_code=201)
+@router.post("/programs/{program_id}/tracks", status_code=201, response_model=IdKeyOut)
 async def create_track(
     program_id: uuid.UUID,
     body: TrackIn,
@@ -184,7 +206,7 @@ async def create_track(
     return out
 
 
-@router.put("/cohorts/{cohort_id}/tracks/{track_id}")
+@router.put("/cohorts/{cohort_id}/tracks/{track_id}", response_model=SavedOut)
 async def set_track_capacity(
     cohort_id: uuid.UUID,
     track_id: uuid.UUID,
@@ -197,7 +219,7 @@ async def set_track_capacity(
     return {"status": "saved"}
 
 
-@router.post("/cohorts/{cohort_id}/classes", status_code=201)
+@router.post("/cohorts/{cohort_id}/classes", status_code=201, response_model=IdNameOut)
 async def create_class(
     cohort_id: uuid.UUID, body: ClassIn, _: Principal = Depends(require("cohort.manage")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -208,7 +230,7 @@ async def create_class(
 
 
 # ---------- Đối tác và thực chiến ----------
-@router.get("/partners")
+@router.get("/partners", response_model=list[PartnerOut])
 async def list_partners(
     _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -216,7 +238,7 @@ async def list_partners(
     return [{"id": p.id, "name": p.name, "skills": p.skills, "status": p.status} for p in rows]
 
 
-@router.post("/partners", status_code=201)
+@router.post("/partners", status_code=201, response_model=IdNameOut)
 async def save_partner(
     body: PartnerIn,
     request: Request,
@@ -231,7 +253,7 @@ async def save_partner(
     return out
 
 
-@router.put("/cohorts/{cohort_id}/partner-demand")
+@router.put("/cohorts/{cohort_id}/partner-demand", response_model=SavedOut)
 async def set_demand(
     cohort_id: uuid.UUID, body: DemandIn, _: Principal = Depends(require("cohort.manage")), db: OrgDb = Depends(org_db)
 ) -> dict[str, str]:
@@ -240,7 +262,7 @@ async def set_demand(
     return {"status": "saved"}
 
 
-@router.post("/enrollments/{enrollment_id}/placement")
+@router.post("/enrollments/{enrollment_id}/placement", response_model=IdOut)
 async def place(
     enrollment_id: uuid.UUID,
     body: PlaceIn,
@@ -263,7 +285,7 @@ async def place(
 
 
 # ---------- Năng lực, mentor, xét đạt ----------
-@router.get("/enrollments/{enrollment_id}/competencies")
+@router.get("/enrollments/{enrollment_id}/competencies", response_model=CompetenciesOut)
 async def competencies(
     enrollment_id: uuid.UUID, principal: Principal = Depends(require("mentor.assess")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -278,7 +300,7 @@ async def competencies(
     }
 
 
-@router.post("/enrollments/{enrollment_id}/assessments", status_code=201)
+@router.post("/enrollments/{enrollment_id}/assessments", status_code=201, response_model=IdOut)
 async def assess(
     enrollment_id: uuid.UUID,
     body: AssessmentIn,
@@ -300,7 +322,7 @@ async def assess(
     return out
 
 
-@router.get("/mentor/learners")
+@router.get("/mentor/learners", response_model=list[MentorLearnerOut])
 async def mentor_learners(
     principal: Principal = Depends(require("mentor.assess")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -326,14 +348,14 @@ async def mentor_learners(
     ]
 
 
-@router.get("/cohorts/{cohort_id}/qualification")
+@router.get("/cohorts/{cohort_id}/qualification", response_model=list[QualificationRowOut])
 async def qualification(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
     return await ops.qualification_report(db, cohort_id)
 
 
-@router.post("/enrollments/{enrollment_id}/qualification")
+@router.post("/enrollments/{enrollment_id}/qualification", response_model=EnrollmentStatusOut)
 async def decide(
     enrollment_id: uuid.UUID,
     body: QualificationIn,
@@ -355,14 +377,14 @@ async def decide(
 
 
 # ---------- Phụ cấp ----------
-@router.get("/cohorts/{cohort_id}/stipends")
+@router.get("/cohorts/{cohort_id}/stipends", response_model=list[StipendSummaryOut])
 async def stipends(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
     return await ops.stipend_summary(db, cohort_id)
 
 
-@router.post("/cohorts/{cohort_id}/stipends/generate")
+@router.post("/cohorts/{cohort_id}/stipends/generate", response_model=CreatedOut)
 async def stipends_generate(
     cohort_id: uuid.UUID,
     body: PeriodIn,
@@ -377,7 +399,7 @@ async def stipends_generate(
     return {"created": created}
 
 
-@router.post("/cohorts/{cohort_id}/stipends/pay")
+@router.post("/cohorts/{cohort_id}/stipends/pay", response_model=PaidOut)
 async def stipends_pay(
     cohort_id: uuid.UUID,
     body: PeriodIn,
@@ -393,7 +415,7 @@ async def stipends_pay(
 
 
 # ---------- Cohort Composer ----------
-@router.post("/cohorts/{cohort_id}/composer/runs", status_code=201)
+@router.post("/cohorts/{cohort_id}/composer/runs", status_code=201, response_model=ComposerRunOut)
 async def composer_run(
     cohort_id: uuid.UUID,
     body: ComposerIn,
@@ -409,7 +431,7 @@ async def composer_run(
     return out
 
 
-@router.get("/cohorts/{cohort_id}/composer/runs")
+@router.get("/cohorts/{cohort_id}/composer/runs", response_model=list[ComposerRunOut])
 async def composer_runs(
     cohort_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -428,7 +450,7 @@ async def composer_runs(
     return [composer.run_out(r) for r in rows]
 
 
-@router.get("/composer/runs/{run_id}")
+@router.get("/composer/runs/{run_id}", response_model=ComposerRunDetailOut)
 async def composer_get(
     run_id: uuid.UUID, _: Principal = Depends(require("cohort.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -449,7 +471,7 @@ async def composer_get(
     return out
 
 
-@router.post("/composer/runs/{run_id}/apply")
+@router.post("/composer/runs/{run_id}/apply", response_model=ComposerAppliedOut)
 async def composer_apply(
     run_id: uuid.UUID,
     request: Request,

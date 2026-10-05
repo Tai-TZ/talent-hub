@@ -269,7 +269,7 @@ async def summary(
         months.setdefault(month_start.strftime("%Y-%m"), {})[cat] = float(total)
     for month_start, month_usd in (await db.session.execute(ai_month.where(*ai_filters))).all():
         months.setdefault(month_start.strftime("%Y-%m"), {})["ai"] = float(Decimal(str(month_usd)) * rate)
-    timeline = [{"month": m, "total": sum(v.values()), **v} for m, v in sorted(months.items())]
+    timeline = [{"month": m, "total": sum(v.values()), "by_category": v} for m, v in sorted(months.items())]
 
     total = sum(by_cat.values(), Decimal(0))
     budgets = (
@@ -350,7 +350,7 @@ async def ai_breakdown(db: OrgDb, *, group: str, limit: int = 31) -> list[dict[s
     ).all()
     return [
         {
-            "key": r[0],
+            "key": r[0].date().isoformat() if group == "day" else r[0],
             "cost_usd": round(float(r[1]), 4),
             "input_tokens": int(r[2]),
             "output_tokens": int(r[3]),

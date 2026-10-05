@@ -12,6 +12,25 @@ from pydantic import BaseModel, Field
 
 from src.api.deps import Principal, request_meta, require
 from src.errors import ValidationFailedError
+from src.schemas.responses.admin import (
+    AccountCreatedOut,
+    AccountPageOut,
+    AccountUpdatedOut,
+    AiUsageRowOut,
+    CostEntryOut,
+    CostEntryPageOut,
+    CostSummaryOut,
+    DocumentDetailOut,
+    DocumentOut,
+    DocumentPageOut,
+    ImportResultOut,
+    InviteLinkOut,
+    OverviewOut,
+    QueuedOut,
+    SearchHitOut,
+    SettingsOut,
+    SettingsValuesOut,
+)
 from src.services import accounts, costs, jobs, kb, org_settings, overview
 from src.services import email as email_svc
 from src.services.tenancy import OrgDb, org_db
@@ -20,7 +39,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 # ---------- Tổng quan ----------
-@router.get("/overview")
+@router.get("/overview", response_model=OverviewOut)
 async def get_overview(_: Principal = Depends(require("audit.read")), db: OrgDb = Depends(org_db)) -> dict[str, Any]:
     return await overview.overview(db)
 
@@ -30,13 +49,13 @@ class SettingsIn(BaseModel):
     values: dict[str, Any]
 
 
-@router.get("/settings")
+@router.get("/settings", response_model=SettingsOut)
 async def get_settings_(_: Principal = Depends(require("user.manage")), db: OrgDb = Depends(org_db)) -> dict[str, Any]:
     values = await org_settings.get_all(db)
     return {"values": values, "spec": {k: v[2] for k, v in org_settings.SPEC.items()}}
 
 
-@router.put("/settings")
+@router.put("/settings", response_model=SettingsValuesOut)
 async def put_settings(
     body: SettingsIn,
     request: Request,
@@ -81,7 +100,7 @@ class ImportIn(BaseModel):
     dry_run: bool = True
 
 
-@router.get("/users")
+@router.get("/users", response_model=AccountPageOut)
 async def list_users(
     q: str | None = Query(None, max_length=100),
     role: str | None = None,
@@ -102,7 +121,7 @@ async def list_users(
     }
 
 
-@router.post("/users", status_code=201)
+@router.post("/users", status_code=201, response_model=AccountCreatedOut)
 async def create_user(
     body: AccountIn,
     request: Request,
@@ -123,7 +142,7 @@ async def create_user(
     return out
 
 
-@router.post("/users/import")
+@router.post("/users/import", response_model=ImportResultOut)
 async def import_users(
     body: ImportIn,
     request: Request,
@@ -144,7 +163,7 @@ async def import_users(
     return out
 
 
-@router.patch("/users/{membership_id}")
+@router.patch("/users/{membership_id}", response_model=AccountUpdatedOut)
 async def patch_user(
     membership_id: uuid.UUID,
     body: AccountPatch,
@@ -164,7 +183,7 @@ async def patch_user(
     return out
 
 
-@router.post("/users/{membership_id}/invite")
+@router.post("/users/{membership_id}/invite", response_model=InviteLinkOut)
 async def resend_invite(
     membership_id: uuid.UUID,
     request: Request,
@@ -180,7 +199,7 @@ async def resend_invite(
     return out
 
 
-@router.post("/users/{membership_id}/reset-password", status_code=202)
+@router.post("/users/{membership_id}/reset-password", status_code=202, response_model=QueuedOut)
 async def reset_password(
     membership_id: uuid.UUID,
     request: Request,
@@ -204,7 +223,7 @@ class DocumentIn(BaseModel):
     content_base64: str
 
 
-@router.get("/documents")
+@router.get("/documents", response_model=DocumentPageOut)
 async def list_documents(
     status: str | None = Query(None, pattern="^(ready|failed|retired)$"),
     limit: int = Query(25, ge=1, le=100),
@@ -216,7 +235,7 @@ async def list_documents(
     return {"items": [kb.doc_out(d) for d in docs], "total": total}
 
 
-@router.post("/documents", status_code=201)
+@router.post("/documents", status_code=201, response_model=DocumentOut)
 async def add_document(
     body: DocumentIn,
     request: Request,
@@ -241,7 +260,7 @@ async def add_document(
     return out
 
 
-@router.get("/documents/{doc_id}")
+@router.get("/documents/{doc_id}", response_model=DocumentDetailOut)
 async def get_document(
     doc_id: uuid.UUID, _: Principal = Depends(require("kb.manage")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -249,7 +268,7 @@ async def get_document(
     return {**kb.doc_out(doc), "preview": await kb.preview_chunks(db, doc_id)}
 
 
-@router.post("/documents/{doc_id}/retire")
+@router.post("/documents/{doc_id}/retire", response_model=DocumentOut)
 async def retire_document(
     doc_id: uuid.UUID,
     request: Request,
@@ -262,7 +281,7 @@ async def retire_document(
     return out
 
 
-@router.post("/documents/{doc_id}/restore")
+@router.post("/documents/{doc_id}/restore", response_model=DocumentOut)
 async def restore_document(
     doc_id: uuid.UUID,
     request: Request,
@@ -275,7 +294,7 @@ async def restore_document(
     return out
 
 
-@router.get("/documents-search")
+@router.get("/documents-search", response_model=list[SearchHitOut])
 async def search_documents(
     q: str = Query(min_length=1, max_length=300),
     _: Principal = Depends(require("kb.manage")),
@@ -319,7 +338,7 @@ def _entry_out(e: Any) -> dict[str, Any]:
     }
 
 
-@router.get("/costs/summary")
+@router.get("/costs/summary", response_model=CostSummaryOut)
 async def costs_summary(
     cohort_id: uuid.UUID | None = None,
     date_from: date | None = None,
@@ -330,7 +349,7 @@ async def costs_summary(
     return await costs.summary(db, cohort_id=cohort_id, date_from=date_from, date_to=date_to)
 
 
-@router.get("/costs/entries")
+@router.get("/costs/entries", response_model=CostEntryPageOut)
 async def costs_entries(
     category: str | None = None,
     cohort_id: uuid.UUID | None = None,
@@ -347,7 +366,7 @@ async def costs_entries(
     return {"items": [_entry_out(e) for e in rows], "total": total}
 
 
-@router.post("/costs/entries", status_code=201)
+@router.post("/costs/entries", status_code=201, response_model=CostEntryOut)
 async def costs_add(
     body: CostIn, request: Request, principal: Principal = Depends(require("cost.manage")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -366,7 +385,7 @@ async def costs_add(
     return out
 
 
-@router.post("/costs/entries/{entry_id}/void")
+@router.post("/costs/entries/{entry_id}/void", response_model=CostEntryOut)
 async def costs_void(
     entry_id: uuid.UUID,
     body: VoidIn,
@@ -382,7 +401,7 @@ async def costs_void(
     return out
 
 
-@router.put("/costs/budgets")
+@router.put("/costs/budgets", response_model=QueuedOut)
 async def costs_budget(
     body: BudgetIn,
     request: Request,
@@ -401,7 +420,7 @@ async def costs_budget(
     return {"status": "saved"}
 
 
-@router.get("/costs/ai")
+@router.get("/costs/ai", response_model=list[AiUsageRowOut])
 async def costs_ai(
     group: str = Query("feature", pattern="^(feature|model|day)$"),
     _: Principal = Depends(require("cost.read")),

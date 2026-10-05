@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from src.api.deps import Principal, current_principal
 from src.models import Notification
+from src.schemas.responses.applicant import NotificationListOut
 from src.services import notifications as svc
 from src.services.tenancy import OrgDb, org_db
 
@@ -17,7 +18,7 @@ class ReadIn(BaseModel):
     id: uuid.UUID | None = None  # bỏ trống = đánh dấu đã đọc tất cả
 
 
-@router.get("")
+@router.get("", response_model=NotificationListOut)
 async def list_notifications(
     limit: int = Query(20, ge=1, le=50),
     principal: Principal = Depends(current_principal),

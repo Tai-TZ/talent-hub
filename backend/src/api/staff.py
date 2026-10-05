@@ -10,6 +10,16 @@ from sqlalchemy import select
 from src.api.deps import Principal, actor_of, request_meta, require
 from src.errors import NotFoundError
 from src.models import AiAssessment, Application, Decision, Intake, OrgMembership, Review, User
+from src.schemas.responses.staff import (
+    AdvanceOut,
+    ApprovalRowOut,
+    ProposalOut,
+    QueuePageOut,
+    ReviewSavedOut,
+    StaffApplicationOut,
+    StatusOut,
+    StatusVersionOut,
+)
 from src.services import applications as app_svc
 from src.services import decisions as decision_svc
 from src.services import reviews as review_svc
@@ -68,7 +78,7 @@ def _ai_out(a: AiAssessment) -> dict[str, Any]:
     }
 
 
-@router.get("/applications")
+@router.get("/applications", response_model=QueuePageOut, response_model_exclude_unset=True)
 async def staff_queue(
     intake_id: uuid.UUID,
     status: str | None = None,
@@ -102,7 +112,7 @@ async def staff_queue(
     return {"items": items, "next_cursor": next_cursor, "total": total, "blind_review": intake.blind_review}
 
 
-@router.get("/applications/{application_id}")
+@router.get("/applications/{application_id}", response_model=StaffApplicationOut)
 async def staff_application(
     application_id: uuid.UUID, principal: Principal = Depends(require("application.read")), db: OrgDb = Depends(org_db)
 ) -> dict[str, Any]:
@@ -205,7 +215,7 @@ async def staff_application(
     return view
 
 
-@router.put("/applications/{application_id}/review")
+@router.put("/applications/{application_id}/review", response_model=ReviewSavedOut)
 async def save_review(
     application_id: uuid.UUID,
     body: ReviewIn,
@@ -231,7 +241,7 @@ async def save_review(
     return out
 
 
-@router.post("/applications/{application_id}/advance")
+@router.post("/applications/{application_id}/advance", response_model=AdvanceOut)
 async def advance(
     application_id: uuid.UUID,
     body: VersionIn,
@@ -248,7 +258,7 @@ async def advance(
     return out
 
 
-@router.post("/applications/{application_id}/request-info")
+@router.post("/applications/{application_id}/request-info", response_model=StatusVersionOut)
 async def request_info(
     application_id: uuid.UUID,
     body: RequestInfoIn,
@@ -270,7 +280,7 @@ async def request_info(
     return out
 
 
-@router.post("/applications/{application_id}/proposals", status_code=201)
+@router.post("/applications/{application_id}/proposals", status_code=201, response_model=ProposalOut)
 async def propose(
     application_id: uuid.UUID,
     body: ProposalIn,
@@ -293,7 +303,7 @@ async def propose(
     return out
 
 
-@router.get("/approvals")
+@router.get("/approvals", response_model=list[ApprovalRowOut])
 async def approvals(
     intake_id: uuid.UUID | None = None,
     principal: Principal = Depends(require("decision.approve")),
@@ -337,7 +347,7 @@ async def approvals(
     return out
 
 
-@router.post("/decisions/{decision_id}/approve")
+@router.post("/decisions/{decision_id}/approve", response_model=StatusOut)
 async def approve(
     decision_id: uuid.UUID,
     body: ApproveIn,
@@ -363,7 +373,7 @@ async def approve(
     return out
 
 
-@router.post("/decisions/{decision_id}/return")
+@router.post("/decisions/{decision_id}/return", response_model=StatusOut)
 async def return_decision(
     decision_id: uuid.UUID,
     body: ReturnIn,

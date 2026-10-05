@@ -1,0 +1,104 @@
+"""Phản hồi cho phân tích: phễu, giám sát công bằng, Rubric Lab."""
+
+import uuid
+
+from src.schemas.responses.common import Out
+
+
+class FunnelIntake(Out):
+    id: uuid.UUID
+    name: str
+    quota: int
+    status: str
+
+
+class FunnelStage(Out):
+    key: str
+    label: str
+    count: int
+
+
+class FunnelOut(Out):
+    intake: FunnelIntake
+    by_status: dict[str, int]
+    stages: list[FunnelStage]
+    decisions: dict[str, int]
+    median_days_to_decision: float | None
+    quota_fill: float | None
+
+
+class GroupRates(Out):
+    rates: dict[str, float]
+    sizes: dict[str, int]
+    impact_ratio: float | None
+
+
+class FairnessIntake(Out):
+    id: uuid.UUID
+    name: str
+
+
+class FairnessOut(Out):
+    intake: FairnessIntake
+    stages: dict[str, dict[str, GroupRates]]
+    warnings: list[str]
+    note: str
+
+
+class LabCriterionDef(Out):
+    id: str
+    name: str
+    weight: float
+
+
+class LabCriterionStat(Out):
+    criterion: str
+    coef: float
+    ci90: list[float]
+    significant: bool
+    auc: float | None
+    mean_if_qualified: float
+    mean_if_not: float
+
+
+class LabAnalysis(Out):
+    n: int
+    events: int
+    qualified_rate: float | None = None
+    criteria: list[LabCriterionStat]
+    model_auc: float | None
+    warnings: list[str]
+    reliable: bool
+
+
+class ObservedRate(Out):
+    known: int
+    of: int
+    qualified_rate: float | None
+
+
+class LabSimulation(Out):
+    pool: int
+    selected: int
+    overlap_old_new: float
+    changed_in: int
+    overlap_actual_old: float
+    observed_old: ObservedRate
+    observed_new: ObservedRate
+    fairness_old: dict[str, GroupRates]
+    fairness_new: dict[str, GroupRates]
+    newly_selected_ids: list[str]
+    dropped_ids: list[str]
+    model_expected_old: float | None = None
+    model_expected_new: float | None = None
+    model_note: str | None = None
+
+
+class LabOut(Out):
+    criteria: list[LabCriterionDef]
+    analysis: LabAnalysis
+    pool: int
+    admitted: int
+    old_weights: dict[str, float]
+    simulation: LabSimulation | None = None
+    new_weights: dict[str, float] | None = None

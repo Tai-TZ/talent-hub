@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from src.api.deps import Principal, current_principal, request_meta
 from src.config import get_settings
 from src.errors import InvalidCredentialsError, InvalidRefreshTokenError, RateLimitedError
+from src.schemas.responses.common import InvitationPreviewOut
 from src.services import accounts
 from src.services import auth as auth_service
 from src.services.audit import RequestMeta
@@ -161,7 +162,7 @@ def _mask_email(email: str) -> str:
     return f"{local[:1]}{'*' * max(len(local) - 1, 2)}@{domain}"
 
 
-@router.get("/invitations/{token}")
+@router.get("/invitations/{token}", response_model=InvitationPreviewOut)
 async def invitation_preview(token: str, request: Request, db: OrgDb = Depends(org_db)) -> dict[str, object]:
     await _throttle_login(request, request_meta(request))
     _, membership, user = await accounts.accept_invitation(db, token=token, password=None)

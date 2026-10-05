@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from src.api.deps import Principal, actor_of, current_principal, request_meta, require
 from src.models import Application, Intake
+from src.schemas.responses.applicant import ApplicationSummaryOut, ApplicationViewOut, TimelineEventOut
 from src.services import applications as svc
 from src.services.intakes import get_intake
 from src.services.tenancy import OrgDb, org_db
@@ -50,7 +51,7 @@ def _summary(app: Application, intake: Intake) -> dict[str, Any]:
     }
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=ApplicationViewOut)
 async def create_application(
     body: CreateIn,
     request: Request,
@@ -71,7 +72,7 @@ async def create_application(
     return out
 
 
-@router.get("/mine")
+@router.get("/mine", response_model=list[ApplicationSummaryOut])
 async def my_applications(
     principal: Principal = Depends(require("application.read.own")), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
@@ -86,7 +87,7 @@ async def my_applications(
     return [_summary(app, intake) for app, intake in rows]
 
 
-@router.get("/{application_id}")
+@router.get("/{application_id}", response_model=ApplicationViewOut)
 async def get_my_application(
     application_id: uuid.UUID,
     principal: Principal = Depends(require("application.read.own")),
@@ -97,7 +98,7 @@ async def get_my_application(
     return svc.application_view(app, intake, can_see_pii=True, owner=True)
 
 
-@router.patch("/{application_id}")
+@router.patch("/{application_id}", response_model=ApplicationViewOut)
 async def save_application(
     application_id: uuid.UUID,
     body: PatchIn,
@@ -112,7 +113,7 @@ async def save_application(
     return out
 
 
-@router.post("/{application_id}/submit")
+@router.post("/{application_id}/submit", response_model=ApplicationViewOut)
 async def submit_application(
     application_id: uuid.UUID,
     body: SubmitIn,
@@ -135,7 +136,7 @@ async def submit_application(
     return out
 
 
-@router.post("/{application_id}/resubmit")
+@router.post("/{application_id}/resubmit", response_model=ApplicationViewOut)
 async def resubmit_application(
     application_id: uuid.UUID,
     body: VersionIn,
@@ -150,7 +151,7 @@ async def resubmit_application(
     return out
 
 
-@router.post("/{application_id}/withdraw")
+@router.post("/{application_id}/withdraw", response_model=ApplicationViewOut)
 async def withdraw_application(
     application_id: uuid.UUID,
     body: WithdrawIn,
@@ -166,7 +167,7 @@ async def withdraw_application(
     return out
 
 
-@router.get("/{application_id}/timeline")
+@router.get("/{application_id}/timeline", response_model=list[TimelineEventOut])
 async def application_timeline(
     application_id: uuid.UUID, principal: Principal = Depends(current_principal), db: OrgDb = Depends(org_db)
 ) -> list[dict[str, Any]]:
