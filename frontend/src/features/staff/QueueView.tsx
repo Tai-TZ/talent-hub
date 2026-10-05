@@ -70,7 +70,14 @@ export function QueueView() {
         {() => (
           <>
             <div className="toolbar">
-              <IntakePicker intakes={intakes} selected={selected} onSelect={select} />
+              <IntakePicker
+                intakes={intakes}
+                selected={selected}
+                onSelect={(id) => {
+                  setRound(""); // khoá vòng thuộc cấu hình từng đợt: giữ lại sẽ lọc theo một vòng không tồn tại
+                  select(id);
+                }}
+              />
               <SelectField label="Trạng thái" value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="">Tất cả</option>
                 {STATUS_OPTIONS.map((s) => (
