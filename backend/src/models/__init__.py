@@ -1,3 +1,4 @@
+from src.models.admin import Budget, CostEntry, EmailOutbox, Invitation, KbChunk, KbDocument, OrgSetting
 from src.models.admissions import (
     AiAssessment,
     AiUsage,
@@ -24,6 +25,13 @@ from src.models.identity import (
 )
 
 __all__ = [
+    "Budget",
+    "CostEntry",
+    "EmailOutbox",
+    "Invitation",
+    "KbChunk",
+    "KbDocument",
+    "OrgSetting",
     "AiAssessment",
     "AiUsage",
     "Application",
