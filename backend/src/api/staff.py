@@ -1,7 +1,7 @@
 """Khu vực nhân sự: hàng đợi, chấm điểm, chuyển vòng, đề xuất và phê duyệt."""
 
 import uuid
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
@@ -33,7 +33,8 @@ router = APIRouter(prefix="/staff", tags=["staff"])
 class ReviewIn(BaseModel):
     scores: dict[str, float] = Field(default_factory=dict)
     comment: str = Field(default="", max_length=4000)
-    recommendation: str | None = None
+    # Khớp ràng buộc recommendation_valid của DB; giá trị lạ trả 422 thay vì để DB ném lỗi (500).
+    recommendation: Literal["advance", "reject", "waitlist"] | None = None
     submit: bool = False
 
 
